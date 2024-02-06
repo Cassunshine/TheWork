@@ -2,8 +2,9 @@ package cassunshine.thework.rendering.blockentities.alchemy_block;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.NodeType;
+import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.NodeTypes;
+import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.NodeTypeRenderers;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import net.minecraft.client.render.RenderLayer;
@@ -14,9 +15,14 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+
 public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<AlchemyCircleBlockEntity> {
 
     private static final Identifier ALCHEMY_CIRCLE_TEXTURE = new Identifier(TheWorkMod.ModID, "textures/other/alchemy_circle.png");
+
+    private ArrayList<AlchemyNode> nodesToDraw = new ArrayList<>();
 
     public AlchemyCircleBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
 
@@ -32,14 +38,17 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         RenderingUtilities.setupRenderLayer(getLayer());
 
         try {
-            matrices.translate(0.5f, 1 / 32.0f, 0.5f);
+            RenderingUtilities.translateMatrix(0.5f, 1 / 32.0f, 0.5f);
 
-            for (int i = 0; i < entity.mainCircles.size(); i++) {
-                AlchemyCircleBlockEntity.MainCircle circle = entity.mainCircles.get(i);
-                AlchemyCircleBlockEntity.MainCircle nextCircle = i + 1 >= entity.mainCircles.size() ? null : entity.mainCircles.get(i + 1);
+            ArrayList<AlchemyRing> rings = entity.rings;
+            for (int i = 0; i < rings.size(); i++)
+                drawRing(rings.get(i), i + 1 >= rings.size() ? null : rings.get(i + 1));
 
-                drawMainCircle(circle, nextCircle == null ? -1 : nextCircle.radius);
+            nodesToDraw.sort(Comparator.comparing(a -> a.type.id));
+            for (AlchemyNode node : nodesToDraw) {
+                drawNode(node);
             }
+            nodesToDraw.clear();
 
         } catch (Exception e) {
             //Do nothing.
@@ -62,64 +71,86 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         return true;
     }
 
-    private void drawMainCircle(AlchemyCircleBlockEntity.MainCircle circle, float nextRadius) {
-        float anglePerNode = MathHelper.TAU / circle.nodes.length;
-        float lastAngle = 0;
+    private void drawRing(AlchemyRing ring, AlchemyRing nextRing) {
 
-        float smallCircleCover = ((0.5f / circle.circumference) * MathHelper.TAU);
-
-        for (int i = 0; i < circle.nodes.length; i++) {
-            NodeType node = circle.nodes[i];
-            NodeType nextNode = circle.nodes[(i + 1) % circle.nodes.length];
-
-            float thisAngle = node == NodeTypes.NONE ? lastAngle : lastAngle + smallCircleCover;
-            float nextAngle = nextNode == NodeTypes.NONE ? lastAngle + anglePerNode : lastAngle + anglePerNode - smallCircleCover;
-
-            float pipHeight = 0.1f;
-            float pipOffset = 0;
-
-            //Draw sub-circle
-            if (node != NodeTypes.NONE) {
-                RenderingUtilities.pushMat();
-                float drawX = MathHelper.sin(thisAngle - smallCircleCover) * circle.radius;
-                float drawZ = MathHelper.cos(thisAngle - smallCircleCover) * circle.radius;
-
-                RenderingUtilities.translateMatrix(drawX, 0, drawZ);
-
-                drawCircleSegment(0.5f, 0, MathHelper.TAU);
-
-                RenderingUtilities.rotateMatrix(0, -lastAngle, 0);
-                RenderingUtilities.translateMatrix(-0.5f, 0, -0.5f);
-
-                //Special node renderer, if any.
-                var renderer = NodeTypeRenderers.get(node.getClass());
-                if (renderer != null) {
-                    renderer.render(node);
-                    RenderingUtilities.setupRenderLayer(getLayer());
-                }
-
-
-                RenderingUtilities.popMat();
-
-                if (nextRadius > 0) {
-                    pipOffset = 0.5f;
-                    pipHeight = (nextRadius - circle.radius) - pipOffset;
-                } else {
-                    pipOffset = 0.5f;
-                }
-            }
-
-
-            if (pipHeight > 0.001f)
-                drawPip(circle.radius + pipOffset, lastAngle, 1 / 32.0f, pipHeight);
-
-            //Draw line to next sub-circle.
-            drawCircleSegment(circle.radius, thisAngle, nextAngle);
-            lastAngle += anglePerNode;
+        //Small circles just draw as-is.
+        if (ring.nodes.length == 0) {
+            drawCircleSegment(ring.radius, 0, MathHelper.TAU);
+            return;
         }
 
-        if (circle.nodes.length == 0)
-            drawCircleSegment(circle.radius, 0, MathHelper.TAU);
+        //How much angle between each node.
+        float anglePerNode = MathHelper.TAU / ring.nodes.length;
+        //The angle where the last node was drawn.
+        float lastAngle = 0;
+
+        //The size of the node's sub-circle, in angle.
+        float nodeSizeAngle = (0.5f / ring.circumference) * MathHelper.TAU;
+
+        for (int i = 0; i < ring.nodes.length; i++) {
+            //Current and nextRing node in the ring.
+            var currentNode = ring.getNode(i);
+            var nextNode = ring.getNode(i + 1);
+
+            //Angles of the line segment being drawn out of this node.
+            float segmentStartAngle = currentNode.type == NodeTypes.NONE ? lastAngle : lastAngle + nodeSizeAngle;
+            float segmentEndAngle = nextNode.type == NodeTypes.NONE ? lastAngle + anglePerNode : lastAngle + anglePerNode - nodeSizeAngle;
+
+            float pipOffset = 0;
+            float nextRadius = nextRing == null ? ring.radius + 0.1f : nextRing.getClosestRadius(lastAngle);
+            float pipHeight = (nextRadius - ring.radius);
+
+            //If the current node is special
+            if (currentNode.type != NodeTypes.NONE) {
+                //Draw circle.
+                RenderingUtilities.pushMat();
+
+                var pos = currentNode.position.subtract(currentNode.ring.position);
+                RenderingUtilities.translateMatrix((float)pos.x, 0, (float)pos.z);
+
+                drawCircleSegment(0.5f, 0, MathHelper.TAU);
+                RenderingUtilities.popMat();
+
+                //Calculate offset for pip
+                pipOffset += 0.5f;
+                pipHeight -= 0.5f;
+
+                //Queue up special renderer for later.
+                nodesToDraw.add(currentNode);
+
+                if(nextRing == null)
+                    pipHeight = 0;
+            } else {
+                pipHeight = 0.1f;
+            }
+
+            if(pipHeight > 0.0001)
+                drawPip(ring.radius + pipOffset, lastAngle, 1 / 32.0f, pipHeight);
+
+            //Draw segment.
+            drawCircleSegment(ring.radius, segmentStartAngle, segmentEndAngle);
+
+            float innerSign = ring.isClockwise ? 1/16.0f : -(1/16.0f);
+            drawSegmentPips(ring.radius, segmentStartAngle, segmentEndAngle, innerSign, innerSign);
+
+            //Increase angle by 1 node.
+            lastAngle += anglePerNode;
+        }
+    }
+
+    private void drawNode(AlchemyNode node) {
+        var customDraw = NodeTypeRenderers.get(node.type.getClass());
+
+        if(customDraw != null){
+            RenderingUtilities.pushMat();
+            var pos = node.position.subtract(node.ring.position);
+            RenderingUtilities.translateMatrix((float)pos.x, 0, (float)pos.z);
+            RenderingUtilities.rotateMatrix(0, -node.rotation, 0);
+
+            customDraw.render(node);
+
+            RenderingUtilities.popMat();
+        }
     }
 
     private void drawCircleSegment(float radius, float startAngle, float endAngle) {
@@ -160,6 +191,27 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             RenderingUtilities.saneVertex(nextSin * circleMin, 0, nextCos * circleMin, 255, 255, 255, startCircumference, 0, 0, 1, 0);
         }
     }
+
+    private void drawSegmentPips(float radius, float startAngle, float endAngle, float size, float offset) {
+
+        //Total circumference of the circle.
+        float totalCircumference = 2 * MathHelper.PI * radius;
+        //The length of the segment we're drawing.
+        float deltaCircumference = totalCircumference * (MathHelper.abs(startAngle - endAngle) / MathHelper.TAU);
+
+        //Draw 3 pip per block length
+        int drawSegments = MathHelper.ceil(deltaCircumference * 3);
+
+        if (radius < 1)
+            drawSegments *= 4;
+
+        for (int i = 1; i < drawSegments; i++) {
+            float angleThis = MathHelper.lerp(i / (float) drawSegments, startAngle, endAngle);
+
+            drawPip(radius + offset, angleThis, 1 / 32.0f, size);
+        }
+    }
+
 
     private void drawPip(float radius, float angle, float pipWidth, float pipHeight) {
         float circumference = 2 * MathHelper.PI * radius;

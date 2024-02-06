@@ -2,6 +2,8 @@ package cassunshine.thework.blockentities;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.jar.AlchemyJarBlockEntity;
+import cassunshine.thework.blocks.AlchemyJarBlock;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;
@@ -12,13 +14,16 @@ import net.minecraft.util.Identifier;
 public class TheWorkBlockEntities {
 
     public static final BlockEntityType<AlchemyCircleBlockEntity> ALCHEMY_CIRCLE_TYPE;
+    public static final BlockEntityType<AlchemyJarBlockEntity> ALCHEMY_JAR_TYPE;
 
     static {
         ALCHEMY_CIRCLE_TYPE = FabricBlockEntityTypeBuilder.create(AlchemyCircleBlockEntity::new, TheWorkBlocks.ALCHEMY_CIRCLE_BLOCK).build();
+        ALCHEMY_JAR_TYPE = FabricBlockEntityTypeBuilder.create(AlchemyJarBlockEntity::new, TheWorkBlocks.ALCHEMY_JAR_BLOCK).build();
     }
 
     public static void initialize() {
         registerBlockEntity(ALCHEMY_CIRCLE_TYPE, "alchemy_circle");
+        registerBlockEntity(ALCHEMY_JAR_TYPE, "alchemy_jar");
     }
 
 

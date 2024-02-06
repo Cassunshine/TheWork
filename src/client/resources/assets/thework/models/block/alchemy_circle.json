@@ -1,0 +1,6 @@
+{
+  "texture_size": [16, 16],
+  "textures": {
+    "particle": "thework:other/alchemy_circle"
+  }
+}

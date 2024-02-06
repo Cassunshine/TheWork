@@ -12,7 +12,7 @@ public class NodeTypes {
 
     public static final NodeType NONE = registerType("none", new NodeType());
     public static final NodeType TEST = registerType("test", new NodeType());
-
+    public static final NodeType ITEM = registerType("item", new ItemNodeType());
 
     public static void initialize() {
         for (var kvp : TheWorkElements.ELEMENT_HASH_MAP.entrySet()) {

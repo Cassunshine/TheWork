@@ -1,0 +1,6 @@
+{
+  "input" : "minecraft:stone",
+  "output" : {
+    "terra" : 8
+  }
+}

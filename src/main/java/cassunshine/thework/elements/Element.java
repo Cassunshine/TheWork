@@ -7,9 +7,12 @@ public class Element {
     public Identifier id;
     public int color;
 
-    public Element(String name, int color) {
-        id = new Identifier(TheWorkMod.ModID, name);
+    public Element(Identifier id, int color) {
+        this.id = id;
+    }
 
-        TheWorkElements.ELEMENT_HASH_MAP.put(id, this);
+    @Override
+    public String toString() {
+        return id.toString();
     }
 }

@@ -13,10 +13,12 @@ import net.minecraft.util.Identifier;
 public class TheWorkBlocks {
 
     public static final Block ALCHEMY_CIRCLE_BLOCK = new AlchemyCircleBlock();
+    public static final Block ALCHEMY_JAR_BLOCK = new AlchemyJarBlock();
 
 
     public static void initialize() {
         registerBlock(ALCHEMY_CIRCLE_BLOCK, "alchemy_circle");
+        registerBlockWithItem(ALCHEMY_JAR_BLOCK, "alchemy_jar");
     }
 
     private static void registerBlock(Block b, String name) {
@@ -25,6 +27,7 @@ public class TheWorkBlocks {
 
     private static void registerBlockWithItem(Block b, String name) {
         registerBlockWithItem(b, name, new FabricItemSettings());
+
     }
 
     private static void registerBlockWithItem(Block b, String name, Item.Settings itemSettings) {
