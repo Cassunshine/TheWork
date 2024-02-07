@@ -6,11 +6,11 @@ import net.minecraft.util.math.ColorHelper;
 
 import java.util.HashMap;
 
-public class TheWorkElements {
+public class Elements {
 
     public static final HashMap<Identifier, Element> ELEMENT_HASH_MAP = new HashMap<>();
 
-    public static final Element NONE = register("NONE", ColorHelper.Argb.getArgb(0, 0, 0, 0));
+    public static final Element NONE = register("none", ColorHelper.Argb.getArgb(0, 0, 0, 0));
 
     public static final Element IGNIS = register("ignis", ColorHelper.Argb.getArgb(255, 255, 255, 255));
     public static final Element TERRA = register("terra", ColorHelper.Argb.getArgb(255, 255, 255, 255));
@@ -30,6 +30,6 @@ public class TheWorkElements {
     }
 
     public static Element getElement(Identifier identifier) {
-        return ELEMENT_HASH_MAP.get(identifier);
+        return ELEMENT_HASH_MAP.getOrDefault(identifier, NONE);
     }
 }

@@ -45,6 +45,8 @@ public class RenderingUtilities {
     }
 
     public static void renderItem(ItemStack stack, World world, int light, int overlay) {
+        if(stack.isEmpty())
+            return;
         MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformationMode.GROUND, light, overlay, RenderingUtilities.stack, consumers, world, 0);
     }
 

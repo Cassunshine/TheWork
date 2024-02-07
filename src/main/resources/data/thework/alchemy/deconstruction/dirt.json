@@ -1,0 +1,6 @@
+{
+  "input" : "minecraft:dirt",
+  "output" : {
+    "terra" : 1
+  }
+}

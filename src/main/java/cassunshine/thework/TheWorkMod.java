@@ -1,33 +1,26 @@
 package cassunshine.thework;
 
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.NodeTypes;
+import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blocks.TheWorkBlocks;
-import cassunshine.thework.elements.TheWorkElements;
+import cassunshine.thework.elements.Elements;
 import cassunshine.thework.elements.recipes.TheWorkRecipes;
 import cassunshine.thework.entities.TheWorkEntities;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.TheWorkNetworking;
 import net.fabricmc.api.ModInitializer;
 
-import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.SimpleResourceReloadListener;
 import net.fabricmc.fabric.api.resource.SimpleSynchronousResourceReloadListener;
-import net.fabricmc.fabric.impl.event.interaction.InteractionEventsRouter;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.resource.ResourceType;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.profiler.Profiler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 
 public class TheWorkMod implements ModInitializer {
     public static final String ModID = "thework";
@@ -39,8 +32,8 @@ public class TheWorkMod implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        TheWorkElements.initialize();
-        NodeTypes.initialize();
+        Elements.initialize();
+        AlchemyNodeTypes.initialize();
 
         TheWorkEntities.initialize();
         TheWorkItems.initialize();
@@ -64,8 +57,8 @@ public class TheWorkMod implements ModInitializer {
         });
     }
 
-    public static void schedule(Runnable runnable){
-        synchronized (scheduledEvents){
+    public static void schedule(Runnable runnable) {
+        synchronized (scheduledEvents) {
             scheduledEvents.add(runnable);
         }
     }

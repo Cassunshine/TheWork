@@ -3,17 +3,22 @@ package cassunshine.thework.rendering.blockentities.alchemy_block;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.NodeTypes;
+import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
-import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.NodeTypeRenderers;
+import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.util.RenderingUtilities;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.LightmapTextureManager;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.LightType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,14 +40,31 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
         RenderingUtilities.pushMat();
         RenderingUtilities.setupConsumers(vertexConsumers);
-        RenderingUtilities.setupRenderLayer(getLayer());
+        RenderingUtilities.setupRenderLayer(getLayer(entity));
+
+        float time = entity.getWorld().getTime() + MinecraftClient.getInstance().getTickDelta();
 
         try {
             RenderingUtilities.translateMatrix(0.5f, 1 / 32.0f, 0.5f);
 
+            /*if (entity.isActive) {
+                entity.animationRotation += MinecraftClient.getInstance().getLastFrameDuration() * 0.1f;
+                entity.animationRotation %= MathHelper.TAU;
+            } else {
+                entity.animationRotation = MathHelper.lerpAngleDegrees(0.1f, (entity.animationRotation / MathHelper.TAU) * 360, 0);
+            }
+
+            RenderingUtilities.rotateMatrix(0, entity.animationRotation, 0);*/
+
+
             ArrayList<AlchemyRing> rings = entity.rings;
-            for (int i = 0; i < rings.size(); i++)
-                drawRing(rings.get(i), i + 1 >= rings.size() ? null : rings.get(i + 1));
+
+            for (int i = 0; i < rings.size(); i++) {
+                AlchemyRing nextRing = entity.isOutward ? (i + 1 >= rings.size() ? null : rings.get(i + 1)) : (i - 1 < 0 ? null : rings.get(i - 1));
+
+                drawRing(rings.get(i), nextRing, entity.isOutward);
+            }
+
 
             nodesToDraw.sort(Comparator.comparing(a -> a.type.id));
             for (AlchemyNode node : nodesToDraw) {
@@ -62,8 +84,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         return 999;
     }
 
-    public RenderLayer getLayer() {
-        return RenderLayer.getEntityCutoutNoCull(ALCHEMY_CIRCLE_TEXTURE);
+    public RenderLayer getLayer(AlchemyCircleBlockEntity entity) {
+        return entity.isActive ? RenderLayer.getEntityTranslucentEmissive(ALCHEMY_CIRCLE_TEXTURE) : RenderLayer.getEntityCutoutNoCull(ALCHEMY_CIRCLE_TEXTURE);
     }
 
     @Override
@@ -71,7 +93,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         return true;
     }
 
-    private void drawRing(AlchemyRing ring, AlchemyRing nextRing) {
+    private void drawRing(AlchemyRing ring, AlchemyRing nextRing, boolean outward) {
 
         //Small circles just draw as-is.
         if (ring.nodes.length == 0) {
@@ -93,44 +115,52 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             var nextNode = ring.getNode(i + 1);
 
             //Angles of the line segment being drawn out of this node.
-            float segmentStartAngle = currentNode.type == NodeTypes.NONE ? lastAngle : lastAngle + nodeSizeAngle;
-            float segmentEndAngle = nextNode.type == NodeTypes.NONE ? lastAngle + anglePerNode : lastAngle + anglePerNode - nodeSizeAngle;
+            float segmentStartAngle = currentNode.type == AlchemyNodeTypes.NONE ? lastAngle : lastAngle + nodeSizeAngle;
+            float segmentEndAngle = nextNode.type == AlchemyNodeTypes.NONE ? lastAngle + anglePerNode : lastAngle + anglePerNode - nodeSizeAngle;
+
+            float nextRadius = nextRing == null ? ring.radius + 0.1f : nextRing.radius;
+            nextRadius = nextRing == null ? nextRadius : nextRadius + (nextRadius - (nextRing.getClosestRadius(lastAngle))) * (outward ? -1 : 1);
 
             float pipOffset = 0;
-            float nextRadius = nextRing == null ? ring.radius + 0.1f : nextRing.getClosestRadius(lastAngle);
             float pipHeight = (nextRadius - ring.radius);
 
             //If the current node is special
-            if (currentNode.type != NodeTypes.NONE) {
+            if (currentNode.type != AlchemyNodeTypes.NONE) {
                 //Draw circle.
                 RenderingUtilities.pushMat();
 
-                var pos = currentNode.position.subtract(currentNode.ring.position);
-                RenderingUtilities.translateMatrix((float)pos.x, 0, (float)pos.z);
+                //Move rendering to where the alchemy node is in the world.
+                var pos = currentNode.position.subtract(ring.circle.fullPosition);
+                RenderingUtilities.translateMatrix((float) pos.x, 0, (float) pos.z);
 
-                drawCircleSegment(0.5f, 0, MathHelper.TAU);
+                var customDraw = AlchemyNodeTypeRenderers.get(currentNode.type);
+                int segments = customDraw == null ? 8 : customDraw.circleSides;
+
+                RenderingUtilities.rotateMatrix(0, lastAngle, 0);
+                //Draw a circle where the node is.
+                drawCircleSegment(0.5f, 0, MathHelper.TAU, segments);
                 RenderingUtilities.popMat();
 
                 //Calculate offset for pip
-                pipOffset += 0.5f;
-                pipHeight -= 0.5f;
+                pipOffset += outward ? 0.5f : -0.5f;
+                if (nextRing == null)
+                    pipHeight = 0;
+                else
+                    pipHeight += outward ? -0.5f : 0.5f;
 
                 //Queue up special renderer for later.
                 nodesToDraw.add(currentNode);
-
-                if(nextRing == null)
-                    pipHeight = 0;
             } else {
-                pipHeight = 0.1f;
+                pipHeight = outward ? 0.1f : -0.1f;
             }
 
-            if(pipHeight > 0.0001)
+            if (Math.abs(pipHeight) > 0.0001)
                 drawPip(ring.radius + pipOffset, lastAngle, 1 / 32.0f, pipHeight);
 
             //Draw segment.
             drawCircleSegment(ring.radius, segmentStartAngle, segmentEndAngle);
 
-            float innerSign = ring.isClockwise ? 1/16.0f : -(1/16.0f);
+            float innerSign = ring.isClockwise ? 1 / 16.0f : -(1 / 16.0f);
             drawSegmentPips(ring.radius, segmentStartAngle, segmentEndAngle, innerSign, innerSign);
 
             //Increase angle by 1 node.
@@ -139,18 +169,33 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
     }
 
     private void drawNode(AlchemyNode node) {
-        var customDraw = NodeTypeRenderers.get(node.type.getClass());
+        RenderingUtilities.pushMat();
 
-        if(customDraw != null){
-            RenderingUtilities.pushMat();
-            var pos = node.position.subtract(node.ring.position);
-            RenderingUtilities.translateMatrix((float)pos.x, 0, (float)pos.z);
-            RenderingUtilities.rotateMatrix(0, -node.rotation, 0);
+        //Move and rotate drawing to match node.
+        var pos = node.position.subtract(node.ring.circle.fullPosition);
+        RenderingUtilities.translateMatrix((float) pos.x, 0, (float) pos.z);
+        RenderingUtilities.rotateMatrix(0, node.rotation - MathHelper.PI, 0);
 
+        var customDraw = AlchemyNodeTypeRenderers.get(node.type);
+        if (customDraw != null)
             customDraw.render(node);
 
-            RenderingUtilities.popMat();
+        {
+
+
+            var world = node.ring.circle.getWorld();
+            var blockPos = BlockPos.ofFloored(node.position);
+            var light = LightmapTextureManager.pack(world.getLightLevel(LightType.BLOCK, blockPos), world.getLightLevel(LightType.SKY, blockPos));
+
+            float random = (node.position.hashCode() % 1000) / 100.0f;
+            float time = world.getTime() + MinecraftClient.getInstance().getTickDelta();
+            RenderingUtilities.rotateMatrix(0, (time + random) / 10.0f, 0);
+            RenderingUtilities.translateMatrix(0, (MathHelper.sin(((time * 0.05f) + random) % MathHelper.TAU) + 1) * 0.1f, 0);
+
+            RenderingUtilities.renderItem(node.item, node.ring.circle.getWorld(), light, OverlayTexture.DEFAULT_UV);
         }
+
+        RenderingUtilities.popMat();
     }
 
     private void drawCircleSegment(float radius, float startAngle, float endAngle) {
@@ -169,6 +214,37 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
         if (radius < 1)
             drawSegments *= 4;
+
+        float startCircumference = totalCircumference * (startAngle / MathHelper.TAU);
+
+        for (int i = 0; i < drawSegments; i++) {
+            float angleThis = MathHelper.lerp(i / (float) drawSegments, startAngle, endAngle);
+            float angleNext = MathHelper.lerp((i + 1) / (float) drawSegments, startAngle, endAngle);
+
+            float startSin = MathHelper.sin(angleThis);
+            float startCos = MathHelper.cos(angleThis);
+
+            float nextSin = MathHelper.sin(angleNext);
+            float nextCos = MathHelper.cos(angleNext);
+
+            RenderingUtilities.saneVertex(startSin * circleMin, 0, startCos * circleMin, 255, 255, 255, startCircumference, 0, 0, 1, 0);
+            RenderingUtilities.saneVertex(startSin * circleMax, 0, startCos * circleMax, 255, 255, 255, startCircumference, 0.125f, 0, 1, 0);
+
+            startCircumference += 1;
+
+            RenderingUtilities.saneVertex(nextSin * circleMax, 0, nextCos * circleMax, 255, 255, 255, startCircumference, 0.125f, 0, 1, 0);
+            RenderingUtilities.saneVertex(nextSin * circleMin, 0, nextCos * circleMin, 255, 255, 255, startCircumference, 0, 0, 1, 0);
+        }
+    }
+
+    private void drawCircleSegment(float radius, float startAngle, float endAngle, int drawSegments) {
+
+        float circleHalfThickness = 1 / 32.0f;
+        float circleMin = radius - circleHalfThickness;
+        float circleMax = radius + circleHalfThickness;
+
+        //Total circumference of the circle.
+        float totalCircumference = 2 * MathHelper.PI * radius;
 
         float startCircumference = totalCircumference * (startAngle / MathHelper.TAU);
 

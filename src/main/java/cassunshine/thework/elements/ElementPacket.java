@@ -1,10 +1,10 @@
 package cassunshine.thework.elements;
 
-public record ElementPacket(Element element, int amount) {
+public record ElementPacket(Element element, float amount) {
 
 
     @Override
     public String toString() {
-        return String.format("Element Packet %s %d", element, amount);
+        return String.format("Element Packet %s %f", element, amount);
     }
 }

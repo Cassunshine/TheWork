@@ -7,12 +7,17 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class AlchemyJarBlock extends BlockWithEntity {
 
@@ -41,5 +46,31 @@ public class AlchemyJarBlock extends BlockWithEntity {
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         return SHAPE;
+    }
+
+    //TODO - Keep inventory
+    @Override
+    public List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
+        return super.getDroppedStacks(state, builder);
+    }
+
+    /**
+     * Checks if a given item stack is either empty, or an empty jar.
+     */
+    public static boolean isEmptyOrEmptyJar(ItemStack stack) {
+        //If the stack is empty, it's empty, regardless.
+        if (stack.isEmpty())
+            return true;
+
+        //If the item isn't a block item, it's not empty jar.
+        if (!(stack.getItem() instanceof BlockItem bi))
+            return false;
+
+        //If the block isn't a jar, it's not an empty jar.
+        if (!(bi.getBlock() instanceof AlchemyJarBlock jar))
+            return false;
+
+        //TODO - Check emptiness of jar.
+        return true;
     }
 }

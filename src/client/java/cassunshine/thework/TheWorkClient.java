@@ -1,8 +1,9 @@
 package cassunshine.thework;
 
 import cassunshine.thework.blocks.TheWorkBlocks;
+import cassunshine.thework.client.networking.TheWorkClientNetworking;
 import cassunshine.thework.rendering.blockentities.TheWorkBlockEntityRenderers;
-import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.NodeTypeRenderers;
+import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.entities.TheWorkEntityRenderers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -17,8 +18,9 @@ public class TheWorkClient implements ClientModInitializer {
     public void onInitializeClient() {
         TheWorkBlockEntityRenderers.initialize();
         TheWorkEntityRenderers.initialize();
+        TheWorkClientNetworking.initialize();
 
-        NodeTypeRenderers.initialize();
+        AlchemyNodeTypeRenderers.initialize();
 
         BlockRenderLayerMap.INSTANCE.putBlock(TheWorkBlocks.ALCHEMY_JAR_BLOCK, RenderLayer.getTranslucent());
     }
