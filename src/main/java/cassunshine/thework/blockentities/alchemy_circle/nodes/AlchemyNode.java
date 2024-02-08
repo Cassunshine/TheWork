@@ -3,15 +3,17 @@ package cassunshine.thework.blockentities.alchemy_circle.nodes;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleComponent;
+import cassunshine.thework.blockentities.alchemy_circle.events.node.AlchemyNodeEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.node.NodeSwapItemEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.node.UpdateRuneOrTypeEvent;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeType;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.Elements;
 import cassunshine.thework.elements.inventory.ElementInventory;
 import cassunshine.thework.items.TheWorkItems;
+import cassunshine.thework.network.events.TheWorkNetworkEvent;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -19,6 +21,7 @@ import net.minecraft.item.Items;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.Pair;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
@@ -34,6 +37,11 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public final AlchemyRing ring;
 
     /**
+     * Index of this node in the parent ring's list of nodes.
+     */
+    public final int index;
+
+    /**
      * 3D position of the node.
      */
     public final Vec3d position;
@@ -46,12 +54,12 @@ public class AlchemyNode implements AlchemyCircleComponent {
     /**
      * The output of this node that will be transferred to the next node in the ring at the end of the tick.
      */
-    public final ElementInventory nextNodeOutput = new ElementInventory(1);
+    public final ElementInventory nextNodeOutput = new ElementInventory(2);
 
     /**
      * The output of this node that will be transferred to the parallel ring at the end of the tick.
      */
-    public final ElementInventory parallelOutput = new ElementInventory(1);
+    public final ElementInventory parallelOutput = new ElementInventory(2);
 
     /**
      * Rotation angle of the node.
@@ -84,14 +92,16 @@ public class AlchemyNode implements AlchemyCircleComponent {
      */
     public int cooldown = 0;
 
-    public AlchemyNode(float rotation, AlchemyRing ring) {
+    public AlchemyNode(float rotation, int index, AlchemyRing ring) {
         this.ring = ring;
         this.rotation = rotation;
+        this.index = index;
 
         this.position = ring.getRadialPosition(rotation);
     }
 
-    private void setType(AlchemyNodeType newType) {
+    public void setType(Identifier newTypeID) {
+        var newType = AlchemyNodeTypes.getType(newTypeID);
         if (newType != type) {
             type = newType;
 
@@ -105,11 +115,11 @@ public class AlchemyNode implements AlchemyCircleComponent {
         }
     }
 
-    private void setRune(Identifier id) {
-        if (rune != id) {
-            rune = id;
+    public void setRune(Identifier newRune) {
+        if (rune != newRune) {
+            rune = newRune;
 
-            //Drop item due to changed type.
+            //Drop item due to changed rune.
             if (!item.isEmpty()) {
                 ItemEntity entity = new ItemEntity(ring.circle.getWorld(), position.x, position.y, position.z, item.copyAndEmpty());
                 ring.circle.getWorld().spawnEntity(entity);
@@ -117,7 +127,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
         }
     }
 
-    private String getFirstPage(ItemUsageContext context) {
+    private Pair<Identifier, Identifier> getDesiredPair(ItemUsageContext context) {
         Hand oppositeHand = context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND;
         ItemStack offhandStack = context.getPlayer().getStackInHand(oppositeHand);
 
@@ -128,47 +138,19 @@ public class AlchemyNode implements AlchemyCircleComponent {
             NbtList list = offhandStack.getNbt().getList("pages", NbtElement.STRING_TYPE);
 
             //Get string from book, trim whitespaces.
-            String firstPage = list.getString(0);
-            firstPage = firstPage.trim();
+            var firstPageLines = list.getString(0).split("\\s");
 
-            return firstPage;
+            if (firstPageLines.length == 0)
+                return null;
+            else if (firstPageLines.length == 1)
+                return new Pair<>(new Identifier(TheWorkMod.ModID, firstPageLines[0]), new Identifier(TheWorkMod.ModID, "none"));
+            else
+                return new Pair<>(new Identifier(TheWorkMod.ModID, firstPageLines[0]), new Identifier(TheWorkMod.ModID, firstPageLines[1]));
         } catch (Exception e) {
             //Ignore
         }
 
         return null;
-    }
-
-    /**
-     * Uses the off-hand item to determine the type of rune (written book for now)
-     */
-    private AlchemyNodeType getDesiredNodeType(ItemUsageContext context) {
-        var firstPage = getFirstPage(context);
-
-        if (firstPage == null)
-            return AlchemyNodeTypes.NONE;
-
-        var potentialID = new Identifier(TheWorkMod.ModID, firstPage);
-
-        var newType = AlchemyNodeTypes.getType(potentialID);
-
-        return newType == type ? AlchemyNodeTypes.NONE : newType;
-    }
-
-    private Identifier getDesiredRune(ItemUsageContext context) {
-        var firstPage = getFirstPage(context);
-
-        if (firstPage == null)
-            return new Identifier(TheWorkMod.ModID, "none");
-
-        var potentialID = new Identifier(TheWorkMod.ModID, firstPage);
-
-        if (potentialID.equals(rune))
-            return new Identifier(TheWorkMod.ModID, "none");
-
-        var element = Elements.getElement(potentialID);
-
-        return element != Elements.NONE ? potentialID : new Identifier(TheWorkMod.ModID, "none");
     }
 
     @Override
@@ -209,43 +191,36 @@ public class AlchemyNode implements AlchemyCircleComponent {
     }
 
     @Override
-    public boolean handleInteraction(ItemUsageContext context) {
+    public TheWorkNetworkEvent generateInteractionEvent(ItemUsageContext context) {
         Vec3d interactPos = context.getHitPos().withAxis(Direction.Axis.Y, position.y);
 
         //Nodes have a radius of 0.5 blocks
         if (interactPos.distanceTo(position) > 0.5f)
-            return false;
+            return TheWorkNetworkEvents.NONE;
 
         //Change the type, if we're holding chalk.
         if (context.getStack().getItem() == TheWorkItems.CHALK_ITEM) {
-            var newType = getDesiredNodeType(context);
-            var newRune = getDesiredRune(context);
+            var newTypeAndRune = getDesiredPair(context);
 
-            //If the new rune is different from the old one, set it.
-            if (!newRune.equals(rune))
-                setRune(newRune);
-            else
-                setType(newType);
-
-            return true;
+            if (newTypeAndRune != null && (newTypeAndRune.getLeft() != type.id || newTypeAndRune.getRight() != rune))
+                return new UpdateRuneOrTypeEvent(newTypeAndRune.getLeft(), newTypeAndRune.getRight(), this);
         }
 
-
-        //If we're not setting the type, try to interact with it.
-        if (type.handleInteraction(this, context))
-            return true;
-
-        //If nothing else is handled, swap the item in the node.
+        //If nothing else is handled, try swapping items.
         if (type.requireInteractionEntity) {
-            var hand = context.getStack().copyAndEmpty();
-            var inv = item.copyAndEmpty();
-
-            context.getPlayer().equipStack(context.getHand() == Hand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND, inv);
-            item = hand;
-            rune = new Identifier(TheWorkMod.ModID, "none");
+            return new NodeSwapItemEvent(context.getPlayer().getStackInHand(Hand.MAIN_HAND), item, context.getPlayer(), this);
         }
 
         //Still handle the input, in either case.
+        return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public boolean handleEvent(TheWorkNetworkEvent interaction) {
+        if (!(interaction instanceof AlchemyNodeEvent nodeEvent))
+            return false;
+
+        nodeEvent.applyToNode(this);
         return true;
     }
 
@@ -271,7 +246,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     @Override
     public void readNbt(NbtCompound nbt) {
-        setType(AlchemyNodeTypes.getType(new Identifier(nbt.getString("type"))));
+        setType(new Identifier(nbt.getString("type")));
         setRune(new Identifier(nbt.getString("rune")));
 
         inventory.readNbt(nbt.getCompound("inventory"));

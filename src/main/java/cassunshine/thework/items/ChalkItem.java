@@ -49,12 +49,10 @@ public class ChalkItem extends Item {
             attemptDrawCircle(x, usedBlock == TheWorkBlocks.ALCHEMY_CIRCLE_BLOCK ? y : y + 1, z, dist, context.getWorld());
         } else {
 
-            //First, attempt to interact with any alchemy circles that may be on the same y-level as this interaction.
-            var maybeCircle = AlchemyCircles.searchForNearestHorizontal(context.getBlockPos().add(0, 1, 0), context.getWorld());
-
-            if (maybeCircle != null)
-                if (maybeCircle.handleInteraction(context))
-                    return ActionResult.SUCCESS;
+            //Try to interact with alchemy circles in-world first.
+            var interactionResult = AlchemyCircles.handleNearestInteraction(context);
+            if (interactionResult)
+                return ActionResult.SUCCESS;
 
             //If not, draw a new circle.
             int[] pos = new int[]{

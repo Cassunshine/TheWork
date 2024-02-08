@@ -12,10 +12,10 @@ public class Elements {
 
     public static final Element NONE = register("none", ColorHelper.Argb.getArgb(0, 0, 0, 0));
 
-    public static final Element IGNIS = register("ignis", ColorHelper.Argb.getArgb(255, 255, 255, 255));
-    public static final Element TERRA = register("terra", ColorHelper.Argb.getArgb(255, 255, 255, 255));
-    public static final Element AQUA = register("aqua", ColorHelper.Argb.getArgb(255, 255, 255, 255));
-    public static final Element VENTUS = register("ventus", ColorHelper.Argb.getArgb(255, 255, 255, 255));
+    public static final Element IGNIS = register("ignis", ColorHelper.Argb.getArgb(255, 245, 149, 66));
+    public static final Element TERRA = register("terra", ColorHelper.Argb.getArgb(255, 102, 74, 49));
+    public static final Element AQUA = register("aqua", ColorHelper.Argb.getArgb(255, 20, 194, 252));
+    public static final Element VENTUS = register("ventus", ColorHelper.Argb.getArgb(255, 217, 252, 238));
 
     public static void initialize() {
 

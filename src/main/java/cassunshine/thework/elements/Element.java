@@ -9,6 +9,7 @@ public class Element {
 
     public Element(Identifier id, int color) {
         this.id = id;
+        this.color = color;
     }
 
     @Override

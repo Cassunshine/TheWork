@@ -3,9 +3,15 @@ package cassunshine.thework.blockentities.alchemy_circle.rings;
 
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleComponent;
+import cassunshine.thework.blockentities.alchemy_circle.events.circle.SetCircleOutwardEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.node.AlchemyNodeEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.ring.AlchemyRingEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.ring.SetRingClockwiseEvent;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.items.TheWorkItems;
+import cassunshine.thework.network.events.TheWorkNetworkEvent;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.*;
 import net.minecraft.util.math.*;
@@ -19,6 +25,8 @@ public class AlchemyRing implements AlchemyCircleComponent {
      * The block entity that holds this alchemy ring.
      */
     public final AlchemyCircleBlockEntity circle;
+
+    public int index;
 
     /**
      * Radius of the ring.
@@ -62,7 +70,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
 
             for (int i = 0; i < nodes.length; i++) {
                 float angle = (i / (float) nodes.length) * MathHelper.TAU;
-                nodes[i] = new AlchemyNode(angle, this);
+                nodes[i] = new AlchemyNode(angle, i, this);
             }
         }
     }
@@ -202,20 +210,14 @@ public class AlchemyRing implements AlchemyCircleComponent {
      * @return True if the interaction was handled, false otherwise.
      */
     @Override
-    public boolean handleInteraction(ItemUsageContext context) {
+    public TheWorkNetworkEvent generateInteractionEvent(ItemUsageContext context) {
         Vec3d interactPos = context.getHitPos().withAxis(Direction.Axis.Y, getPosition().y);
-
-        //Interaction relative to this ring.
         Vec3d delta = interactPos.subtract(getPosition());
-
-        float distFromCenter = (float) delta.length();
-
-        //Distance that interaction is from the ring itself.
-        float difference = distFromCenter - radius;
+        float difference = (float) delta.length() - radius;
 
         //If interaction point is outside this ring, we don't handle it.
         boolean intersection = intersects(context.getBlockPos().add(context.getSide().getVector()));
-        if (!intersection) return false;
+        if (!intersection) return TheWorkNetworkEvents.NONE;
 
         delta = delta.normalize();
 
@@ -229,21 +231,28 @@ public class AlchemyRing implements AlchemyCircleComponent {
         int nearestIndex = getNearestNodeIndex(angle);
         AlchemyNode node = nodes[nearestIndex];
 
-        if (node.handleInteraction(context)) return true;
+        var nodeEvent = node.generateInteractionEvent(context);
+        if (nodeEvent != TheWorkNetworkEvents.NONE)
+            return nodeEvent;
 
         //If interacting with chalk, you can change the direction of the ring.
         if (context.getStack().getItem() == TheWorkItems.CHALK_ITEM) {
             if (context.getPlayer().isSneaking()) {
-                circle.isOutward = !circle.isOutward;
+                return new SetCircleOutwardEvent(!circle.isOutward, circle);
             } else {
-                if (difference > 0) {
-                    isClockwise = true;
-                } else {
-                    isClockwise = false;
-                }
+                return new SetRingClockwiseEvent(difference > 0, this);
             }
         }
 
+        return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public boolean handleEvent(TheWorkNetworkEvent interaction) {
+        if (!(interaction instanceof AlchemyRingEvent nodeEvent))
+            return false;
+
+        nodeEvent.applyToRing(this);
         return true;
     }
 

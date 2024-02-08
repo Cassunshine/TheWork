@@ -2,25 +2,26 @@ package cassunshine.thework.blockentities.alchemy_circle;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
+import cassunshine.thework.blockentities.alchemy_circle.events.circle.AlchemyCircleEvent;
+import cassunshine.thework.blockentities.alchemy_circle.events.node.AlchemyNodeEvent;
 import cassunshine.thework.blockentities.alchemy_circle.layout.AlchemyCircleLayout;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
 import cassunshine.thework.entities.InteractionPointEntity;
 import cassunshine.thework.entities.TheWorkEntities;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import cassunshine.thework.network.events.TheWorkNetworkEvent;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -102,8 +103,10 @@ public class AlchemyCircleBlockEntity extends BlockEntity implements AlchemyCirc
 
         int lastIndex = isOutward ? rings.size() - 1 : 0;
 
-        for (int i = 0; i < rings.size(); i++)
+        for (int i = 0; i < rings.size(); i++) {
+            rings.get(i).index = i;
             rings.get(i).hasNextRing = i != lastIndex;
+        }
 
         updateLayouts();
     }
@@ -243,16 +246,24 @@ public class AlchemyCircleBlockEntity extends BlockEntity implements AlchemyCirc
     }
 
     @Override
-    public boolean handleInteraction(ItemUsageContext context) {
-        for (AlchemyRing ring : rings)
-            if (ring.handleInteraction(context)) {
-                markDirty();
+    public TheWorkNetworkEvent generateInteractionEvent(ItemUsageContext context) {
+        for (AlchemyRing ring : rings) {
+            var event = ring.generateInteractionEvent(context);
 
-                updateLayouts();
-                return true;
-            }
+            if (event != TheWorkNetworkEvents.NONE)
+                return event;
+        }
 
-        return false;
+        return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public boolean handleEvent(TheWorkNetworkEvent interaction) {
+        if (!(interaction instanceof AlchemyCircleEvent event))
+            return false;
+
+        event.applyToCircle(this);
+        return true;
     }
 
     @Override

@@ -1,9 +1,9 @@
 package cassunshine.thework.entities;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircles;
+import cassunshine.thework.blockentities.alchemy_circle.events.circle.AlchemyCircleEvent;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -12,7 +12,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.decoration.InteractionEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
@@ -102,8 +101,10 @@ public class InteractionPointEntity extends Entity {
         if (circle == null)
             return ActionResult.PASS;
 
+        //Create an ItemUsageContext to generate an event from.
         BlockHitResult bhr = (BlockHitResult) player.raycast(PlayerEntity.getReachDistance(player.isCreative()), 0, false);
         ItemUsageContext ctx = new ItemUsageContext(player.getWorld(), player, Hand.MAIN_HAND, player.getMainHandStack(), bhr);
-        return circle.handleInteraction(ctx) ? ActionResult.SUCCESS : ActionResult.PASS;
+
+        return AlchemyCircles.generateAndSendEvent(circle, ctx) ? ActionResult.SUCCESS : ActionResult.PASS;
     }
 }

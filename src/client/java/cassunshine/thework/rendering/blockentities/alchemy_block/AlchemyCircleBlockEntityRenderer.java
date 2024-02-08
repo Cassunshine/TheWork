@@ -5,8 +5,12 @@ import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity
 import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
 import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
+import cassunshine.thework.elements.Element;
+import cassunshine.thework.particles.TheWorkParticles;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
+import cassunshine.thework.rendering.particles.RadialParticle;
 import cassunshine.thework.rendering.util.RenderingUtilities;
+import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
@@ -15,6 +19,8 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.command.argument.ParticleEffectArgumentType;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -71,7 +77,6 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
                 drawNode(node);
             }
             nodesToDraw.clear();
-
         } catch (Exception e) {
             //Do nothing.
         } finally {
@@ -108,6 +113,9 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
         //The size of the node's sub-circle, in angle.
         float nodeSizeAngle = (0.5f / ring.circumference) * MathHelper.TAU;
+
+        var ringPos = ring.circle.fullPosition.add(0, 0.1f, 0);
+        var random = ring.circle.getWorld().random;
 
         for (int i = 0; i < ring.nodes.length; i++) {
             //Current and nextRing node in the ring.
@@ -150,6 +158,27 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
                 //Queue up special renderer for later.
                 nodesToDraw.add(currentNode);
+
+                //Draw particles for each element in this node's inventory, if the circle is active.
+                if (ring.circle.isActive && !MinecraftClient.getInstance().isPaused()) {
+                    for (var entry : currentNode.inventory.amounts.object2FloatEntrySet()) {
+                        if (random.nextInt(10) < 8)
+                            continue;
+
+                        var particleStart = MathHelper.lerp(random.nextFloat(), 0, MathHelper.TAU);
+
+                        RadialParticle.color = entry.getKey().color;
+                        //Draw particles
+                        ring.circle.getWorld().addParticle(
+                                TheWorkParticles.RADIAL_ELEMENT,
+                                currentNode.position.getX() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f),
+                                currentNode.position.getY() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f) + 0.1f,
+                                currentNode.position.getZ() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f),
+                                0.5f, particleStart, particleStart + MathHelper.TAU
+                        );
+                    }
+                }
+
             } else {
                 pipHeight = outward ? 0.1f : -0.1f;
             }
@@ -162,6 +191,32 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
             float innerSign = ring.isClockwise ? 1 / 16.0f : -(1 / 16.0f);
             drawSegmentPips(ring.radius, segmentStartAngle, segmentEndAngle, innerSign, innerSign);
+
+
+            if (!ring.isClockwise) {
+                segmentStartAngle -= nodeSizeAngle * 2;
+                segmentEndAngle = segmentStartAngle + ((segmentEndAngle - segmentStartAngle) * (ring.isClockwise ? 1 : -1));
+                segmentEndAngle += nodeSizeAngle * 2;
+            }
+
+            //Spawn particles for path to next node.
+            if (ring.circle.isActive && !MinecraftClient.getInstance().isPaused()) {
+                for (var entry : currentNode.nextNodeOutput.amounts.object2FloatEntrySet()) {
+                    if (random.nextInt(10) < 3)
+                        continue;
+
+                    RadialParticle.color = entry.getKey().color;
+
+                    //Draw particles
+                    ring.circle.getWorld().addParticle(
+                            TheWorkParticles.RADIAL_ELEMENT,
+                            ringPos.getX() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f),
+                            ringPos.getY() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f),
+                            ringPos.getZ() + MathHelper.lerp(random.nextFloat(), -0.05f, 0.05f),
+                            ring.radius, segmentStartAngle, segmentEndAngle
+                    );
+                }
+            }
 
             //Increase angle by 1 node.
             lastAngle += anglePerNode;
@@ -180,9 +235,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         if (customDraw != null)
             customDraw.render(node);
 
-        {
-
-
+        if (!node.item.isEmpty()) {
             var world = node.ring.circle.getWorld();
             var blockPos = BlockPos.ofFloored(node.position);
             var light = LightmapTextureManager.pack(world.getLightLevel(LightType.BLOCK, blockPos), world.getLightLevel(LightType.SKY, blockPos));

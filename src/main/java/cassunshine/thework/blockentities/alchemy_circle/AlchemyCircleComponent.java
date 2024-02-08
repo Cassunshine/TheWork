@@ -1,9 +1,8 @@
 package cassunshine.thework.blockentities.alchemy_circle;
 
+import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
-
-import java.util.ArrayList;
 
 /**
  * Common events shared between pieces of the alchemy circle will call recursively, so they're stored here.
@@ -42,6 +41,14 @@ public interface AlchemyCircleComponent {
 
     /**
      * Tries to handle a player right-clicking this circle.
+     * <p>
+     * May generate an interaction event, but itself does nothing.
+     * Interaction event will be relayed to server and other clients to make sure everyone remains in sync.
      */
-    boolean handleInteraction(ItemUsageContext context);
+    TheWorkNetworkEvent generateInteractionEvent(ItemUsageContext context);
+
+    /**
+     * Handles an alchemy circle event to update the state of the alchemy circle.
+     */
+    boolean handleEvent(TheWorkNetworkEvent interaction);
 }

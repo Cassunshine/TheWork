@@ -1,7 +1,7 @@
 package cassunshine.thework.blockentities.alchemy_circle;
 
-import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.items.TheWorkItems;
+import cassunshine.thework.blockentities.alchemy_circle.events.circle.AlchemyCircleEvent;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -86,18 +86,25 @@ public class AlchemyCircles {
                 target.add(circle);
     }
 
-    public static boolean handleInteraction(ItemUsageContext context) {
-        //Pass chalk events to itself.
-        if(context.getStack().getItem() == TheWorkItems.CHALK_ITEM) return false;
+    public static boolean handleNearestInteraction(ItemUsageContext context) {
+        var nearestCircle = searchForNearestHorizontal(context.getBlockPos().add(0, 1, 0), context.getWorld());
 
+        if (nearestCircle == null)
+            return false;
 
-        //Try to interact with the nearest alchemy circle.
-        var maybeCircle = AlchemyCircles.searchForNearestHorizontal(context.getBlockPos().add(context.getSide().getVector()), context.getWorld());
-        if (maybeCircle != null)
-            if (maybeCircle.handleInteraction(context))
-                return true;
+        return generateAndSendEvent(nearestCircle, context);
+    }
 
-        return false;
+    public static boolean generateAndSendEvent(AlchemyCircleBlockEntity alchemyCircle, ItemUsageContext context) {
+        var event = alchemyCircle.generateInteractionEvent(context);
+
+        //Client generates no events.
+        if (context.getWorld().isClient)
+            return event != TheWorkNetworkEvents.NONE;
+
+        //Send alchemy circle events to players observing the circle.
+        TheWorkNetworkEvents.sendEvent(alchemyCircle.getPos(), alchemyCircle.getWorld(), event);
+        return event != TheWorkNetworkEvents.NONE;
     }
 
 }

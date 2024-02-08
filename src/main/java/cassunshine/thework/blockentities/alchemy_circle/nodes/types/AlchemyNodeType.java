@@ -28,18 +28,11 @@ public class AlchemyNodeType {
      */
     public void operate(AlchemyNode node) {
         //Output from inventory to outputs.
-        node.inventory.transferAll(node.nextNodeOutput, 1);
-        if (node.ring.hasNextRing) node.inventory.transferAll(node.parallelOutput, 1);
+        node.inventory.transferAll(node.nextNodeOutput, 2);
+        if (node.ring.hasNextRing) node.inventory.transferAll(node.parallelOutput, 2);
     }
 
     public void stop(AlchemyNode node) {
 
-    }
-
-    /**
-     * Handles interaction when the player right-clicks a node with this type.
-     */
-    public boolean handleInteraction(AlchemyNode node, ItemUsageContext context) {
-        return false;
     }
 }
