@@ -1,6 +1,6 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block.nodes;
 
-import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
+import cassunshine.thework.blockentities.alchemycircle.nodes.AlchemyNode;
 
 public class AlchemyNodeTypeRenderer {
 

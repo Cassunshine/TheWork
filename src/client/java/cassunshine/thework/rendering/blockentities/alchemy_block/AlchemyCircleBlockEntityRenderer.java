@@ -1,16 +1,14 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block;
 
 import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
-import cassunshine.thework.blockentities.alchemy_circle.rings.AlchemyRing;
-import cassunshine.thework.elements.Element;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.alchemycircle.nodes.AlchemyNode;
+import cassunshine.thework.blockentities.alchemycircle.nodes.types.AlchemyNodeTypes;
+import cassunshine.thework.blockentities.alchemycircle.rings.AlchemyRing;
 import cassunshine.thework.particles.TheWorkParticles;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.particles.RadialParticle;
 import cassunshine.thework.rendering.util.RenderingUtilities;
-import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
@@ -19,8 +17,6 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.command.argument.ParticleEffectArgumentType;
-import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -313,9 +309,6 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
             RenderingUtilities.saneVertex(startSin * circleMin, 0, startCos * circleMin, 255, 255, 255, startCircumference, 0, 0, 1, 0);
             RenderingUtilities.saneVertex(startSin * circleMax, 0, startCos * circleMax, 255, 255, 255, startCircumference, 0.125f, 0, 1, 0);
-
-            startCircumference += 1;
-
             RenderingUtilities.saneVertex(nextSin * circleMax, 0, nextCos * circleMax, 255, 255, 255, startCircumference, 0.125f, 0, 1, 0);
             RenderingUtilities.saneVertex(nextSin * circleMin, 0, nextCos * circleMin, 255, 255, 255, startCircumference, 0, 0, 1, 0);
         }

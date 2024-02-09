@@ -1,7 +1,7 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block.nodes;
 
-import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeType;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
+import cassunshine.thework.blockentities.alchemycircle.nodes.types.AlchemyNodeType;
+import cassunshine.thework.blockentities.alchemycircle.nodes.types.AlchemyNodeTypes;
 
 import java.util.HashMap;
 

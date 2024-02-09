@@ -1,6 +1,6 @@
 package cassunshine.thework.blocks;
 
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;

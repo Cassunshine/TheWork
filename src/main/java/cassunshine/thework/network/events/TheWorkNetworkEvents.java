@@ -1,11 +1,11 @@
 package cassunshine.thework.network.events;
 
-import cassunshine.thework.blockentities.alchemy_circle.events.circle.ActivateCircleEvent;
-import cassunshine.thework.blockentities.alchemy_circle.events.circle.FullSyncEvent;
-import cassunshine.thework.blockentities.alchemy_circle.events.circle.SetCircleOutwardEvent;
-import cassunshine.thework.blockentities.alchemy_circle.events.node.NodeSwapItemEvent;
-import cassunshine.thework.blockentities.alchemy_circle.events.node.UpdateRuneOrTypeEvent;
-import cassunshine.thework.blockentities.alchemy_circle.events.ring.SetRingClockwiseEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.circle.ActivateCircleEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.circle.FullSyncEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.circle.SetCircleOutwardEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.node.NodeSwapItemEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.node.UpdateRuneOrTypeEvent;
+import cassunshine.thework.blockentities.alchemycircle.events.ring.SetRingClockwiseEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

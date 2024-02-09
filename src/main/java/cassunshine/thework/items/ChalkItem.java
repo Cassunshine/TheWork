@@ -1,8 +1,8 @@
 package cassunshine.thework.items;
 
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircles;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircles;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.BlockState;

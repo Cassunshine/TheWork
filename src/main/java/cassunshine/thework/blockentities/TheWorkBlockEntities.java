@@ -1,9 +1,8 @@
 package cassunshine.thework.blockentities;
 
 import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blockentities.jar.AlchemyJarBlockEntity;
-import cassunshine.thework.blocks.AlchemyJarBlock;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.block.entity.BlockEntityType;

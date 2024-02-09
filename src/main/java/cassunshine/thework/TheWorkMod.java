@@ -1,7 +1,7 @@
 package cassunshine.thework;
 
+import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
-import cassunshine.thework.blockentities.alchemy_circle.nodes.types.AlchemyNodeTypes;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.elements.Elements;
 import cassunshine.thework.elements.recipes.TheWorkRecipes;

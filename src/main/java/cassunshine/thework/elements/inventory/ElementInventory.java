@@ -87,4 +87,8 @@ public class ElementInventory {
     public void flush() {
         amounts.clear();
     }
+
+    public boolean canFit(Element element, float amount) {
+        return (amounts.containsKey(element) ? amounts.getFloat(element) + amount : amount) < capacity;
+    }
 }

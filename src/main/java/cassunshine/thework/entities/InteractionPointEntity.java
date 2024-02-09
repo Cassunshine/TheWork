@@ -1,9 +1,9 @@
 package cassunshine.thework.entities;
 
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircleBlockEntity;
-import cassunshine.thework.blockentities.alchemy_circle.AlchemyCircles;
-import cassunshine.thework.blockentities.alchemy_circle.events.circle.AlchemyCircleEvent;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircles;
+import cassunshine.thework.blockentities.alchemycircle.events.circle.AlchemyCircleEvent;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;

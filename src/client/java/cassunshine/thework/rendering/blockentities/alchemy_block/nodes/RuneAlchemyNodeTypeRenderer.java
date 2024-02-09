@@ -1,10 +1,8 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block.nodes;
 
-import cassunshine.thework.blockentities.alchemy_circle.nodes.AlchemyNode;
+import cassunshine.thework.blockentities.alchemycircle.nodes.AlchemyNode;
 import cassunshine.thework.rendering.util.RenderingUtilities;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.util.Identifier;
 
 /**
  * Renders a rune along with the alchemy node.

@@ -66,7 +66,9 @@ public class TheWorkRecipes {
                     outputsList[index++] = (new ElementPacket(element, amount));
                 }
 
-                builder.put(inputID, new DeconstructionRecipe(inputID, outputsList));
+                float time = json.has("time") ? json.get("time").getAsInt() : 10;
+
+                builder.put(inputID, new DeconstructionRecipe(inputID, time, outputsList));
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
             }

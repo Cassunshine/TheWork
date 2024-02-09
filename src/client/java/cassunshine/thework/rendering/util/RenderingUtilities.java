@@ -19,6 +19,9 @@ public class RenderingUtilities {
     private static VertexConsumerProvider consumers;
     private static VertexConsumer consumer;
 
+    private static int r, g, b, a;
+    private static float normalX, normalY, normalZ;
+
     private static int light;
     private static int overlay;
 
@@ -40,12 +43,25 @@ public class RenderingUtilities {
         RenderingUtilities.overlay = overlay;
     }
 
-    public static void saneVertex(float x, float y, float z, int red, int green, int blue, float u, float v, float normalX, float normalY, float normalZ) {
-        consumer.vertex(stack.peek().getPositionMatrix(), x, y, z).color(red, green, blue, 255).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
+    public static void setupColor(int red, int green, int blue, int alpha) {
+        r = red;
+        g = green;
+        b = blue;
+        a = alpha;
+    }
+
+    public static void setupNormal(float x, float y, float z) {
+        normalX = x;
+        normalY = y;
+        normalZ = z;
+    }
+
+    public static void saneVertex(float x, float y, float z, float u, float v) {
+        consumer.vertex(stack.peek().getPositionMatrix(), x, y, z).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
     }
 
     public static void renderItem(ItemStack stack, World world, int light, int overlay) {
-        if(stack.isEmpty())
+        if (stack.isEmpty())
             return;
         MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformationMode.GROUND, light, overlay, RenderingUtilities.stack, consumers, world, 0);
     }
