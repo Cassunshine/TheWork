@@ -4,12 +4,14 @@ import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.blocks.AlchemyCircleBlock;
+import cassunshine.thework.entities.InteractionPointEntity;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FenceBlock;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemUsage;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
@@ -30,6 +32,10 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
      */
     private static final HashMap<World, ArrayList<AlchemyCircleBlockEntity>> LOADED = new HashMap<>();
 
+    private final ArrayList<InteractionPointEntity> interactionPoints = new ArrayList<>();
+    private final ArrayList<InteractionPointEntity> newPoints = new ArrayList<>();
+
+
     public final Vec3d fullPosition;
 
     public final AlchemyCircle circle;
@@ -44,10 +50,48 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
 
 
     public static void tick(World world, BlockPos pos, BlockState blockState, AlchemyCircleBlockEntity blockEntity) {
+
+        //Update new block entities.
+        for (InteractionPointEntity newPoint : blockEntity.newPoints)
+            newPoint.setCircle(blockEntity);
+        blockEntity.newPoints.clear();
+
         if (!blockEntity.circle.isActive)
             return;
 
         var circle = blockEntity.circle;
+    }
+
+    public void regenerateInteractionPoints() {
+        //Clear all previous interaction points.
+        for (InteractionPointEntity point : interactionPoints)
+            point.remove(Entity.RemovalReason.DISCARDED);
+        interactionPoints.clear();
+
+        //Generate entirely new ones.
+        circle.regenerateInteractionPoints(this);
+    }
+
+    public InteractionPointEntity addInteractionPoint(Vec3d position) {
+        if (getWorld() == null)
+            return null;
+
+        var point = new InteractionPointEntity(null, getWorld());
+        point.setPosition(position);
+
+        interactionPoints.add(point);
+        getWorld().spawnEntity(point);
+
+        newPoints.add(point);
+
+        return point;
+    }
+
+    public InteractionPointEntity removeInteractionPoint(InteractionPointEntity toRemove) {
+        if (interactionPoints.remove(toRemove))
+            toRemove.remove(Entity.RemovalReason.DISCARDED);
+
+        return null;
     }
 
     @Override
@@ -78,6 +122,8 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
         synchronized (LOADED) {
             LOADED.computeIfAbsent(world, id -> new ArrayList<>()).add(this);
         }
+
+        regenerateInteractionPoints();
     }
 
     @Override
@@ -90,6 +136,10 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
             list.remove(this);
             if (list.isEmpty()) LOADED.remove(world);
         }
+
+        for (InteractionPointEntity point : interactionPoints)
+            point.remove(Entity.RemovalReason.DISCARDED);
+        interactionPoints.clear();
     }
 
     //Handles interaction with the alchemy circle given a context.

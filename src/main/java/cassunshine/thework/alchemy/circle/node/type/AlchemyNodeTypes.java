@@ -11,7 +11,7 @@ public class AlchemyNodeTypes {
 
     public static final AlchemyNodeType NONE = register(new Identifier(TheWorkMod.ModID, "none"), new AlchemyNodeType());
 
-    public static final AlchemyNodeType DECONSTRUCT = register(new Identifier(TheWorkMod.ModID, "deconstruct"), new DeconstructNodeType());
+    public static final AlchemyNodeType DECONSTRUCT = register(new Identifier(TheWorkMod.ModID, "deconstruct"), new DeconstructNodeType().withItemHolding());
 
     public static void initialize() {
 

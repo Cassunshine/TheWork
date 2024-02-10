@@ -2,6 +2,7 @@ package cassunshine.thework.network.events;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItem;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRune;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSet;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -29,7 +30,7 @@ public class TheWorkNetworkEvents {
         register(AddRingEvent.IDENTIFIER, AddRingEvent::new);
         register(AlchemyRingClockwiseSet.IDENTIFIER, AlchemyRingClockwiseSet::new);
         register(AlchemyNodeSetTypeAndRune.IDENTIFIER, AlchemyNodeSetTypeAndRune::new);
-
+        register(AlchemyNodeSetItem.IDENTIFIER, AlchemyNodeSetItem::new);
     }
 
 

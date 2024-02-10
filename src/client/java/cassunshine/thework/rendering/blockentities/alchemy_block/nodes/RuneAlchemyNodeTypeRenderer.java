@@ -12,7 +12,7 @@ public class RuneAlchemyNodeTypeRenderer extends AlchemyNodeTypeRenderer {
     @Override
     public void render(AlchemyNode node) {
         var sprite = node.rune;
-        if (sprite == null || sprite == AlchemyNode.NULL_RUNE)
+        if (sprite == null || node.rune.equals(AlchemyNode.NULL_RUNE))
             return;
 
         //Modify rune to point to rune texture.

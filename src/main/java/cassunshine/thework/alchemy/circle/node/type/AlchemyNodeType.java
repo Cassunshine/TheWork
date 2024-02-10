@@ -7,6 +7,8 @@ import net.minecraft.util.Identifier;
 public class AlchemyNodeType {
     public Identifier id;
 
+    public boolean holdsItems = false;
+
     public void activate(AlchemyNode node) {
 
     }
@@ -21,6 +23,11 @@ public class AlchemyNodeType {
 
     public AlchemyNodeType.Data getData() {
         return Data.NONE;
+    }
+
+    public AlchemyNodeType withItemHolding() {
+        this.holdsItems = true;
+        return this;
     }
 
 

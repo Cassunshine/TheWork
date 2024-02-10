@@ -2,11 +2,14 @@ package cassunshine.thework.alchemy.circle.node;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItem;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRune;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.inventory.ElementInventory;
+import cassunshine.thework.entities.InteractionPointEntity;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import cassunshine.thework.utils.TheWorkUtils;
@@ -49,6 +52,10 @@ public class AlchemyNode implements AlchemyCircleComponent {
      */
     public AlchemyNodeType.Data typeData = AlchemyNodeType.Data.NONE;
 
+    /**
+     * Interaction point entity for nodes that hold items
+     */
+    public InteractionPointEntity interactionPoint;
 
     /**
      * Determines if the node should output to the next path in the sequence.
@@ -77,19 +84,14 @@ public class AlchemyNode implements AlchemyCircleComponent {
     }
 
     public Vec3d getPosition() {
-        return ring.circle.blockEntity.fullPosition.add(
-                MathHelper.sin(getAngle()) * ring.radius,
-                0,
-                MathHelper.cos(getAngle()) * ring.radius
-        );
+        return ring.circle.blockEntity.fullPosition.add(MathHelper.sin(getAngle()) * ring.radius, 0, MathHelper.cos(getAngle()) * ring.radius);
     }
 
     private String[] getBookPages(ItemUsageContext context) {
         var offHand = context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND;
         var stack = context.getPlayer().getStackInHand(offHand);
 
-        if (stack.isEmpty() || stack.getItem() != Items.WRITABLE_BOOK || !stack.hasNbt())
-            return null;
+        if (stack.isEmpty() || stack.getItem() != Items.WRITABLE_BOOK || !stack.hasNbt()) return null;
 
         var bookNbt = stack.getNbt();
         var list = bookNbt.getList("pages", NbtElement.STRING_TYPE);
@@ -107,16 +109,43 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public void setTypeAndRune(Identifier type, Identifier rune) {
         var newType = AlchemyNodeTypes.get(type);
 
-        if (newType == nodeType && this.rune == rune)
-            return;
+        if (newType == nodeType && this.rune == rune) return;
 
-        if (!heldStack.isEmpty()) {
+        //Only spawn an interaction entity if the type requires, and there is no rune set.
+        if (newType.holdsItems && rune.equals(NULL_RUNE)) {
+            if (interactionPoint == null) interactionPoint = ring.circle.blockEntity.addInteractionPoint(getPosition().add(0, ring.circle.blockEntity.getPos().getY() + 1 / 64.0f, 0));
+        } else {
+            if (interactionPoint != null) interactionPoint = ring.circle.blockEntity.removeInteractionPoint(interactionPoint);
+        }
+
+        //Pop off any existing items.
+        if (!heldStack.isEmpty() && interactionPoint == null) {
             var pos = getPosition();
             TheWorkUtils.dropItem(ring.circle.blockEntity.getWorld(), heldStack, (float) pos.x, (float) ring.circle.blockEntity.getPos().getY() + 0.5f, (float) pos.z);
         }
 
         nodeType = newType;
         this.rune = rune;
+    }
+
+    public boolean isInteractionInRange(ItemUsageContext context) {
+        var interactPos = context.getHitPos().withAxis(Direction.Axis.Y, 0);
+        var pos = getPosition();
+
+        return interactPos.distanceTo(pos) < 0.7f;
+    }
+
+    private TheWorkNetworkEvent swapItemWithPlayer(ItemUsageContext context) {
+        var hand = context.getHand();
+        var stack = context.getPlayer().getStackInHand(hand);
+
+        //If both items are empty, do nothing.
+        if ((stack.isEmpty() && heldStack.isEmpty()))
+            return TheWorkNetworkEvents.NONE;
+
+        context.getPlayer().setStackInHand(hand, heldStack);
+
+        return new AlchemyNodeSetItem(stack, this);
     }
 
     @Override
@@ -148,34 +177,26 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     @Override
     public TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context) {
-        var interactPos = context.getHitPos().withAxis(Direction.Axis.Y, 0);
-        var pos = getPosition();
-
-        var length = interactPos.distanceTo(pos);
-
-        if (interactPos.distanceTo(pos) > 0.7f)
-            return TheWorkNetworkEvents.NONE;
+        if (!isInteractionInRange(context)) return TheWorkNetworkEvents.NONE;
 
         //Get all pages in held book.
         var pages = getBookPages(context);
-        if (pages == null || pages.length == 0)
-            return TheWorkNetworkEvents.NONE;
+        if (pages == null || pages.length == 0) return TheWorkNetworkEvents.NONE;
 
         //Try to parse identifiers from pages.
         ArrayList<Identifier> identifiers = new ArrayList<>();
         for (var page : pages) {
             var id = Identifier.tryParse(page);
 
-            if (id != null)
-                identifiers.add(id);
+            if (id.getPath().isEmpty()) continue;
 
-            if (identifiers.size() == 2)
-                break;
+            if (id != null) identifiers.add(id);
+
+            if (identifiers.size() == 2) break;
         }
 
 
-        if (identifiers.isEmpty())
-            return TheWorkNetworkEvents.NONE;
+        if (identifiers.isEmpty()) return TheWorkNetworkEvents.NONE;
 
         Identifier[] ids = new Identifier[2];
 
@@ -188,15 +209,25 @@ public class AlchemyNode implements AlchemyCircleComponent {
             ids[1] = identifiers.get(1);
         }
 
-        if (ids[0].equals(nodeType.id) && ids[1].equals(rune))
-            return new AlchemyNodeSetTypeAndRune(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
+        if (ids[0].equals(nodeType.id) && ids[1].equals(rune)) return new AlchemyNodeSetTypeAndRune(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
 
         return new AlchemyNodeSetTypeAndRune(ids[0], ids[1], this);
     }
 
     @Override
     public TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context) {
+        if (!isInteractionInRange(context)) return TheWorkNetworkEvents.NONE;
+
+        //If the type holds items, swap item with player item.
+        if (nodeType.holdsItems)
+            return swapItemWithPlayer(context);
+
         return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
+        if (nodeType.holdsItems) interactionPoint = blockEntity.addInteractionPoint(getPosition().add(0, blockEntity.getPos().getY() + 1 / 64.0f, 0));
     }
 }
 

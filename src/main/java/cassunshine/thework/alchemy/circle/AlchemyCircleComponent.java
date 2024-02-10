@@ -1,5 +1,6 @@
 package cassunshine.thework.alchemy.circle;
 
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
@@ -13,4 +14,6 @@ public interface AlchemyCircleComponent {
     TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context);
 
     TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context);
+
+    void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity);
 }

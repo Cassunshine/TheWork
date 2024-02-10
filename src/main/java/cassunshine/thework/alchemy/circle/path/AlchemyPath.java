@@ -2,6 +2,7 @@ package cassunshine.thework.alchemy.circle.path;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
@@ -135,5 +136,10 @@ public class AlchemyPath implements AlchemyCircleComponent {
     @Override
     public TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context) {
         return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
+
     }
 }

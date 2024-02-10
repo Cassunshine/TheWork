@@ -6,6 +6,7 @@ import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSet;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.path.AlchemyPath;
+import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -105,8 +106,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
     }
 
     public AlchemyNode getNode(int i) {
-        if (i < 0)
-            i += nodes.length;
+        if (i < 0) i += nodes.length;
         return nodes[i % nodes.length];
     }
 
@@ -150,8 +150,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
         //Pass to nodes first.
         for (AlchemyNode node : nodes) {
             var nodeEvent = node.generateChalkEvent(context);
-            if (nodeEvent != TheWorkNetworkEvents.NONE)
-                return nodeEvent;
+            if (nodeEvent != TheWorkNetworkEvents.NONE) return nodeEvent;
         }
 
         var flatHitPos = context.getHitPos().withAxis(Direction.Axis.Y, 0);
@@ -160,15 +159,23 @@ public class AlchemyRing implements AlchemyCircleComponent {
         var relativeRadius = hitRadius - radius;
 
         //If chalk hit point is too far, do nothing.
-        if (Math.abs(relativeRadius) > 1.0f)
-            return TheWorkNetworkEvents.NONE;
+        if (Math.abs(relativeRadius) > 1.0f) return TheWorkNetworkEvents.NONE;
 
         return new AlchemyRingClockwiseSet(relativeRadius >= 0, this);
     }
 
     @Override
     public TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context) {
+        for (AlchemyNode node : nodes) {
+            var event = node.generateInteractEvent(context);
+            if (event != TheWorkNetworkEvents.NONE) return event;
+        }
         return TheWorkNetworkEvents.NONE;
     }
 
+    @Override
+    public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
+        for (AlchemyNode node : nodes)
+            node.regenerateInteractionPoints(blockEntity);
+    }
 }

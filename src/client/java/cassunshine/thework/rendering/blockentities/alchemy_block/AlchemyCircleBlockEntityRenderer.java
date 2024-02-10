@@ -1,5 +1,6 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block;
 
+import cassunshine.thework.TheWorkClient;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
@@ -7,9 +8,12 @@ import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
+import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import cassunshine.thework.utils.TheWorkUtils;
+import com.google.common.hash.HashCode;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -17,6 +21,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.BlockItem;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.LightType;
@@ -68,7 +73,6 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         RenderingUtilities.setupNormal(0, 1, 0);
         RenderingUtilities.setupColor(255, 255, 255, 255);
 
-        renderRandom.setSeed(entity.getPos().asLong());
 
         try {
             //Offset to middle of block, and move up a little to prevent z-fighting.
@@ -76,6 +80,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
             drawFullCircle(0.5f, 8);
             drawFullCircle(0.5f, 4);
+
+            renderRandom.setSeed(entity.getPos().asLong());
 
             drawCirclePips(0.5f + LINE_THICKNESS, 0, MathHelper.PI, 4, 1 / 8.0f, false);
             drawCirclePips(0.5f + LINE_THICKNESS, MathHelper.PI, MathHelper.TAU, 4, 1 / 8.0f, false);
@@ -104,9 +110,12 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
     private void drawRing(AlchemyRing ring, AlchemyRing next) {
 
+        renderRandom.setSeed(Float.hashCode(ring.radius));
+
         var clockwise = ring.isClockwise;
         var nodeWidthAngle = MathHelper.lerp(0.5f / ring.circumference, 0, MathHelper.TAU);
         var spinMult = clockwise ? 1 : -1;
+
 
         for (int i = 0; i < ring.nodes.length; i++) {
 
@@ -151,8 +160,21 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             drawFullCircle(0.5f, 8);
 
             //Render item
-            if (!node.heldStack.isEmpty())
-                RenderingUtilities.renderItem(node.heldStack, node.ring.circle.blockEntity.getWorld(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+            if (!node.heldStack.isEmpty()) {
+                if (node.heldStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == TheWorkBlocks.ALCHEMY_JAR_BLOCK) {
+                    RenderingUtilities.translateMatrix(-0.5f, 0, -0.5f);
+                    RenderingUtilities.renderBlock(TheWorkBlocks.ALCHEMY_JAR_BLOCK.getDefaultState(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+                } else {
+                    renderRandom.setSeed(node.getPosition().hashCode());
+                    float time = (float) TheWorkClient.getTime();
+                    time += renderRandom.nextFloat(MathHelper.TAU);
+
+                    RenderingUtilities.translateMatrix(0, MathHelper.sin((time * 2) % MathHelper.TAU) * 0.1f, 0);
+                    RenderingUtilities.rotateMatrix(0, time * 2.0f, 0);
+
+                    RenderingUtilities.renderItem(node.heldStack, node.ring.circle.blockEntity.getWorld(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+                }
+            }
 
             //Run custom renderer
             var customRenderer = AlchemyNodeTypeRenderers.get(node.nodeType);

@@ -53,6 +53,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
             if (radiusDifference < 1) {
                 rings.remove(i);
+                blockEntity.regenerateInteractionPoints();
                 return;
             }
         }
@@ -63,6 +64,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         rings.add(ring);
         sortRings();
+
+        blockEntity.regenerateInteractionPoints();
     }
 
 
@@ -97,6 +100,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
             rings.add(newRing);
         }
+
+        sortRings();
     }
 
     @Override
@@ -142,5 +147,11 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         }
 
         return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
+        for (AlchemyRing ring : rings)
+            ring.regenerateInteractionPoints(blockEntity);
     }
 }
