@@ -13,13 +13,12 @@ public abstract class TheWorkNetworkEvent {
         this.id = id;
     }
 
-
     public TheWorkNetworkEvent(BlockPos pos, Identifier id) {
         this(id);
         position = pos;
     }
 
-    public void write(PacketByteBuf buf) {
+    public void writePacket(PacketByteBuf buf) {
         buf.writeBlockPos(position);
     }
 

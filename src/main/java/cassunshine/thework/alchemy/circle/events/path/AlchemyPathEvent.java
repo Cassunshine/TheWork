@@ -29,8 +29,8 @@ public class AlchemyPathEvent extends AlchemyRingEvent {
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
-        super.write(buf);
+    public void writePacket(PacketByteBuf buf) {
+        super.writePacket(buf);
         buf.writeInt(index);
     }
 

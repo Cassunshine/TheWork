@@ -1,7 +1,7 @@
 package cassunshine.thework.rendering.blockentities.alchemy_block.nodes;
 
-import cassunshine.thework.blockentities.alchemycircle.nodes.types.AlchemyNodeType;
-import cassunshine.thework.blockentities.alchemycircle.nodes.types.AlchemyNodeTypes;
+import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
+import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 
 import java.util.HashMap;
 
@@ -22,6 +22,6 @@ public class AlchemyNodeTypeRenderers {
 
     static {
         register(AlchemyNodeTypes.DECONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(4));
-        register(AlchemyNodeTypes.CONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(6));
+        //register(AlchemyNodeTypes.CONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(6));
     }
 }

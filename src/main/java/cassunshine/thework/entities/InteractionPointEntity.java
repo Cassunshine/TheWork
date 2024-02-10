@@ -2,8 +2,6 @@ package cassunshine.thework.entities;
 
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
-import cassunshine.thework.blockentities.alchemycircle.AlchemyCircles;
-import cassunshine.thework.blockentities.alchemycircle.events.circle.AlchemyCircleEvent;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
@@ -105,6 +103,6 @@ public class InteractionPointEntity extends Entity {
         BlockHitResult bhr = (BlockHitResult) player.raycast(PlayerEntity.getReachDistance(player.isCreative()), 0, false);
         ItemUsageContext ctx = new ItemUsageContext(player.getWorld(), player, Hand.MAIN_HAND, player.getMainHandStack(), bhr);
 
-        return AlchemyCircles.generateAndSendEvent(circle, ctx) ? ActionResult.SUCCESS : ActionResult.PASS;
+        return AlchemyCircleBlockEntity.generateAndSendEvent(circle, ctx) ? ActionResult.SUCCESS : ActionResult.PASS;
     }
 }

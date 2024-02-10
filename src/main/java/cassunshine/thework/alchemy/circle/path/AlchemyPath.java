@@ -4,6 +4,9 @@ import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
+import cassunshine.thework.network.events.TheWorkNetworkEvent;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
@@ -122,5 +125,15 @@ public class AlchemyPath implements AlchemyCircleComponent {
             this.element = element;
             this.progress = progress;
         }
+    }
+
+    @Override
+    public TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context) {
+        return TheWorkNetworkEvents.NONE;
+    }
+
+    @Override
+    public TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context) {
+        return TheWorkNetworkEvents.NONE;
     }
 }

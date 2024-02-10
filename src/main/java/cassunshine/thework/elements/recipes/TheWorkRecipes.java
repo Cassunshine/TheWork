@@ -66,7 +66,7 @@ public class TheWorkRecipes {
                     outputsList[index++] = (new ElementPacket(element, amount));
                 }
 
-                float time = json.has("time") ? json.get("time").getAsInt() : 10;
+                int time = json.has("time") ? json.get("time").getAsInt() : 10;
 
                 builder.put(inputID, new DeconstructionRecipe(inputID, time, outputsList));
             } catch (Exception e) {

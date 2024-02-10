@@ -21,7 +21,7 @@ import java.util.List;
 
 public class AlchemyJarBlock extends BlockWithEntity {
 
-    private final VoxelShape SHAPE = VoxelShapes.cuboid(0.3125f, 0, 0.3125f, 0.6875f, 0.625f, 0.6875f);
+    private final VoxelShape SHAPE = VoxelShapes.cuboid(3/16.0f, 0, 3/16.0f, 13/16.0f, 12/16.0f, 13/16.0f);
 
     protected AlchemyJarBlock() {
         super(FabricBlockSettings.create().breakInstantly().nonOpaque());

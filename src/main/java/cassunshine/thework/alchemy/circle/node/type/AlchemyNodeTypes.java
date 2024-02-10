@@ -9,7 +9,7 @@ public class AlchemyNodeTypes {
 
     private static HashMap<Identifier, AlchemyNodeType> NODE_TYPES = new HashMap<>();
 
-    public static final AlchemyNodeType NONE = new AlchemyNodeType();
+    public static final AlchemyNodeType NONE = register(new Identifier(TheWorkMod.ModID, "none"), new AlchemyNodeType());
 
     public static final AlchemyNodeType DECONSTRUCT = register(new Identifier(TheWorkMod.ModID, "deconstruct"), new DeconstructNodeType());
 

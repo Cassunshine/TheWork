@@ -6,21 +6,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public abstract class BlockEntityEvent extends TheWorkNetworkEvent {
-    public BlockPos targetPosition;
-
     public BlockEntityEvent(Identifier id) {
         super(id);
     }
 
     public BlockEntityEvent(BlockPos pos, Identifier id) {
-        super(id);
-
-        targetPosition = pos;
+        super(pos, id);
     }
 
     @Override
     public void applyToWorld(World world) {
-        var be = world.getBlockEntity(targetPosition);
+        var be = world.getBlockEntity(position);
 
         if (be == null) return;
 

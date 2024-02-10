@@ -29,7 +29,7 @@ public class TheWorkClientNetworkEvents {
         //Send event to server.
         {
             var packet = PacketByteBufs.create();
-            theWorkNetworkEvent.write(packet);
+            theWorkNetworkEvent.writePacket(packet);
 
             ClientPlayNetworking.send(theWorkNetworkEvent.id, packet);
         }

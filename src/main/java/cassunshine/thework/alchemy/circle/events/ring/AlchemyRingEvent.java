@@ -22,7 +22,7 @@ public class AlchemyRingEvent extends AlchemyCircleEvent {
 
     @Override
     public void applyToCircle(AlchemyCircle circle) {
-
+        applyToRing(circle.rings.get(index));
     }
 
     public void applyToRing(AlchemyRing ring) {
@@ -31,8 +31,8 @@ public class AlchemyRingEvent extends AlchemyCircleEvent {
 
 
     @Override
-    public void write(PacketByteBuf buf) {
-        super.write(buf);
+    public void writePacket(PacketByteBuf buf) {
+        super.writePacket(buf);
         buf.writeInt(index);
     }
 

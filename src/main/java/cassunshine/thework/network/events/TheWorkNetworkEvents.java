@@ -1,11 +1,9 @@
 package cassunshine.thework.network.events;
 
-import cassunshine.thework.blockentities.alchemycircle.events.circle.ActivateCircleEvent;
-import cassunshine.thework.blockentities.alchemycircle.events.circle.FullSyncEvent;
-import cassunshine.thework.blockentities.alchemycircle.events.circle.SetCircleOutwardEvent;
-import cassunshine.thework.blockentities.alchemycircle.events.node.NodeSwapItemEvent;
-import cassunshine.thework.blockentities.alchemycircle.events.node.UpdateRuneOrTypeEvent;
-import cassunshine.thework.blockentities.alchemycircle.events.ring.SetRingClockwiseEvent;
+import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRune;
+import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSet;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -24,35 +22,14 @@ public class TheWorkNetworkEvents {
 
     public static TriConsumer<BlockPos, World, TheWorkNetworkEvent> clientEventConsumer;
 
-    public static final TheWorkNetworkEvent NONE = null;
+    public static final TheWorkNetworkEvent NONE = new EmptyNetworkEvent(new Identifier(TheWorkMod.ModID, "none"));
+    public static final TheWorkNetworkEvent SUCCESS = new EmptyNetworkEvent(new Identifier(TheWorkMod.ModID, "success"));
 
     public static void initialize() {
+        register(AddRingEvent.IDENTIFIER, AddRingEvent::new);
+        register(AlchemyRingClockwiseSet.IDENTIFIER, AlchemyRingClockwiseSet::new);
+        register(AlchemyNodeSetTypeAndRune.IDENTIFIER, AlchemyNodeSetTypeAndRune::new);
 
-        //Node
-        register(UpdateRuneOrTypeEvent.IDENTIFIER, UpdateRuneOrTypeEvent::new);
-        register(NodeSwapItemEvent.IDENTIFIER, NodeSwapItemEvent::new);
-
-        //Ring
-        register(SetRingClockwiseEvent.IDENTIFIER, SetRingClockwiseEvent::new);
-
-        //Circle
-        register(FullSyncEvent.IDENTIFIER, FullSyncEvent::new);
-        register(ActivateCircleEvent.IDENTIFIER, ActivateCircleEvent::new);
-        register(SetCircleOutwardEvent.IDENTIFIER, SetCircleOutwardEvent::new);
-
-        //Maybe need this someday?
-        /*for (var entry : TheWorkNetworkEvents.EVENT_FACTORIES.entrySet()) {
-            ServerPlayNetworking.registerGlobalReceiver(entry.getKey(), (server, player, handler, buf, responseSender) -> {
-                //Read event packet
-                var event = entry.getValue().get();
-                event.readPacket(buf);
-
-                //Run event on server.
-                server.execute(() -> {
-                    event.applyToWorld(player.getWorld());
-                });
-            });
-        }*/
     }
 
 
@@ -79,7 +56,7 @@ public class TheWorkNetworkEvents {
 
         //Write packet.
         var packet = PacketByteBufs.create();
-        event.write(packet);
+        event.writePacket(packet);
 
         //Send each player who can see the event the packet.
         for (var player : PlayerLookup.tracking((ServerWorld) world, position))

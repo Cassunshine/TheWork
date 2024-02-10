@@ -23,7 +23,7 @@ public class AlchemyNodeEvent extends AlchemyRingEvent {
 
     @Override
     public void applyToRing(AlchemyRing ring) {
-        applyToNode(ring.nodes[ring.index]);
+        applyToNode(ring.nodes[index]);
     }
 
     public void applyToNode(AlchemyNode node) {
@@ -31,8 +31,8 @@ public class AlchemyNodeEvent extends AlchemyRingEvent {
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
-        super.write(buf);
+    public void writePacket(PacketByteBuf buf) {
+        super.writePacket(buf);
         buf.writeInt(index);
     }
 
