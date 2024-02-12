@@ -7,16 +7,16 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class AlchemyNodeSetItem extends AlchemyNodeEvent {
+public class AlchemyNodeSetItemEvent extends AlchemyNodeEvent {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "node_set_item");
 
     public ItemStack stack;
 
-    public AlchemyNodeSetItem() {
+    public AlchemyNodeSetItemEvent() {
         super(IDENTIFIER);
     }
 
-    public AlchemyNodeSetItem(ItemStack stack, AlchemyNode node) {
+    public AlchemyNodeSetItemEvent(ItemStack stack, AlchemyNode node) {
         super(node, IDENTIFIER);
 
         this.stack = stack.copy();

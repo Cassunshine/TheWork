@@ -1,5 +1,9 @@
 package cassunshine.thework.rendering.particles;
 
+import cassunshine.thework.alchemy.circle.path.AlchemyPath;
+import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
+import cassunshine.thework.particles.TheWorkParticles;
+import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.world.ClientWorld;
@@ -10,35 +14,34 @@ import net.minecraft.util.math.Vec3d;
 
 public class RadialParticle extends SpriteBillboardParticle {
 
-    public static int color = Integer.MAX_VALUE;
+    private float radius;
+    private float startAngle;
+    private float endAngle;
 
-    private double radius;
-    private double startAngle;
-    private double endAngle;
+    private float progress = 0;
 
     private Vec3d startPos;
 
-    boolean direction = true;
+    boolean direction;
 
     protected RadialParticle(ClientWorld clientWorld, double x, double y, double z, double radius, double startAngle, double endAngle) {
         super(clientWorld, x + MathHelper.sin((float) startAngle) * radius, y, z + MathHelper.cos((float) startAngle) * radius);
 
-        this.radius = radius;
-        this.startAngle = startAngle;
-        this.endAngle = endAngle;
+        this.radius = (float) radius - (1 / 32.0f);
+        this.startAngle = (float) startAngle;
+        this.endAngle = (float) endAngle;
 
         startPos = new Vec3d(x, y, z);
         scale = 0.05f;
 
-        double circumference = MathHelper.TAU * radius;
-
-        prevPosX = x + MathHelper.sin((float) (startAngle - ((0.1 * MinecraftClient.getInstance().getTickDelta()) / circumference))) * radius;
+        var angle = getAngle(progress);
+        prevPosX = x + MathHelper.sin(angle) * this.radius;
         prevPosY = y;
-        prevPosZ = z + MathHelper.cos((float) (startAngle - ((0.1 * MinecraftClient.getInstance().getTickDelta()) / circumference))) * radius;
+        prevPosZ = z + MathHelper.cos(angle) * this.radius;
 
         this.maxAge = Integer.MAX_VALUE;
 
-        this.setColor(ColorHelper.Argb.getRed(color) / 255.0f, ColorHelper.Argb.getGreen(color) / 255.0f, ColorHelper.Argb.getBlue(color) / 255.0f);
+        this.setColor(ColorHelper.Argb.getRed(TheWorkParticles.radialColor) / 255.0f, ColorHelper.Argb.getGreen(TheWorkParticles.radialColor) / 255.0f, ColorHelper.Argb.getBlue(TheWorkParticles.radialColor) / 255.0f);
 
         direction = startAngle < endAngle;
     }
@@ -48,24 +51,27 @@ public class RadialParticle extends SpriteBillboardParticle {
         return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
     }
 
+    private float getAngle(float progress) {
+        float pathLength = (radius * MathHelper.TAU) * (TheWorkUtils.angleBetweenRadians(startAngle, endAngle) / MathHelper.TAU);
+        return TheWorkUtils.lerpRadians(progress / pathLength, startAngle, endAngle);
+    }
+
     @Override
     public void tick() {
         super.tick();
 
-        if (direction && startAngle >= endAngle)
-            this.markDead();
-        if(!direction && startAngle <= endAngle)
-            this.markDead();
+        float pathLength = (radius * MathHelper.TAU) * (TheWorkUtils.angleBetweenRadians(startAngle, endAngle) / MathHelper.TAU);
 
-        x = startPos.x + MathHelper.sin((float) startAngle) * radius;
-        z = startPos.z + MathHelper.cos((float) startAngle) * radius;
+        if (progress > pathLength)
+            markDead();
 
-        double circumference = MathHelper.TAU * radius;
+        //Move along path...
+        progress += AlchemyPath.TRAVEL_SPEED;
 
-        if(direction)
-            startAngle += MathHelper.TAU * (0.1f / circumference);
-        else
-            startAngle -= MathHelper.TAU * (0.1f / circumference);
+        float currentAngle = TheWorkUtils.lerpRadians(progress / pathLength, startAngle, endAngle);
+
+        x = startPos.x + MathHelper.sin(currentAngle) * radius;
+        z = startPos.z + MathHelper.cos(currentAngle) * radius;
     }
 
     public static class Factory implements ParticleFactory<DefaultParticleType> {

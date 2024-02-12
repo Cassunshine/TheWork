@@ -1,15 +1,17 @@
 package cassunshine.thework.elements;
 
-import cassunshine.thework.TheWorkMod;
 import net.minecraft.util.Identifier;
 
 public class Element {
     public Identifier id;
     public int color;
 
-    public Element(Identifier id, int color) {
+    public int number;
+
+    public Element(Identifier id, int color, int score) {
         this.id = id;
         this.color = color;
+        this.number = score;
     }
 
     @Override

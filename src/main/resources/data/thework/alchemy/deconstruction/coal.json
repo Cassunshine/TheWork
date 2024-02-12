@@ -1,0 +1,7 @@
+{
+  "input": "minecraft:coal",
+  "output": {
+    "terra": 2,
+    "ignis": 4
+  }
+}

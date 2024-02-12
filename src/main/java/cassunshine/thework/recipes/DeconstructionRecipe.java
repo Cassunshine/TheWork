@@ -1,4 +1,4 @@
-package cassunshine.thework.elements.recipes;
+package cassunshine.thework.recipes;
 
 import cassunshine.thework.elements.ElementPacket;
 import net.minecraft.util.Identifier;

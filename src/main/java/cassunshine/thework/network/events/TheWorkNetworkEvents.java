@@ -1,10 +1,11 @@
 package cassunshine.thework.network.events;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItem;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRune;
-import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSet;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRuneEvent;
+import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -27,10 +28,14 @@ public class TheWorkNetworkEvents {
     public static final TheWorkNetworkEvent SUCCESS = new EmptyNetworkEvent(new Identifier(TheWorkMod.ModID, "success"));
 
     public static void initialize() {
+
         register(AddRingEvent.IDENTIFIER, AddRingEvent::new);
-        register(AlchemyRingClockwiseSet.IDENTIFIER, AlchemyRingClockwiseSet::new);
-        register(AlchemyNodeSetTypeAndRune.IDENTIFIER, AlchemyNodeSetTypeAndRune::new);
-        register(AlchemyNodeSetItem.IDENTIFIER, AlchemyNodeSetItem::new);
+        register(ActivateToggleEvent.IDENTIFIER, ActivateToggleEvent::new);
+
+        register(AlchemyRingClockwiseSetEvent.IDENTIFIER, AlchemyRingClockwiseSetEvent::new);
+
+        register(AlchemyNodeSetTypeAndRuneEvent.IDENTIFIER, AlchemyNodeSetTypeAndRuneEvent::new);
+        register(AlchemyNodeSetItemEvent.IDENTIFIER, AlchemyNodeSetItemEvent::new);
     }
 
 

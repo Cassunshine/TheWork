@@ -13,14 +13,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MatrixUtil;
 import net.minecraft.world.World;
 import org.joml.Quaternionf;
+import org.joml.Random;
 
 public class RenderingUtilities {
+
+    private static final Random renderRandom = new Random();
+
     private static MatrixStack stack;
     private static VertexConsumerProvider consumers;
     private static VertexConsumer consumer;
 
     private static int r, g, b, a;
     private static float normalX, normalY, normalZ;
+
+    private static float wobbleAmount = 0;
 
     private static int light;
     private static int overlay;
@@ -56,8 +62,12 @@ public class RenderingUtilities {
         normalZ = z;
     }
 
+    public static void setupWobble(float wobble) {
+        wobbleAmount = wobble;
+    }
+
     public static void saneVertex(float x, float y, float z, float u, float v) {
-        consumer.vertex(stack.peek().getPositionMatrix(), x, y, z).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
+        consumer.vertex(stack.peek().getPositionMatrix(), x + getWobble(), y, z + getWobble()).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
     }
 
     public static void renderItem(ItemStack stack, World world, int light, int overlay) {
@@ -88,6 +98,12 @@ public class RenderingUtilities {
         stack.multiply(new Quaternionf().rotationX(x));
         stack.multiply(new Quaternionf().rotationY(y));
         stack.multiply(new Quaternionf().rotationZ(z));
+    }
+
+    public static float getWobble() {
+        if (wobbleAmount <= 0)
+            return 0;
+        return (renderRandom.nextFloat() - 0.5f) * wobbleAmount;
     }
 
 }

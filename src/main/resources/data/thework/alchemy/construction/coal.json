@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:coal": 1
+  }
+}

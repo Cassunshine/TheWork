@@ -1,11 +1,13 @@
 package cassunshine.thework.alchemy.circle;
 
-import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.recipes.ConstructionRecipe;
+import cassunshine.thework.recipes.TheWorkRecipes;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -28,10 +30,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
      */
     public final ArrayList<AlchemyRing> rings = new ArrayList<>();
 
-    /**
-     * Determines if the circle is constructed with rings going inward or outward.
-     */
-    public boolean isOutward = false;
+    public AlchemyCircleConstructLayout constructNodeLayout;
 
     /**
      * Stores if the circle is currently in an active alchemical reaction.
@@ -40,6 +39,10 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public AlchemyCircle(AlchemyCircleBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+    }
+
+    public void regenerateLayouts() {
+        constructNodeLayout = new AlchemyCircleConstructLayout(this);
     }
 
     /**
@@ -74,6 +77,33 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         for (int i = 0; i < rings.size(); i++)
             rings.get(i).index = i;
+
+        regenerateLayouts();
+    }
+
+    @Override
+    public void activate() {
+        isActive = true;
+
+        for (AlchemyRing ring : rings)
+            ring.activate();
+    }
+
+    @Override
+    public void activeTick() {
+        for (AlchemyRing ring : rings)
+            ring.activeTick();
+
+        if (constructNodeLayout.recipe != null)
+            constructNodeLayout.tryProduceItem();
+    }
+
+    @Override
+    public void deactivate() {
+        isActive = false;
+
+        for (AlchemyRing ring : rings)
+            ring.deactivate();
     }
 
     @Override
@@ -106,6 +136,11 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     @Override
     public TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context) {
+
+        //You can't use chalk on a circle while it's active.
+        if (isActive) {
+            return TheWorkNetworkEvents.NONE;
+        }
 
         //Try to interact with chalk, first, adding a new ring.
         if (context.getBlockPos().equals(blockEntity.getPos())) {
@@ -140,11 +175,15 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     @Override
     public TheWorkNetworkEvent generateInteractEvent(ItemUsageContext context) {
 
+        if (context.getBlockPos().equals(blockEntity.getPos()))
+            return new ActivateToggleEvent(this);
+
         //Try to do normal interaction on the rings.
         for (AlchemyRing ring : rings) {
             var event = ring.generateInteractEvent(context);
             if (event != TheWorkNetworkEvents.NONE) return event;
         }
+
 
         return TheWorkNetworkEvents.NONE;
     }

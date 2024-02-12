@@ -1,15 +1,19 @@
-package cassunshine.thework.elements.recipes;
+package cassunshine.thework.recipes;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.ElementPacket;
 import cassunshine.thework.elements.Elements;
+import cassunshine.thework.utils.ShiftSorting;
+import cassunshine.thework.utils.TheWorkUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.item.ItemStack;
+import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
@@ -87,44 +91,49 @@ public class TheWorkRecipes {
             try {
                 var json = gson.fromJson(value.getReader(), JsonObject.class);
 
-                ConstructionRecipe.Ring[] rings;
-                Object2IntMap<Identifier> outputs;
+                ConstructionRecipe.Entry[][] rings;
+                ItemStack[] outputs;
 
                 //Inputs...
                 {
                     var jsonInputList = json.get("inputs").getAsJsonArray();
-                    rings = new ConstructionRecipe.Ring[jsonInputList.size()];
+                    rings = new ConstructionRecipe.Entry[jsonInputList.size()][];
 
                     for (int i = 0; i < jsonInputList.size(); i++) {
                         var jsonInputRing = jsonInputList.get(i).getAsJsonArray();
 
-                        ConstructionRecipe.Ring.Entry[] entries = new ConstructionRecipe.Ring.Entry[jsonInputRing.size()];
+                        ConstructionRecipe.Entry[] ring = new ConstructionRecipe.Entry[jsonInputRing.size()];
                         for (int j = 0; j < jsonInputRing.size(); j++) {
-                            var jsonRingEntry = jsonInputRing.get(i).getAsJsonObject();
+                            var jsonRingEntry = jsonInputRing.get(j).getAsJsonObject();
                             var element = Elements.getElement(new Identifier(TheWorkMod.ModID, jsonRingEntry.get("element").getAsString()));
 
-                            if (element == Elements.NONE)
-                                throw new Exception("Element not found!!");
+                            if (element == Elements.NONE) throw new Exception("Element not found!!");
 
-                            entries[j] = new ConstructionRecipe.Ring.Entry(element, jsonRingEntry.get("amount").getAsFloat());
+                            ring[j] = new ConstructionRecipe.Entry(element, jsonRingEntry.get("amount").getAsInt());
                         }
 
-                        rings[i] = new ConstructionRecipe.Ring(entries);
+                        var offset = ShiftSorting.findShiftValue(ring, r -> r.element.number);
+                        ShiftSorting.rotateArray(ring, offset);
+
+                        rings[i] = ring;
                     }
                 }
 
                 //Outputs...
                 {
                     var jsonOutputList = json.get("outputs").getAsJsonObject();
-                    outputs = new Object2IntOpenHashMap<>();
+                    outputs = new ItemStack[jsonOutputList.size()];
 
-                    for (var outputEntry : jsonOutputList.entrySet())
-                        outputs.put(new Identifier(outputEntry.getKey()), outputEntry.getValue().getAsInt());
+                    int index = 0;
+                    for (var outputEntry : jsonOutputList.entrySet()) {
+                        var stack = new ItemStack(Registries.ITEM.get(new Identifier(outputEntry.getKey())));
+                        stack.setCount(outputEntry.getValue().getAsInt());
+                        outputs[index++] = stack;
+                    }
                 }
 
-                var recipe = new ConstructionRecipe(rings, outputs);
-
-                builder.put(ConstructionRecipe.buildSignature(recipe), recipe);
+                var recipe = new ConstructionRecipe(rings, outputs, TheWorkUtils.generateSignature(rings, r -> TheWorkUtils.generateSignature(r, e -> e.element.id.toString())));
+                builder.put(recipe.signature, recipe);
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
             }

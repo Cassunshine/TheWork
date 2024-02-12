@@ -4,7 +4,6 @@ import cassunshine.thework.TheWorkClient;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
-import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
@@ -12,8 +11,6 @@ import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import cassunshine.thework.utils.TheWorkUtils;
-import com.google.common.hash.HashCode;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -24,8 +21,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.LightType;
-import org.spongepowered.asm.mixin.injection.selectors.ElementNode;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -33,6 +28,7 @@ import java.util.Random;
 public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<AlchemyCircleBlockEntity> {
 
     public static final Random renderRandom = new Random();
+    public static final Random seededRenderRandom = new Random();
 
     private static final float LINE_THICKNESS = 1 / 16.0f;
     private static final float HALF_LINE_THICKNESS = LINE_THICKNESS / 2.0f;
@@ -40,6 +36,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
     private static final Identifier ALCHEMY_CIRCLE_TEXTURE = new Identifier(TheWorkMod.ModID, "textures/other/alchemy_circle.png");
 
     private ArrayList<AlchemyNode> specialRenders = new ArrayList<>();
+
+    public boolean wobble = false;
 
     public AlchemyCircleBlockEntityRenderer(BlockEntityRendererFactory.Context context) {
 
@@ -71,7 +69,14 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
         RenderingUtilities.setupLightOverlay(light, overlay);
         RenderingUtilities.setupNormal(0, 1, 0);
-        RenderingUtilities.setupColor(255, 255, 255, 255);
+
+
+        if (!circle.isActive)
+            RenderingUtilities.setupColor(240, 240, 240, 255);
+        else
+            RenderingUtilities.setupColor(230, 240, 255, 255);
+
+        RenderingUtilities.setupWobble(circle.isActive ? 0.01f : 0);
 
 
         try {
@@ -81,18 +86,18 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             drawFullCircle(0.5f, 8);
             drawFullCircle(0.5f, 4);
 
-            renderRandom.setSeed(entity.getPos().asLong());
+            seededRenderRandom.setSeed(entity.getPos().asLong());
 
             drawCirclePips(0.5f + LINE_THICKNESS, 0, MathHelper.PI, 4, 1 / 8.0f, false);
             drawCirclePips(0.5f + LINE_THICKNESS, MathHelper.PI, MathHelper.TAU, 4, 1 / 8.0f, false);
 
             for (int i = 0; i < circle.rings.size(); i++) {
                 var ring = circle.rings.get(i);
-                var nextRing = circle.isOutward ?
-                        (i == circle.rings.size() - 1 ? null : circle.rings.get(i + 1)) :
-                        (i == 0 ? null : circle.rings.get(i - 1));
+                //var nextRing = circle.isOutward ?
+                //(i == circle.rings.size() - 1 ? null : circle.rings.get(i + 1)) :
+                //(i == 0 ? null : circle.rings.get(i - 1));
 
-                drawRing(ring, nextRing);
+                drawRing(ring, null);
             }
 
             for (AlchemyNode node : specialRenders) {
@@ -109,42 +114,20 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
 
     private void drawRing(AlchemyRing ring, AlchemyRing next) {
-
-        renderRandom.setSeed(Float.hashCode(ring.radius));
-
-        var clockwise = ring.isClockwise;
-        var nodeWidthAngle = MathHelper.lerp(0.5f / ring.circumference, 0, MathHelper.TAU);
-        var spinMult = clockwise ? 1 : -1;
-
+        seededRenderRandom.setSeed(Float.hashCode(ring.radius));
 
         for (int i = 0; i < ring.nodes.length; i++) {
-
-            var indexNext = ring.getNextNodeIndex(i);
-
+            //Calculate the properties for this node.
             var nodeThis = ring.getNode(i);
-            var nextNode = ring.getNode(indexNext);
-
-            var progressThis = nodeThis.index / (float) ring.nodes.length;
-            var angleThis = progressThis * MathHelper.TAU;
-            angleThis = TheWorkUtils.wrapRadians(angleThis);
-
-            var progressNext = nextNode.index / (float) ring.nodes.length;
-            var angleNext = progressNext * MathHelper.TAU;
-            angleNext = TheWorkUtils.wrapRadians(angleNext);
-
+            //If node is special, do the special rendering for it later.
             if (nodeThis.nodeType != AlchemyNodeTypes.NONE)
                 specialRenders.add(nodeThis);
 
-            if (nodeThis.nodeType != AlchemyNodeTypes.NONE)
-                angleThis -= nodeWidthAngle * spinMult;
-            if (nextNode.nodeType != AlchemyNodeTypes.NONE)
-                angleNext += nodeWidthAngle * spinMult;
+            var pathThis = ring.paths[i];
 
-
-            int length = MathHelper.ceil(TheWorkUtils.angleBetweenRadians(progressNext * MathHelper.TAU, progressThis * MathHelper.TAU) * ring.radius);
-
-            drawPippedCircleSegment(ring.radius, angleThis, angleNext, length, length * 3, ring.isClockwise ? LINE_THICKNESS : -LINE_THICKNESS * 3, ring.isClockwise ? 0.1f : -0.05f);
-
+            //Draw the arc between this node and the next.
+            int length = MathHelper.ceil(pathThis.length);
+            drawPippedCircleSegment(ring.radius, pathThis.startAngle, pathThis.endAngle, length, length * 3, ring.isClockwise ? LINE_THICKNESS : -LINE_THICKNESS * 3, ring.isClockwise ? 0.1f : -0.05f);
         }
     }
 
@@ -152,12 +135,15 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         RenderingUtilities.pushMat();
 
         try {
+            var customRenderer = AlchemyNodeTypeRenderers.get(node.nodeType);
+
             RenderingUtilities.translateMatrix(MathHelper.sin(node.getAngle()) * node.ring.radius, 0, MathHelper.cos(node.getAngle()) * node.ring.radius);
             RenderingUtilities.rotateMatrix(0, node.getAngle() + MathHelper.PI, 0);
 
             //TODO - Check perf on this
             RenderingUtilities.setupRenderLayer(getLayer(node.ring.circle));
-            drawFullCircle(0.5f, 8);
+
+            drawFullCircle(0.5f, customRenderer == null ? 8 : customRenderer.circleSides);
 
             //Render item
             if (!node.heldStack.isEmpty()) {
@@ -165,9 +151,9 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
                     RenderingUtilities.translateMatrix(-0.5f, 0, -0.5f);
                     RenderingUtilities.renderBlock(TheWorkBlocks.ALCHEMY_JAR_BLOCK.getDefaultState(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
                 } else {
-                    renderRandom.setSeed(node.getPosition().hashCode());
+                    seededRenderRandom.setSeed(node.getPosition().hashCode());
                     float time = (float) TheWorkClient.getTime();
-                    time += renderRandom.nextFloat(MathHelper.TAU);
+                    time += seededRenderRandom.nextFloat(MathHelper.TAU);
 
                     RenderingUtilities.translateMatrix(0, MathHelper.sin((time * 2) % MathHelper.TAU) * 0.1f, 0);
                     RenderingUtilities.rotateMatrix(0, time * 2.0f, 0);
@@ -177,7 +163,6 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             }
 
             //Run custom renderer
-            var customRenderer = AlchemyNodeTypeRenderers.get(node.nodeType);
             if (customRenderer != null)
                 customRenderer.render(node);
 
@@ -236,7 +221,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             float progressThis = (offsetPips ? i + 0.5f : i) / (float) pips;
             float angleThis = TheWorkUtils.lerpRadians(progressThis, startAngle, endAngle);
 
-            drawPip(radius, angleThis, MathHelper.lerp(renderRandom.nextFloat(), -0.03f, 0.03f) + pipHeight);
+            drawPip(radius, angleThis, MathHelper.lerp(seededRenderRandom.nextFloat(), -0.03f, 0.03f) + pipHeight);
         }
     }
 

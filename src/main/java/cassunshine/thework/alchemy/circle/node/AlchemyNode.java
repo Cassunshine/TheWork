@@ -2,8 +2,8 @@ package cassunshine.thework.alchemy.circle.node;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItem;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRune;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRuneEvent;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
@@ -41,6 +41,11 @@ public class AlchemyNode implements AlchemyCircleComponent {
      */
     public final ElementInventory inventory = new ElementInventory();
 
+    /**
+     * Inventory to move to outputs.
+     */
+    public final ElementInventory output = new ElementInventory();
+
 
     /**
      * The type of this node.
@@ -56,15 +61,6 @@ public class AlchemyNode implements AlchemyCircleComponent {
      * Interaction point entity for nodes that hold items
      */
     public InteractionPointEntity interactionPoint;
-
-    /**
-     * Determines if the node should output to the next path in the sequence.
-     */
-    public boolean outputMain;
-    /**
-     * Determines if the node should output to the secondary path.
-     */
-    public boolean outputSecondary;
 
 
     /**
@@ -125,7 +121,11 @@ public class AlchemyNode implements AlchemyCircleComponent {
         }
 
         nodeType = newType;
+        typeData = newType.getData();
+
         this.rune = rune;
+
+        ring.circle.regenerateLayouts();
     }
 
     public boolean isInteractionInRange(ItemUsageContext context) {
@@ -145,7 +145,26 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
         context.getPlayer().setStackInHand(hand, heldStack);
 
-        return new AlchemyNodeSetItem(stack, this);
+        return new AlchemyNodeSetItemEvent(stack, this);
+    }
+
+    @Override
+    public void activate() {
+        nodeType.activate(this);
+
+    }
+
+    @Override
+    public void activeTick() {
+        nodeType.activeTick(this);
+    }
+
+    @Override
+    public void deactivate() {
+        nodeType.deactivate(this);
+
+        inventory.clear();
+        output.clear();
     }
 
     @Override
@@ -153,8 +172,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
         nbt.putString("type", nodeType.id.toString());
         nbt.put("typeData", typeData.writeNbt(new NbtCompound()));
 
-        nbt.putBoolean("outputMain", outputMain);
-        nbt.putBoolean("outputSecondary", outputSecondary);
+        nbt.putString("rune", rune.toString());
 
         nbt.put("item", heldStack.writeNbt(new NbtCompound()));
         nbt.put("inventory", inventory.writeNbt(new NbtCompound()));
@@ -168,8 +186,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
         typeData = nodeType.getData();
         typeData.readNbt(nbt.getCompound("typeData"));
 
-        outputMain = nbt.getBoolean("outputMain");
-        outputSecondary = nbt.getBoolean("outputSecondary");
+        rune = new Identifier(nbt.getString("rune"));
 
         heldStack = ItemStack.fromNbt(nbt.getCompound("item"));
         inventory.readNbt(nbt.getCompound("inventory"));
@@ -209,9 +226,9 @@ public class AlchemyNode implements AlchemyCircleComponent {
             ids[1] = identifiers.get(1);
         }
 
-        if (ids[0].equals(nodeType.id) && ids[1].equals(rune)) return new AlchemyNodeSetTypeAndRune(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
+        if (ids[0].equals(nodeType.id) && ids[1].equals(rune)) return new AlchemyNodeSetTypeAndRuneEvent(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
 
-        return new AlchemyNodeSetTypeAndRune(ids[0], ids[1], this);
+        return new AlchemyNodeSetTypeAndRuneEvent(ids[0], ids[1], this);
     }
 
     @Override

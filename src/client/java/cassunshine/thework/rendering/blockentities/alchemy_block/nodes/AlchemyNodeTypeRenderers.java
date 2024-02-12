@@ -22,6 +22,6 @@ public class AlchemyNodeTypeRenderers {
 
     static {
         register(AlchemyNodeTypes.DECONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(4));
-        //register(AlchemyNodeTypes.CONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(6));
+        register(AlchemyNodeTypes.CONSTRUCT, new RuneAlchemyNodeTypeRenderer().withSides(6));
     }
 }

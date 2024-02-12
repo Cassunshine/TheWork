@@ -5,17 +5,17 @@ import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class AlchemyNodeSetTypeAndRune extends AlchemyNodeEvent {
+public class AlchemyNodeSetTypeAndRuneEvent extends AlchemyNodeEvent {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "node_set_rune_and_type");
 
     public Identifier type;
     public Identifier rune;
 
-    public AlchemyNodeSetTypeAndRune() {
+    public AlchemyNodeSetTypeAndRuneEvent() {
         super(IDENTIFIER);
     }
 
-    public AlchemyNodeSetTypeAndRune(Identifier type, Identifier rune, AlchemyNode node) {
+    public AlchemyNodeSetTypeAndRuneEvent(Identifier type, Identifier rune, AlchemyNode node) {
         super(node, IDENTIFIER);
 
         this.type = type;
@@ -42,6 +42,7 @@ public class AlchemyNodeSetTypeAndRune extends AlchemyNodeEvent {
     @Override
     public void applyToNode(AlchemyNode node) {
         node.setTypeAndRune(type, rune);
+        node.ring.updatePathLengths();
     }
 }
 

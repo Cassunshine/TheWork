@@ -1,5 +1,6 @@
 package cassunshine.thework.alchemy.circle.path;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
@@ -7,6 +8,8 @@ import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.particles.TheWorkParticles;
+import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Identifier;
@@ -23,7 +26,7 @@ public class AlchemyPath implements AlchemyCircleComponent {
     /**
      * The speed at which elements travel along paths, in blocks per tick.
      */
-    public static final float TRAVEL_SPEED = 1 / 20.0f;
+    public static final float TRAVEL_SPEED = 1 / 4.0f;
 
     public final AlchemyRing ring;
 
@@ -39,6 +42,15 @@ public class AlchemyPath implements AlchemyCircleComponent {
      */
     public float length = 1;
 
+    /**
+     * The angle that the path starts at on the ring.
+     */
+    public float startAngle = 0;
+    /**
+     * The angle that the path ends at on the ring.
+     */
+    public float endAngle = 0;
+
     public AlchemyPath(AlchemyRing ring, int index, float length) {
         this.ring = ring;
         this.index = index;
@@ -46,20 +58,16 @@ public class AlchemyPath implements AlchemyCircleComponent {
     }
 
     /**
-     * Moves elements along the path.
-     * <p>
-     * use removeFinishedElements to remove any elements that reach the end after this.
-     */
-    public void tick() {
-        for (ElementInstance instance : elements)
-            instance.progress = MathHelper.clamp(instance.progress + TRAVEL_SPEED, 0, length);
-    }
-
-    /**
      * Inserts an element into the path.
      */
     public void addElement(Element element, float progress) {
         elements.add(new ElementInstance(element, progress));
+
+        var position = ring.circle.blockEntity.fullPosition.add(0, ring.circle.blockEntity.getPos().getY() + 0.15f, 0);
+        var start = MathHelper.lerp(progress / length, startAngle, endAngle);
+
+        TheWorkParticles.radialColor = element.color;
+        ring.circle.blockEntity.getWorld().addParticle(TheWorkParticles.RADIAL_ELEMENT, position.x, position.y, position.z, ring.radius, start, endAngle);
     }
 
     /**
@@ -75,6 +83,25 @@ public class AlchemyPath implements AlchemyCircleComponent {
             results.add(element.element);
             elements.remove(i);
         }
+    }
+
+    @Override
+    public void activate() {
+
+    }
+
+    @Override
+    public void activeTick() {
+        for (ElementInstance instance : elements)
+            instance.progress = MathHelper.clamp(instance.progress + TRAVEL_SPEED, 0, length);
+    }
+
+    @Override
+    public void deactivate() {
+        //Discard all elements,
+        elements.clear();
+
+        //TODO - Release from circle when side effects are implemented.
     }
 
     @Override

@@ -1,12 +1,12 @@
 package cassunshine.thework.alchemy.circle.node.type;
 
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
-import cassunshine.thework.elements.recipes.TheWorkRecipes;
+import cassunshine.thework.recipes.TheWorkRecipes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 
 public class DeconstructNodeType extends AlchemyNodeType {
-    
+
     @Override
     public void activate(AlchemyNode node) {
         super.activate(node);
@@ -35,7 +35,8 @@ public class DeconstructNodeType extends AlchemyNodeType {
         var itemId = Registries.ITEM.getId(node.heldStack.getItem());
         var recipe = TheWorkRecipes.getDeconstruction(itemId);
 
-        if (recipe == null) return;
+        if (recipe == null)
+            return;
 
         //If inventory can't fit any of the elements, don't deconstruct.
         for (int i = 0; i < recipe.output().length; i++) {
@@ -49,11 +50,16 @@ public class DeconstructNodeType extends AlchemyNodeType {
         //Add elements to inventory now that its destroyed.
         for (int i = 0; i < recipe.output().length; i++) {
             var output = recipe.output()[i];
-            node.inventory.add(output.element(), output.amount());
+            node.inventory.put(output.element(), output.amount());
         }
 
         //Set on cooldown.
         data.cooldown = recipe.time();
+    }
+
+    @Override
+    public Data getData() {
+        return new DeconstructNodeData();
     }
 
     public static class DeconstructNodeData extends Data {

@@ -1,0 +1,10 @@
+{
+  "required_work" : "mix",
+  "inputs": [
+    "terra",
+    "terra"
+  ],
+  "outputs": [
+    "adamnium"
+  ]
+}

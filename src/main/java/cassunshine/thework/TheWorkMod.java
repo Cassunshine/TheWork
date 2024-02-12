@@ -4,7 +4,7 @@ import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.elements.Elements;
-import cassunshine.thework.elements.recipes.TheWorkRecipes;
+import cassunshine.thework.recipes.TheWorkRecipes;
 import cassunshine.thework.entities.TheWorkEntities;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.TheWorkNetworking;

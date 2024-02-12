@@ -2,14 +2,13 @@ package cassunshine.thework.elements.inventory;
 
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
-import it.unimi.dsi.fastutil.objects.Object2FloatMap;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+
+import java.util.Arrays;
 
 public class ElementInventory {
-    public final Object2FloatMap<Element> amounts = new Object2FloatOpenHashMap<>();
+    private final float[] amounts = new float[Elements.getElementCount()];
 
     public float capacity = Float.POSITIVE_INFINITY;
 
@@ -17,78 +16,104 @@ public class ElementInventory {
 
     }
 
-    public ElementInventory(float capacity) {
+    public ElementInventory withCapacity(float capacity) {
         this.capacity = capacity;
+        return this;
     }
 
-    public void transferAll(ElementInventory target, float amount) {
-        for (Element element : amounts.keySet())
-            transfer(target, element, amount);
+    private void setAmount(Element element, float amount) {
+        amounts[element.number] = amount;
     }
 
-    public void transfer(ElementInventory target, Element element, float amount) {
-        float has = amounts.getFloat(element);
-        has -= target.add(element, amount);
-
-        if (has <= 0)
-            amounts.removeFloat(element);
-        else
-            amounts.put(element, has);
+    /**
+     * Gets how much of an element the inventory has.
+     */
+    public float get(Element element) {
+        return amounts[element.number];
     }
 
-    public float add(Element element, float amount) {
-        float has = amounts.getFloat(element);
-        float newAmount = Math.min(has + amount, capacity);
-        float added = newAmount - has;
-
-        amounts.put(element, newAmount);
-
-        return added;
+    /**
+     * Returns true if inventory has at least as much as the specified element.
+     */
+    public boolean has(Element element, float amount) {
+        return get(element) >= amount;
     }
 
-    public boolean take(Element element, float amount) {
-        float has = amounts.getFloat(element);
 
-        if (has < amount)
+    /**
+     * Puts some amount of element in the inventory, returning the leftover that couldn't fit.
+     */
+    public float put(Element element, float amount) {
+        //Get current amount, for later.
+        float prevAmount = get(element);
+
+        //Put new amount into dictionary
+        float newAmount = Math.min(prevAmount + amount, capacity);
+        setAmount(element, newAmount);
+
+        //Calculate how much we added to this inventory.
+        float added = newAmount - prevAmount;
+
+        //Return anything we didn't add.
+        return amount - added;
+    }
+
+    /**
+     * Transfers up to the specified amount from this inventory into the target.
+     */
+    public void transfer(ElementInventory target, float amount) {
+
+        for (int i = 0; i < amounts.length; i++) {
+            float mine = amounts[i];
+            var element = Elements.getElement(i);
+
+            //'remove' the amount we gave.
+            float giveValue = Math.min(amount, mine);
+            mine -= giveValue;
+
+            //Add to target inventory, recording how much it gave back.
+            float leftover = target.put(element, giveValue);
+            mine += leftover;
+
+            //Set to how much we have now.
+            setAmount(element, mine);
+        }
+    }
+
+    public boolean give(Element element, float amount) {
+        float mine = get(element);
+
+        if (mine < amount)
             return false;
 
-        float newAmount = has - amount;
-        if (newAmount == 0)
-            amounts.removeFloat(element);
-        else
-            amounts.put(element, newAmount);
-
+        setAmount(element, mine - amount);
         return true;
     }
 
-    public boolean has(Element element, float amount) {
-        return amounts.getFloat(element) >= amount;
+    public boolean canFit(Element element, float amount) {
+        return get(element) + amount < capacity;
+    }
+
+    public void clear() {
+        Arrays.fill(amounts, 0);
     }
 
 
     public NbtCompound writeNbt(NbtCompound compound) {
+        for (int i = 0; i < amounts.length; i++) {
+            var amount = amounts[i];
+            var element = Elements.getElement(i);
 
-        for (Object2FloatMap.Entry<Element> entry : amounts.object2FloatEntrySet())
-            compound.putFloat(entry.getKey().id.toString(), entry.getFloatValue());
+            compound.putFloat(element.id.toString(), amount);
+        }
 
         return compound;
     }
 
     public void readNbt(NbtCompound compound) {
         for (String key : compound.getKeys()) {
-            Element element = Elements.getElement(new Identifier(key));
-
-            if (element == Elements.NONE) continue;
-
-            amounts.put(element, compound.getFloat(key));
+            var element = Elements.getElement(new Identifier(key));
+            put(element, compound.getFloat(key));
         }
-    }
-
-    public void flush() {
-        amounts.clear();
-    }
-
-    public boolean canFit(Element element, float amount) {
-        return (amounts.containsKey(element) ? amounts.getFloat(element) + amount : amount) < capacity;
     }
 }

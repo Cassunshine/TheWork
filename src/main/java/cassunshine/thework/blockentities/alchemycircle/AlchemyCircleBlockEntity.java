@@ -60,6 +60,8 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
             return;
 
         var circle = blockEntity.circle;
+
+        circle.activeTick();
     }
 
     public void regenerateInteractionPoints() {

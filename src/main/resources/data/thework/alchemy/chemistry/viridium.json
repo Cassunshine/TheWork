@@ -1,0 +1,10 @@
+{
+  "required_work": "compress",
+  "inputs": [
+    "ventus",
+    "ventus"
+  ],
+  "outputs": [
+    "viridium"
+  ]
+}

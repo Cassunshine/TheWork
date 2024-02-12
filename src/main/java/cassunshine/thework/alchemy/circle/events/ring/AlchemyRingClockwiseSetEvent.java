@@ -5,16 +5,16 @@ import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class AlchemyRingClockwiseSet extends AlchemyRingEvent {
+public class AlchemyRingClockwiseSetEvent extends AlchemyRingEvent {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "ring_set_clockwise");
 
     public boolean isClockwise;
 
-    public AlchemyRingClockwiseSet() {
+    public AlchemyRingClockwiseSetEvent() {
         super(IDENTIFIER);
     }
 
-    public AlchemyRingClockwiseSet(boolean isClockwise, AlchemyRing ring) {
+    public AlchemyRingClockwiseSetEvent(boolean isClockwise, AlchemyRing ring) {
         super(ring, IDENTIFIER);
 
         this.isClockwise = isClockwise;
@@ -38,5 +38,6 @@ public class AlchemyRingClockwiseSet extends AlchemyRingEvent {
     @Override
     public void applyToRing(AlchemyRing ring) {
         ring.isClockwise = isClockwise;
+        ring.updatePathLengths();
     }
 }

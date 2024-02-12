@@ -14,7 +14,7 @@ public class AlchemyNodeType {
     }
 
     public void activeTick(AlchemyNode node) {
-
+        node.inventory.transfer(node.output, Float.POSITIVE_INFINITY);
     }
 
     public void deactivate(AlchemyNode node) {
