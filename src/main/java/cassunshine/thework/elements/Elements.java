@@ -23,6 +23,19 @@ public class Elements {
     public static final Element AQUA = register("aqua", ColorHelper.Argb.getArgb(255, 20, 194, 252));
     public static final Element VENTUS = register("ventus", ColorHelper.Argb.getArgb(255, 217, 252, 238));
 
+
+    public static final Element FERRUM = register("ferrum", ColorHelper.Argb.getArgb(255, 245, 255, 255));
+    public static final Element CUPRUM = register("cuprum", ColorHelper.Argb.getArgb(255, 255, 172, 84));
+    public static final Element AURUM = register("aurum", ColorHelper.Argb.getArgb(255, 255, 222, 74));
+
+
+    public static final Element GEHNIUM = register("gehnium", ColorHelper.Argb.getArgb(255, 133, 0, 0));
+    public static final Element FINIUM = register("finium", ColorHelper.Argb.getArgb(255, 28, 28, 28));
+
+
+    public static final Element MANA = register("mana", ColorHelper.Argb.getArgb(255, 209, 255, 221));
+
+
     public static void initialize() {
     }
 

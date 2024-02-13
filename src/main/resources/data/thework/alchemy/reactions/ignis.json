@@ -1,0 +1,8 @@
+{
+  "order" : 9999,
+  "min_temperature": -10,
+  "heat_output": 1,
+  "inputs": {
+    "ignis": 1
+  }
+}

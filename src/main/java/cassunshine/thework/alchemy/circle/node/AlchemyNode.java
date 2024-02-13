@@ -2,10 +2,12 @@ package cassunshine.thework.alchemy.circle.node;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
+import cassunshine.thework.alchemy.circle.events.circle.CreateLinkEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRuneEvent;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
+import cassunshine.thework.alchemy.circle.path.AlchemyLink;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.inventory.ElementInventory;
@@ -20,6 +22,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -148,6 +151,106 @@ public class AlchemyNode implements AlchemyCircleComponent {
         return new AlchemyNodeSetItemEvent(stack, this);
     }
 
+    /**
+     * Attempts to either:
+     * - Use an existing NBT tag on a chalk to link this and another node
+     * - Create an NBT tag on the chalk to link this node to another node
+     */
+    private TheWorkNetworkEvent generateLinkEvent(ItemUsageContext context) {
+        var stack = context.getStack();
+        var nbt = stack.getNbt();
+
+        //Check first if the tag for making links is present. If it is, we've already started to make a link, so finish it.
+        if (nbt != null) {
+            var desiredTag = nbt.getCompound("link_info");
+            //Remove tag, we either use it in this block or discard it.
+            nbt.remove("link_info");
+
+            try {
+                if (desiredTag != null) {
+                    BlockPos circlePos = BlockPos.fromLong(desiredTag.getLong("circle_pos"));
+                    int ringIndex = desiredTag.getInt("ring_index");
+                    int nodeIndex = desiredTag.getInt("node_index");
+
+                    var circle = ring.circle;
+                    //If position on tag matches this circle's position (same entity)
+                    if (circle.blockEntity.getPos().equals(circlePos)) {
+                        var otherNode = circle.rings.get(ringIndex).getNode(nodeIndex);
+
+                        return new CreateLinkEvent(circle, this, otherNode);
+                    }
+                }
+            } catch (Exception e) {
+                //Silently fail.
+                return TheWorkNetworkEvents.SUCCESS;
+            }
+        }
+
+        //If we haven't started making a link, but the player is sneaking, then start making one.
+        if (context.getPlayer().isSneaking()) {
+            NbtCompound linkInfo = new NbtCompound();
+
+            //Store position of block entity so we don't link across circles.
+            linkInfo.putLong("circle_pos", ring.circle.blockEntity.getPos().asLong());
+            linkInfo.putInt("ring_index", ring.index);
+            linkInfo.putInt("node_index", index);
+
+            nbt.put("link_info", linkInfo);
+            //Don't actually run anything, but don't run anything else, either. Just succeed.
+            return TheWorkNetworkEvents.SUCCESS;
+        }
+
+        return TheWorkNetworkEvents.NONE;
+    }
+
+    /**
+     * Attempts to change this node to the type described by items held by the player.
+     */
+    private TheWorkNetworkEvent generateActionEvent(ItemUsageContext context) {
+        //Get all pages in held book.
+        var pages = getBookPages(context);
+
+        //If there are no pages, reset the node.
+        //If node is default already, do nothing.
+        if (pages == null || pages.length == 0) {
+            if (nodeType != AlchemyNodeTypes.NONE || !rune.equals(NULL_RUNE))
+                return new AlchemyNodeSetTypeAndRuneEvent(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
+            else return TheWorkNetworkEvents.NONE;
+        }
+
+        //Try to parse identifiers from pages.
+        ArrayList<Identifier> identifiers = new ArrayList<>();
+        for (var page : pages) {
+            var id = Identifier.tryParse(page);
+
+            if (id.getPath().isEmpty()) continue;
+
+            if (id != null) identifiers.add(id);
+
+            if (identifiers.size() == 2) break;
+        }
+
+        //If there are no identifiers found in the book, do nothing.
+        if (identifiers.isEmpty()) return TheWorkNetworkEvents.NONE;
+
+        //Collect ids into an array
+        Identifier[] ids = new Identifier[2];
+        if (identifiers.size() == 1) {
+            ids[0] = identifiers.get(0);
+            ids[1] = NULL_RUNE;
+        } else {
+            ids[0] = identifiers.get(0);
+            ids[1] = identifiers.get(1);
+        }
+
+        //If runes are exactly the same, set the node to nothing.
+        if (ids[0].equals(nodeType.id) && ids[1].equals(rune))
+            return new AlchemyNodeSetTypeAndRuneEvent(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
+
+        //Set the node to whatever the book specified.
+        return new AlchemyNodeSetTypeAndRuneEvent(ids[0], ids[1], this);
+    }
+
     @Override
     public void activate() {
         nodeType.activate(this);
@@ -194,41 +297,18 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     @Override
     public TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context) {
-        if (!isInteractionInRange(context)) return TheWorkNetworkEvents.NONE;
+        if (!isInteractionInRange(context))
+            return TheWorkNetworkEvents.NONE;
 
-        //Get all pages in held book.
-        var pages = getBookPages(context);
-        if (pages == null || pages.length == 0) return TheWorkNetworkEvents.NONE;
+        var linkInteraction = generateLinkEvent(context);
+        if (linkInteraction != TheWorkNetworkEvents.NONE)
+            return linkInteraction;
 
-        //Try to parse identifiers from pages.
-        ArrayList<Identifier> identifiers = new ArrayList<>();
-        for (var page : pages) {
-            var id = Identifier.tryParse(page);
+        var changeInteraction = generateActionEvent(context);
+        if (changeInteraction != TheWorkNetworkEvents.NONE)
+            return changeInteraction;
 
-            if (id.getPath().isEmpty()) continue;
-
-            if (id != null) identifiers.add(id);
-
-            if (identifiers.size() == 2) break;
-        }
-
-
-        if (identifiers.isEmpty()) return TheWorkNetworkEvents.NONE;
-
-        Identifier[] ids = new Identifier[2];
-
-
-        if (identifiers.size() == 1) {
-            ids[0] = identifiers.get(0);
-            ids[1] = NULL_RUNE;
-        } else {
-            ids[0] = identifiers.get(0);
-            ids[1] = identifiers.get(1);
-        }
-
-        if (ids[0].equals(nodeType.id) && ids[1].equals(rune)) return new AlchemyNodeSetTypeAndRuneEvent(AlchemyNodeTypes.NONE.id, NULL_RUNE, this);
-
-        return new AlchemyNodeSetTypeAndRuneEvent(ids[0], ids[1], this);
+        return TheWorkNetworkEvents.NONE;
     }
 
     @Override

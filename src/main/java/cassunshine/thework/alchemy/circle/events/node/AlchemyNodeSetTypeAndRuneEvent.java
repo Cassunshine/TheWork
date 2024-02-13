@@ -43,6 +43,7 @@ public class AlchemyNodeSetTypeAndRuneEvent extends AlchemyNodeEvent {
     public void applyToNode(AlchemyNode node) {
         node.setTypeAndRune(type, rune);
         node.ring.updatePathLengths();
+        node.ring.circle.updateLinkLengths();
     }
 }
 

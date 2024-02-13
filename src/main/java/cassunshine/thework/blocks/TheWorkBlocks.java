@@ -13,11 +13,15 @@ import net.minecraft.util.Identifier;
 public class TheWorkBlocks {
 
     public static final Block ALCHEMY_CIRCLE_BLOCK = new AlchemyCircleBlock();
+    public static final Block CHEMISTRY_SET_BLOCK = new ChemistrySetBlock();
+
     public static final Block ALCHEMY_JAR_BLOCK = new AlchemyJarBlock();
 
 
     public static void initialize() {
         registerBlock(ALCHEMY_CIRCLE_BLOCK, "alchemy_circle");
+        registerBlock(CHEMISTRY_SET_BLOCK, "chemistry_set");
+
         registerBlockWithItem(ALCHEMY_JAR_BLOCK, "alchemy_jar");
     }
 

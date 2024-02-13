@@ -70,6 +70,10 @@ public class RenderingUtilities {
         consumer.vertex(stack.peek().getPositionMatrix(), x + getWobble(), y, z + getWobble()).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
     }
 
+    public static void saneVertex(double x, double y, double z, float u, float v) {
+        saneVertex((float) x, (float) y, (float) z, u, v);
+    }
+
     public static void renderItem(ItemStack stack, World world, int light, int overlay) {
         if (stack.isEmpty())
             return;
@@ -93,6 +97,10 @@ public class RenderingUtilities {
     public static void translateMatrix(float x, float y, float z) {
         stack.translate(x, y, z);
     }
+    public static void translateMatrix(double x, double y, double z) {
+        stack.translate(x, y, z);
+    }
+
 
     public static void rotateMatrix(float x, float y, float z) {
         stack.multiply(new Quaternionf().rotationX(x));

@@ -1,23 +1,25 @@
 package cassunshine.thework.recipes;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.chemistry.ChemistryWorkType;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.ElementPacket;
 import cassunshine.thework.elements.Elements;
+import cassunshine.thework.elements.inventory.ElementInventory;
 import cassunshine.thework.utils.ShiftSorting;
 import cassunshine.thework.utils.TheWorkUtils;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 
+import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Map;
 
 public class TheWorkRecipes {
@@ -26,6 +28,8 @@ public class TheWorkRecipes {
 
     private static ImmutableMap<Identifier, DeconstructionRecipe> DECONSTRUCTION_RECIPES = ImmutableMap.of();
     private static ImmutableMap<String, ConstructionRecipe> CONSTRUCTION_RECIPES = ImmutableMap.of();
+
+    private static ArrayList<ReactionRecipe> REACTIONS = new ArrayList<>();
 
 
     /**
@@ -39,11 +43,35 @@ public class TheWorkRecipes {
         return CONSTRUCTION_RECIPES.get(signature);
     }
 
+    /**
+     * Finds all matching reactions, putting them into a list.
+     */
+    public static void findReactions(float temperature, ElementInventory inputs, ChemistryWorkType workType, ArrayList<ReactionRecipe> target) {
+
+        for (ReactionRecipe reaction : REACTIONS) {
+            //If the work type is wrong
+            if (workType != reaction.requiredWork) continue;
+            //If temperature is outside of range
+            if (temperature > reaction.maxTemperature || temperature < reaction.minTemperature) continue;
+            //If the inputs don't match up.
+            boolean hasRightInputs = true;
+            for (var reactionInput : reaction.inputs) {
+                if (!inputs.has(reactionInput.element(), reactionInput.amount())) {
+                    hasRightInputs = false;
+                    break;
+                }
+            }
+            if (!hasRightInputs) continue;
+
+            target.add(reaction);
+        }
+    }
+
     public static void loadRecipes(ResourceManager resourceManager) {
         loadDeconstructionRecipes(resourceManager);
         loadConstructionRecipes(resourceManager);
+        loadReactionRecipes(resourceManager);
     }
-
 
     private static void loadDeconstructionRecipes(ResourceManager resourceManager) {
         Map<Identifier, Resource> recipes = resourceManager.findResources("alchemy/deconstruction", p -> p.getPath().endsWith(".json"));
@@ -91,28 +119,28 @@ public class TheWorkRecipes {
             try {
                 var json = gson.fromJson(value.getReader(), JsonObject.class);
 
-                ConstructionRecipe.Entry[][] rings;
+                ElementPacket[][] rings;
                 ItemStack[] outputs;
 
                 //Inputs...
                 {
                     var jsonInputList = json.get("inputs").getAsJsonArray();
-                    rings = new ConstructionRecipe.Entry[jsonInputList.size()][];
+                    rings = new ElementPacket[jsonInputList.size()][];
 
                     for (int i = 0; i < jsonInputList.size(); i++) {
                         var jsonInputRing = jsonInputList.get(i).getAsJsonArray();
 
-                        ConstructionRecipe.Entry[] ring = new ConstructionRecipe.Entry[jsonInputRing.size()];
+                        var ring = new ElementPacket[jsonInputRing.size()];
                         for (int j = 0; j < jsonInputRing.size(); j++) {
                             var jsonRingEntry = jsonInputRing.get(j).getAsJsonObject();
                             var element = Elements.getElement(new Identifier(TheWorkMod.ModID, jsonRingEntry.get("element").getAsString()));
 
                             if (element == Elements.NONE) throw new Exception("Element not found!!");
 
-                            ring[j] = new ConstructionRecipe.Entry(element, jsonRingEntry.get("amount").getAsInt());
+                            ring[j] = new ElementPacket(element, jsonRingEntry.get("amount").getAsInt());
                         }
 
-                        var offset = ShiftSorting.findShiftValue(ring, r -> r.element.number);
+                        var offset = ShiftSorting.findShiftValue(ring, r -> r.element().number);
                         ShiftSorting.rotateArray(ring, offset);
 
                         rings[i] = ring;
@@ -132,7 +160,7 @@ public class TheWorkRecipes {
                     }
                 }
 
-                var recipe = new ConstructionRecipe(rings, outputs, TheWorkUtils.generateSignature(rings, r -> TheWorkUtils.generateSignature(r, e -> e.element.id.toString())));
+                var recipe = new ConstructionRecipe(rings, outputs, TheWorkUtils.generateSignature(rings, r -> TheWorkUtils.generateSignature(r, e -> e.element().id.toString())));
                 builder.put(recipe.signature, recipe);
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
@@ -140,5 +168,64 @@ public class TheWorkRecipes {
         }
 
         CONSTRUCTION_RECIPES = builder.build();
+    }
+
+    private static void loadReactionRecipes(ResourceManager resourceManager) {
+        Map<Identifier, Resource> recipes = resourceManager.findResources("alchemy/reactions", p -> p.getPath().endsWith(".json"));
+        REACTIONS.clear();
+
+        for (var entry : recipes.entrySet()) {
+            var value = entry.getValue();
+
+            try {
+                var json = gson.fromJson(value.getReader(), JsonObject.class);
+
+                var recipe = new ReactionRecipe();
+
+                recipe.minTemperature = json.has("min_temperature") ? json.get("min_temperature").getAsFloat() : Float.NEGATIVE_INFINITY;
+                recipe.maxTemperature = json.has("max_temperature") ? json.get("max_temperature").getAsFloat() : Float.NEGATIVE_INFINITY;
+
+                recipe.heatOutput = json.has("heat_output") ? json.get("heat_output").getAsFloat() : 0;
+                recipe.order = json.has("order") ? json.get("order").getAsInt() : 0;
+
+                recipe.requiredWork = json.has("required_work") ? ChemistryWorkType.valueOf(json.get("required_work").getAsString().toUpperCase(Locale.ROOT)) : ChemistryWorkType.NONE;
+
+                //Read inputs
+                if (json.has("inputs")) {
+                    var inputJson = json.get("inputs").getAsJsonObject();
+                    var inputPackets = new ElementPacket[inputJson.size()];
+
+                    var index = 0;
+                    for (var key : inputJson.keySet()) {
+                        var val = inputJson.get(key).getAsFloat();
+                        inputPackets[index++] = new ElementPacket(Elements.getElement(new Identifier(TheWorkMod.ModID, key)), val);
+                    }
+
+                    recipe.inputs = inputPackets;
+                } else {
+                    recipe.inputs = new ElementPacket[0];
+                }
+
+                //Read outputs
+                if (json.has("outputs")) {
+                    var outputJson = json.get("outputs").getAsJsonObject();
+                    var outputPackets = new ElementPacket[outputJson.size()];
+
+                    var index = 0;
+                    for (var key : outputJson.keySet()) {
+                        var val = outputJson.get(key).getAsFloat();
+                        outputPackets[index++] = new ElementPacket(Elements.getElement(new Identifier(TheWorkMod.ModID, key)), val);
+                    }
+
+                    recipe.outputs = outputPackets;
+                } else {
+                    recipe.outputs = new ElementPacket[0];
+                }
+
+                REACTIONS.add(recipe);
+            } catch (Exception e) {
+                TheWorkMod.LOGGER.error(e.toString());
+            }
+        }
     }
 }

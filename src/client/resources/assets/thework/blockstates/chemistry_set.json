@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "" : {
+      "model" : "thework:block/chemistry_set"
+    }
+  }
+}

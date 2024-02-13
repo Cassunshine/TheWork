@@ -2,15 +2,14 @@ package cassunshine.thework;
 
 import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.client.networking.TheWorkClientNetworking;
-import cassunshine.thework.particles.TheWorkParticles;
 import cassunshine.thework.rendering.blockentities.TheWorkBlockEntityRenderers;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.entities.TheWorkEntityRenderers;
+import cassunshine.thework.rendering.model.TheWorkModelPlugin;
 import cassunshine.thework.rendering.particles.TheWorkParticleRenderers;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import org.slf4j.Logger;
@@ -32,6 +31,9 @@ public class TheWorkClient implements ClientModInitializer {
 
         TheWorkClientNetworking.initialize();
         BlockRenderLayerMap.INSTANCE.putBlock(TheWorkBlocks.ALCHEMY_JAR_BLOCK, RenderLayer.getTranslucent());
+
+
+        ModelLoadingPlugin.register(new TheWorkModelPlugin());
     }
 
     public static double getTime() {
@@ -41,4 +43,6 @@ public class TheWorkClient implements ClientModInitializer {
             return 0;
         return (world.getTime() + MinecraftClient.getInstance().getTickDelta()) / 20.0f;
     }
+
+
 }

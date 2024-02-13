@@ -1,0 +1,10 @@
+{
+  "order": 0,
+  "required_work": "compress",
+  "inputs": {
+    "ventus": 2
+  },
+  "outputs": {
+    "viridium": 1
+  }
+}

@@ -32,7 +32,7 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
                 var alchemyNode = alchemyRing.nodes.get(n);
                 var recipeNode = recipeRing[n];
 
-                hasAll = alchemyNode.inventory.has(recipeNode.element, recipeNode.amount);
+                hasAll = alchemyNode.inventory.has(recipeNode.element(), recipeNode.amount());
             }
         }
 
@@ -49,7 +49,7 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
                 var alchemyNode = alchemyRing.nodes.get(n);
                 var recipeNode = recipeRing[n];
 
-                alchemyNode.inventory.give(recipeNode.element, recipeNode.amount);
+                alchemyNode.inventory.give(recipeNode.element(), recipeNode.amount());
             }
         }
 

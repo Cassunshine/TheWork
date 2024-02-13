@@ -2,18 +2,19 @@ package cassunshine.thework.alchemy.circle.events.path;
 
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingEvent;
 import cassunshine.thework.alchemy.circle.path.AlchemyPath;
+import cassunshine.thework.alchemy.circle.path.AlchemyRingPath;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class AlchemyPathEvent extends AlchemyRingEvent {
+public class AlchemyRingPathEvent extends AlchemyRingEvent {
     public int index;
 
-    public AlchemyPathEvent(Identifier id) {
+    public AlchemyRingPathEvent(Identifier id) {
         super(id);
     }
 
-    public AlchemyPathEvent(AlchemyPath path, Identifier id) {
+    public AlchemyRingPathEvent(AlchemyRingPath path, Identifier id) {
         super(path.ring, id);
         index = path.index;
     }
@@ -24,8 +25,7 @@ public class AlchemyPathEvent extends AlchemyRingEvent {
         applyToPath(ring.paths[index]);
     }
 
-    public void applyToPath(AlchemyPath path) {
-
+    public void applyToPath(AlchemyRingPath path) {
     }
 
     @Override

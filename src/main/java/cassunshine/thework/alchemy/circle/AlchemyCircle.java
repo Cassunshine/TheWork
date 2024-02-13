@@ -2,12 +2,12 @@ package cassunshine.thework.alchemy.circle;
 
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.node.AlchemyNode;
+import cassunshine.thework.alchemy.circle.path.AlchemyLink;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
-import cassunshine.thework.recipes.ConstructionRecipe;
-import cassunshine.thework.recipes.TheWorkRecipes;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -29,6 +29,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
      * Holds all rings in this circle.
      */
     public final ArrayList<AlchemyRing> rings = new ArrayList<>();
+
+    public final ArrayList<AlchemyLink> links = new ArrayList<>();
 
     public AlchemyCircleConstructLayout constructNodeLayout;
 
@@ -55,8 +57,19 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             var radiusDifference = MathHelper.abs(radius - rings.get(i).radius);
 
             if (radiusDifference < 1) {
-                rings.remove(i);
+                var ring = rings.remove(i);
                 blockEntity.regenerateInteractionPoints();
+
+                //Clear all links involving this node.
+                for (AlchemyNode node : ring.nodes) {
+                    for (int j = links.size() - 1; j >= 0; j--) {
+                        var link = links.get(j);
+
+                        if (link.sourceNode == node || link.destinationNode == node)
+                            links.remove(j);
+                    }
+                }
+
                 return;
             }
         }
@@ -79,6 +92,27 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             rings.get(i).index = i;
 
         regenerateLayouts();
+    }
+
+
+    public void addLink(AlchemyLink newLink) {
+
+        for (int i = links.size() - 1; i >= 0; i--) {
+            var link = links.get(i);
+
+            if (link.sourceNode == newLink.sourceNode && link.destinationNode == newLink.destinationNode) {
+                links.remove(i);
+                return;
+            }
+        }
+
+        links.add(newLink);
+    }
+
+    public void updateLinkLengths() {
+        for (AlchemyLink link : links) {
+            link.updateLength();
+        }
     }
 
     @Override
@@ -109,18 +143,23 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         NbtList ringsList = new NbtList();
+        NbtList linkList = new NbtList();
 
         //Write lists to NBT
         for (int i = 0; i < rings.size(); i++)
             ringsList.add(rings.get(i).writeNbt(new NbtCompound()));
+        for (int i = 0; i < links.size(); i++)
+            linkList.add(links.get(i).writeNbt(new NbtCompound()));
 
         nbt.put("rings", ringsList);
+        nbt.put("links", linkList);
         return nbt;
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         NbtList ringsList = nbt.getList("rings", NbtElement.COMPOUND_TYPE);
+        NbtList linkList = nbt.getList("links", NbtElement.COMPOUND_TYPE);
 
         //Re-create rings.
         rings.clear();
@@ -128,7 +167,16 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             var newRing = new AlchemyRing(this);
             newRing.readNbt(ringsList.getCompound(i));
 
-            rings.add(newRing);
+            if(newRing.radius != 0)
+                rings.add(newRing);
+        }
+
+        links.clear();
+        for (int i = 0; i < linkList.size(); i++) {
+            var newLink = new AlchemyLink(this);
+            newLink.readNbt(linkList.getCompound(i));
+
+            links.add(newLink);
         }
 
         sortRings();

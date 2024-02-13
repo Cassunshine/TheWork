@@ -1,0 +1,10 @@
+{
+  "order": 0,
+  "required_work": "mix",
+  "inputs": {
+    "terra": 2
+  },
+  "outputs": {
+    "adamnium": 1
+  }
+}

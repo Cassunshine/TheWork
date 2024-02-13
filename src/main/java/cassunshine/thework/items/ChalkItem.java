@@ -10,6 +10,7 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 
@@ -42,20 +43,26 @@ public class ChalkItem extends Item {
 
             return ActionResult.SUCCESS;
         } else {
-            //Try to place new alchemy circle block.
-
+            //Try to interact with existing alchemy circle
             if (AlchemyCircleBlockEntity.generateAndSendEventNearest(context))
                 return ActionResult.SUCCESS;
+
+            //If there isn't a circle, place one.
+
 
             //Calculate where we're placing it, and if that block is replaceable or air.
             var realPos = context.getBlockPos().add(context.getSide().getVector());
             var realPosBlock = context.getWorld().getBlockState(realPos);
             if (!realPosBlock.isAir() && !realPosBlock.isReplaceable()) return ActionResult.PASS;
 
-            //If alchemy circle can be placed there, place it.
+            //If alchemy circle can be placed there, place it, and interact with it.
             var state = TheWorkBlocks.ALCHEMY_CIRCLE_BLOCK.getDefaultState();
             if (state.canPlaceAt(context.getWorld(), realPos)) {
                 context.getWorld().setBlockState(realPos, state);
+
+                var hit = new BlockHitResult(context.getHitPos(), context.getSide(), realPos, context.hitsInsideBlock());
+
+                AlchemyCircleBlockEntity.generateAndSendEventNearest(new ItemUsageContext(context.getPlayer(), context.getHand(), hit));
                 return ActionResult.SUCCESS;
             }
         }

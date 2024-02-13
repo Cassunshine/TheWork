@@ -3,6 +3,7 @@ package cassunshine.thework.network.events;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.events.circle.CreateLinkEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRuneEvent;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
@@ -30,12 +31,14 @@ public class TheWorkNetworkEvents {
     public static void initialize() {
 
         register(AddRingEvent.IDENTIFIER, AddRingEvent::new);
+        register(CreateLinkEvent.IDENTIFIER, CreateLinkEvent::new);
         register(ActivateToggleEvent.IDENTIFIER, ActivateToggleEvent::new);
 
         register(AlchemyRingClockwiseSetEvent.IDENTIFIER, AlchemyRingClockwiseSetEvent::new);
 
         register(AlchemyNodeSetTypeAndRuneEvent.IDENTIFIER, AlchemyNodeSetTypeAndRuneEvent::new);
         register(AlchemyNodeSetItemEvent.IDENTIFIER, AlchemyNodeSetItemEvent::new);
+
     }
 
 

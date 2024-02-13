@@ -1,19 +1,16 @@
 package cassunshine.thework.alchemy.circle.path;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
-import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
-import cassunshine.thework.particles.TheWorkParticles;
-import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 
@@ -22,15 +19,12 @@ import java.util.ArrayList;
  * <p>
  * They operate in single units of elements, i.e., 1 element unit at a time.
  */
-public class AlchemyPath implements AlchemyCircleComponent {
+public abstract class AlchemyPath implements AlchemyCircleComponent {
     /**
      * The speed at which elements travel along paths, in blocks per tick.
      */
     public static final float TRAVEL_SPEED = 1 / 4.0f;
 
-    public final AlchemyRing ring;
-
-    public final int index;
 
     /**
      * List of all elements currently travelling through this path.
@@ -42,20 +36,12 @@ public class AlchemyPath implements AlchemyCircleComponent {
      */
     public float length = 1;
 
-    /**
-     * The angle that the path starts at on the ring.
-     */
-    public float startAngle = 0;
-    /**
-     * The angle that the path ends at on the ring.
-     */
-    public float endAngle = 0;
 
-    public AlchemyPath(AlchemyRing ring, int index, float length) {
-        this.ring = ring;
-        this.index = index;
+    public AlchemyPath(float length) {
         this.length = length;
     }
+
+    public abstract void spawnParticle(Element element, float progress);
 
     /**
      * Inserts an element into the path.
@@ -63,11 +49,7 @@ public class AlchemyPath implements AlchemyCircleComponent {
     public void addElement(Element element, float progress) {
         elements.add(new ElementInstance(element, progress));
 
-        var position = ring.circle.blockEntity.fullPosition.add(0, ring.circle.blockEntity.getPos().getY() + 0.15f, 0);
-        var start = MathHelper.lerp(progress / length, startAngle, endAngle);
-
-        TheWorkParticles.radialColor = element.color;
-        ring.circle.blockEntity.getWorld().addParticle(TheWorkParticles.RADIAL_ELEMENT, position.x, position.y, position.z, ring.radius, start, endAngle);
+        spawnParticle(element, progress);
     }
 
     /**

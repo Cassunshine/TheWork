@@ -1,5 +1,6 @@
 package cassunshine.thework;
 
+import cassunshine.thework.alchemy.chemistry.ChemistryObjects;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.blocks.TheWorkBlocks;
@@ -34,6 +35,7 @@ public class TheWorkMod implements ModInitializer {
     public void onInitialize() {
         Elements.initialize();
         AlchemyNodeTypes.initialize();
+        ChemistryObjects.initialize();
 
         TheWorkEntities.initialize();
         TheWorkItems.initialize();

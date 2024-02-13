@@ -1,6 +1,13 @@
 package cassunshine.thework.alchemy.chemistry;
 
 import cassunshine.thework.elements.inventory.ElementInventory;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
 
 public class ChemistryObject {
     /**
@@ -21,9 +28,16 @@ public class ChemistryObject {
      */
     public float temperature;
 
+    public ActionResult onUse(PlayerEntity player, Hand hand, BlockHitResult hit, Vec3d localPos) {
+        return ActionResult.PASS;
+    }
+
     public void tick() {
 
 
+    }
 
+    public VoxelShape getShape() {
+        return VoxelShapes.cuboid(0, 0, 0, 0.5f, 1, 0.5f);
     }
 }

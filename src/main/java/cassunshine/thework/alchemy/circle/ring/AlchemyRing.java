@@ -7,6 +7,7 @@ import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEve
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.path.AlchemyPath;
+import cassunshine.thework.alchemy.circle.path.AlchemyRingPath;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
@@ -58,7 +59,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
     /**
      * Array of all paths in the ring, in order of appearance.
      */
-    public AlchemyPath[] paths = new AlchemyPath[0];
+    public AlchemyRingPath[] paths = new AlchemyRingPath[0];
 
 
     public AlchemyRing(AlchemyCircle circle) {
@@ -70,11 +71,11 @@ public class AlchemyRing implements AlchemyCircleComponent {
         float lengthPerPath = circumference / nodeCount;
 
         nodes = new AlchemyNode[nodeCount];
-        paths = new AlchemyPath[nodeCount];
+        paths = new AlchemyRingPath[nodeCount];
 
         for (int i = 0; i < nodeCount; i++) {
             nodes[i] = new AlchemyNode(this, i);
-            paths[i] = new AlchemyPath(this, i, lengthPerPath);
+            paths[i] = new AlchemyRingPath(this, i, lengthPerPath);
         }
 
         updatePathLengths();

@@ -1,0 +1,11 @@
+{
+  "order": 0,
+  "max_temperature": -150,
+  "required_work": "compress",
+  "inputs": {
+    "ignis": 2
+  },
+  "outputs": {
+    "rubrum": 1
+  }
+}

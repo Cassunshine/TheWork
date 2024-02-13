@@ -5,6 +5,7 @@ import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
+import cassunshine.thework.alchemy.circle.path.AlchemyLink;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blocks.TheWorkBlocks;
@@ -20,7 +21,9 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -100,6 +103,9 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
                 drawRing(ring, null);
             }
 
+            for (AlchemyLink link : circle.links)
+                drawLink(circle, link);
+
             for (AlchemyNode node : specialRenders) {
                 drawNode(node);
             }
@@ -169,6 +175,33 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         } catch (Exception e) {
             TheWorkMod.LOGGER.error(e.toString());
         }
+        RenderingUtilities.popMat();
+    }
+
+    private void drawLink(AlchemyCircle circle, AlchemyLink link) {
+        Vec3d sourcePosition = link.sourceNode.getPosition().withAxis(Direction.Axis.Y, circle.blockEntity.getPos().getY());
+        Vec3d destinationPosition = link.destinationNode.getPosition().withAxis(Direction.Axis.Y, circle.blockEntity.getPos().getY());
+
+        sourcePosition = sourcePosition.subtract(circle.blockEntity.fullPosition);
+        destinationPosition = destinationPosition.subtract(circle.blockEntity.fullPosition);
+
+        var delta = destinationPosition.subtract(sourcePosition);
+
+        float angle = (float)MathHelper.atan2(-delta.z, delta.x);
+        angle += MathHelper.PI * 0.5f;
+
+        RenderingUtilities.pushMat();
+        RenderingUtilities.translateMatrix(sourcePosition.x, 0, sourcePosition.z);
+        RenderingUtilities.rotateMatrix(0, angle, 0);
+
+        if(link.sourceNode.nodeType != AlchemyNodeTypes.NONE)
+            RenderingUtilities.translateMatrix(0, 0, 0.5f);
+
+        RenderingUtilities.saneVertex(-HALF_LINE_THICKNESS, 0, 0, 0, 0);
+        RenderingUtilities.saneVertex(HALF_LINE_THICKNESS, 0, 0, 0, 0);
+        RenderingUtilities.saneVertex(HALF_LINE_THICKNESS, 0, link.length, 0, 0);
+        RenderingUtilities.saneVertex(-HALF_LINE_THICKNESS, 0, link.length, 0, 0);
+
         RenderingUtilities.popMat();
     }
 
