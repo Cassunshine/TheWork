@@ -183,6 +183,20 @@ public class AlchemyRing implements AlchemyCircleComponent {
                 path.addElement(element, 0);
             }
 
+            //Move elements still in inventory to the link, if any.
+            if (nodeThis.outputLink != null) {
+                for (int elementNumber = 1; elementNumber < Elements.getElementCount(); elementNumber++) {
+                    var element = Elements.getElement(elementNumber);
+
+                    //Only move in discreet packets of 1 at a time.
+                    if (!nodeThis.inventory.give(element, 1))
+                        continue;
+
+                    //Add to path.
+                    nodeThis.outputLink.addElement(element, 0);
+                }
+            }
+
             //Collect elements that have finished moving along the path.
             finishedPathElements.clear();
             path.removeFinishedElements(finishedPathElements);

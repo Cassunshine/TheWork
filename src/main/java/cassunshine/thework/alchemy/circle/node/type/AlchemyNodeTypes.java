@@ -13,7 +13,10 @@ public class AlchemyNodeTypes {
 
     public static final AlchemyNodeType DECONSTRUCT = register(new Identifier(TheWorkMod.ModID, "deconstruct"), new DeconstructNodeType().withItemHolding());
 
-    public static final AlchemyNodeType CONSTRUCT = register(new Identifier(TheWorkMod.ModID, "construct"), new ConstructNodeType().withItemHolding());
+    public static final AlchemyNodeType CONSTRUCT = register(new Identifier(TheWorkMod.ModID, "construct"), new ConstructNodeType());
+
+    public static final AlchemyNodeType FILTER = register(new Identifier(TheWorkMod.ModID, "filter"), new FilterNodeType());
+
 
 
     public static void initialize() {

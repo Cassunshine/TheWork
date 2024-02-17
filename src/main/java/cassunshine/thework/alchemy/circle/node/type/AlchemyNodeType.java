@@ -14,6 +14,11 @@ public class AlchemyNodeType {
     }
 
     public void activeTick(AlchemyNode node) {
+
+        if(node.outputLink != null){
+            //node.outputLink.addElement();
+        }
+
         node.inventory.transfer(node.output, Float.POSITIVE_INFINITY);
     }
 

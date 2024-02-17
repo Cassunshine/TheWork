@@ -102,6 +102,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
             if (link.sourceNode == newLink.sourceNode && link.destinationNode == newLink.destinationNode) {
                 links.remove(i);
+                link.sourceNode.outputLink = null;
                 return;
             }
         }
@@ -112,6 +113,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public void updateLinkLengths() {
         for (AlchemyLink link : links) {
             link.updateLength();
+            link.sourceNode.outputLink = link;
         }
     }
 
@@ -156,6 +158,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         return nbt;
     }
 
+
     @Override
     public void readNbt(NbtCompound nbt) {
         NbtList ringsList = nbt.getList("rings", NbtElement.COMPOUND_TYPE);
@@ -167,7 +170,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             var newRing = new AlchemyRing(this);
             newRing.readNbt(ringsList.getCompound(i));
 
-            if(newRing.radius != 0)
+            if (newRing.radius != 0)
                 rings.add(newRing);
         }
 
@@ -180,6 +183,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         }
 
         sortRings();
+        updateLinkLengths();
     }
 
     @Override

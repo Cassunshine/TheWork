@@ -1,0 +1,19 @@
+{
+  "type" : "minecraft:crafting_shaped",
+  "pattern" : [
+    " T ",
+    "G G",
+    " G "
+  ],
+  "key": {
+    "T" : {
+      "item": "minecraft:terracotta"
+    },
+    "G": {
+      "item": "minecraft:glass_pane"
+    }
+  },
+  "result": {
+    "item": "thework:alchemy_jar"
+  }
+}

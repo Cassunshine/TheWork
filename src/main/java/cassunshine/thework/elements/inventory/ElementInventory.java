@@ -4,8 +4,10 @@ import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 public class ElementInventory {
     private final float[] amounts = new float[Elements.getElementCount()];
@@ -80,6 +82,31 @@ public class ElementInventory {
         }
     }
 
+    /**
+     * Transfers up to the specified amount from this inventory into the target.
+     */
+    public void transfer(ElementInventory target, float amount, Predicate<Element> allowedElements) {
+
+        for (int i = 0; i < amounts.length; i++) {
+            float mine = amounts[i];
+            var element = Elements.getElement(i);
+
+            if (!allowedElements.test(element))
+                continue;
+
+            //'remove' the amount we gave.
+            float giveValue = Math.min(amount, mine);
+            mine -= giveValue;
+
+            //Add to target inventory, recording how much it gave back.
+            float leftover = target.put(element, giveValue);
+            mine += leftover;
+
+            //Set to how much we have now.
+            setAmount(element, mine);
+        }
+    }
+
     public boolean give(Element element, float amount) {
         float mine = get(element);
 
@@ -88,6 +115,17 @@ public class ElementInventory {
 
         setAmount(element, mine - amount);
         return true;
+    }
+
+    //Takes up to the specified amount.
+    //Returns how much it ACTUALLY took.
+    public float take(Element element, float amount) {
+        float mine = get(element);
+        float taken = Math.min(amount, mine);
+
+        setAmount(element, mine - taken);
+
+        return taken;
     }
 
     public boolean canFit(Element element, float amount) {

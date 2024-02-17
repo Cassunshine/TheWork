@@ -71,6 +71,8 @@ public class AlchemyNode implements AlchemyCircleComponent {
      */
     public ItemStack heldStack = ItemStack.EMPTY;
 
+    public AlchemyLink outputLink = null;
+
     public Identifier rune = NULL_RUNE;
 
     public AlchemyNode(AlchemyRing ring, int index) {

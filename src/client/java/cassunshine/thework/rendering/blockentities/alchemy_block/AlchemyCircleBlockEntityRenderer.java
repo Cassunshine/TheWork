@@ -128,6 +128,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             //If node is special, do the special rendering for it later.
             if (nodeThis.nodeType != AlchemyNodeTypes.NONE)
                 specialRenders.add(nodeThis);
+            else
+                drawPip(ring.radius - 0.1f - LINE_THICKNESS, nodeThis.getAngle(), 0.2f + LINE_THICKNESS);
 
             var pathThis = ring.paths[i];
 
@@ -153,6 +155,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
             //Render item
             if (!node.heldStack.isEmpty()) {
+                RenderingUtilities.pushMat();
+
                 if (node.heldStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == TheWorkBlocks.ALCHEMY_JAR_BLOCK) {
                     RenderingUtilities.translateMatrix(-0.5f, 0, -0.5f);
                     RenderingUtilities.renderBlock(TheWorkBlocks.ALCHEMY_JAR_BLOCK.getDefaultState(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
@@ -166,6 +170,8 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
                     RenderingUtilities.renderItem(node.heldStack, node.ring.circle.blockEntity.getWorld(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
                 }
+
+                RenderingUtilities.popMat();
             }
 
             //Run custom renderer
@@ -175,6 +181,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         } catch (Exception e) {
             TheWorkMod.LOGGER.error(e.toString());
         }
+
         RenderingUtilities.popMat();
     }
 
@@ -190,17 +197,25 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         float angle = (float)MathHelper.atan2(-delta.z, delta.x);
         angle += MathHelper.PI * 0.5f;
 
+        float length = link.length;
+
         RenderingUtilities.pushMat();
         RenderingUtilities.translateMatrix(sourcePosition.x, 0, sourcePosition.z);
         RenderingUtilities.rotateMatrix(0, angle, 0);
 
-        if(link.sourceNode.nodeType != AlchemyNodeTypes.NONE)
+        if(link.sourceNode.nodeType != AlchemyNodeTypes.NONE) {
             RenderingUtilities.translateMatrix(0, 0, 0.5f);
+        } else {
+            RenderingUtilities.translateMatrix(0, 0, LINE_THICKNESS * 2);
+            length -= LINE_THICKNESS * 2;
+        }
+
+        length -= LINE_THICKNESS;
 
         RenderingUtilities.saneVertex(-HALF_LINE_THICKNESS, 0, 0, 0, 0);
         RenderingUtilities.saneVertex(HALF_LINE_THICKNESS, 0, 0, 0, 0);
-        RenderingUtilities.saneVertex(HALF_LINE_THICKNESS, 0, link.length, 0, 0);
-        RenderingUtilities.saneVertex(-HALF_LINE_THICKNESS, 0, link.length, 0, 0);
+        RenderingUtilities.saneVertex(HALF_LINE_THICKNESS, 0, length, 0, 0);
+        RenderingUtilities.saneVertex(-HALF_LINE_THICKNESS, 0, length, 0, 0);
 
         RenderingUtilities.popMat();
     }
@@ -208,6 +223,10 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
     private void drawFullCircle(float radius, int segments) {
         float circleMin = radius;
         float circleMax = radius - LINE_THICKNESS;
+
+        //extra THICC for triangles bc my rendering code is bad
+        if(segments == 3)
+            circleMax -= LINE_THICKNESS;
 
         for (int i = 0; i < segments; i++) {
             float progressThis = i / (float) segments;
@@ -266,7 +285,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
     }
 
     private void drawPip(float radius, float angle, float pipHeight) {
-        float tangent = (float) (angle + MathHelper.HALF_PI);
+        float tangent = angle + MathHelper.HALF_PI;
         float tanX = MathHelper.sin(tangent) * HALF_LINE_THICKNESS;
         float tanY = MathHelper.cos(tangent) * HALF_LINE_THICKNESS;
 
