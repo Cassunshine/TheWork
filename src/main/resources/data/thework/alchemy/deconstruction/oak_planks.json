@@ -1,0 +1,8 @@
+{
+  "input" : "minecraft:oak_planks",
+  "time" : 10,
+  "output" : {
+    "terra" : 1,
+    "aqua" : 1
+  }
+}

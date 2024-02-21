@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 3
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 3
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:oak_log": 1
+  }
+}

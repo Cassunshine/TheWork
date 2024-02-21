@@ -31,7 +31,7 @@ public class AlchemyRingPath extends AlchemyPath {
         var angle = MathHelper.lerp(progress / length, startAngle, endAngle);
 
         var position = ring.circle.blockEntity.fullPosition.add(0, ring.circle.blockEntity.getPos().getY() + 0.15f, 0);
-        TheWorkParticles.radialColor = element.color;
+        TheWorkParticles.particleColor = element.color;
         ring.circle.blockEntity.getWorld().addParticle(TheWorkParticles.RADIAL_ELEMENT, position.x, position.y, position.z, ring.radius, angle, endAngle);
     }
 }

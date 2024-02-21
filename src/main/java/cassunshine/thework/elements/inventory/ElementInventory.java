@@ -23,7 +23,7 @@ public class ElementInventory {
         return this;
     }
 
-    private void setAmount(Element element, float amount) {
+    protected void setAmount(Element element, float amount) {
         amounts[element.number] = amount;
     }
 
@@ -41,6 +41,13 @@ public class ElementInventory {
         return get(element) >= amount;
     }
 
+    public boolean empty(){
+        for (int i = 0; i < Elements.getElementCount(); i++)
+            if (get(Elements.getElement(i)) > 0)
+                return false;
+
+        return true;
+    }
 
     /**
      * Puts some amount of element in the inventory, returning the leftover that couldn't fit.
@@ -65,8 +72,12 @@ public class ElementInventory {
      */
     public void transfer(ElementInventory target, float amount) {
 
-        for (int i = 0; i < amounts.length; i++) {
-            float mine = amounts[i];
+        for (int i = 0; i < Elements.getElementCount(); i++) {
+            float mine = get(Elements.getElement(i));
+
+            if(mine == 0)
+                continue;
+
             var element = Elements.getElement(i);
 
             //'remove' the amount we gave.
@@ -82,16 +93,40 @@ public class ElementInventory {
         }
     }
 
+    public void transferSingle(ElementInventory target, float amount) {
+
+        for (int i = 0; i < Elements.getElementCount(); i++) {
+            var element = Elements.getElement(i);
+            float mine = get(element);
+
+            if (mine == 0)
+                continue;
+
+            //'remove' the amount we gave.
+            float giveValue = Math.min(amount, mine);
+            mine -= giveValue;
+
+            //Add to target inventory, recording how much it gave back.
+            float leftover = target.put(element, giveValue);
+            mine += leftover;
+
+            //Set to how much we have now.
+            setAmount(element, mine);
+            return;
+        }
+    }
+
+
     /**
      * Transfers up to the specified amount from this inventory into the target.
      */
     public void transfer(ElementInventory target, float amount, Predicate<Element> allowedElements) {
 
-        for (int i = 0; i < amounts.length; i++) {
-            float mine = amounts[i];
+        for (int i = 0; i < Elements.getElementCount(); i++) {
+            float mine = get(Elements.getElement(i));
             var element = Elements.getElement(i);
 
-            if (!allowedElements.test(element))
+            if (!allowedElements.test(element) || mine == 0)
                 continue;
 
             //'remove' the amount we gave.

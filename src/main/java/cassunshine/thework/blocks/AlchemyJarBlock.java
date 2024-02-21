@@ -1,5 +1,7 @@
 package cassunshine.thework.blocks;
 
+import cassunshine.thework.elements.Element;
+import cassunshine.thework.elements.inventory.ElementInventory;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockRenderType;
@@ -10,6 +12,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
@@ -21,7 +25,7 @@ import java.util.List;
 
 public class AlchemyJarBlock extends BlockWithEntity {
 
-    private final VoxelShape SHAPE = VoxelShapes.cuboid(3/16.0f, 0, 3/16.0f, 13/16.0f, 12/16.0f, 13/16.0f);
+    private final VoxelShape SHAPE = VoxelShapes.cuboid(3 / 16.0f, 0, 3 / 16.0f, 13 / 16.0f, 12 / 16.0f, 13 / 16.0f);
 
     protected AlchemyJarBlock() {
         super(FabricBlockSettings.create().breakInstantly().nonOpaque());
@@ -54,23 +58,56 @@ public class AlchemyJarBlock extends BlockWithEntity {
         return super.getDroppedStacks(state, builder);
     }
 
-    /**
-     * Checks if a given item stack is either empty, or an empty jar.
-     */
-    public static boolean isEmptyOrEmptyJar(ItemStack stack) {
-        //If the stack is empty, it's empty, regardless.
-        if (stack.isEmpty())
-            return true;
+    public static ElementInventory getInventoryForStack(ItemStack stack) {
+        if (!(stack.getItem() instanceof BlockItem bi) || bi.getBlock() != TheWorkBlocks.ALCHEMY_JAR_BLOCK)
+            return null;
 
-        //If the item isn't a block item, it's not empty jar.
-        if (!(stack.getItem() instanceof BlockItem bi))
-            return false;
+        return new JarInventory(stack);
+    }
 
-        //If the block isn't a jar, it's not an empty jar.
-        if (!(bi.getBlock() instanceof AlchemyJarBlock jar))
-            return false;
+    private static class JarInventory extends ElementInventory {
+        private final ItemStack stack;
 
-        //TODO - Check emptiness of jar.
-        return true;
+        public JarInventory(ItemStack stack) {
+            this.stack = stack;
+            capacity = 2048;
+        }
+
+        @Override
+        public float get(Element element) {
+            if (!stack.hasNbt())
+                return 0;
+
+            var nbt = stack.getOrCreateNbt();
+            if (!nbt.getString("element").equals(element.id.toString()))
+                return 0;
+
+            return nbt.getFloat("amount");
+        }
+
+        @Override
+        public boolean canFit(Element element, float amount) {
+            if (!stack.hasNbt())
+                return super.canFit(element, amount);
+
+            var nbt = stack.getOrCreateNbt();
+            return nbt.contains("element", NbtElement.STRING_TYPE) && nbt.getString("element").equals(element.id.toString());
+        }
+
+        @Override
+        protected void setAmount(Element element, float amount) {
+            var nbt = stack.getOrCreateNbt();
+
+            if (nbt.contains("element", NbtElement.STRING_TYPE) && !nbt.getString("element").equals(element.id.toString()))
+                return;
+
+            if (amount == 0) {
+                nbt.remove("element");
+                nbt.remove("amount");
+            } else {
+                nbt.putString("element", element.id.toString());
+                nbt.putFloat("amount", amount);
+            }
+        }
     }
 }

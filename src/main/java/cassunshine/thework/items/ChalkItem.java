@@ -6,17 +6,30 @@ import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 public class ChalkItem extends Item {
     public ChalkItem() {
         super(new FabricItemSettings());
+    }
+
+    @Override
+    public boolean hasRecipeRemainder() {
+        return true;
+    }
+
+    @Override
+    public ItemStack getRecipeRemainder(ItemStack stack) {
+        return new ItemStack(TheWorkItems.CHALK_ITEM);
     }
 
     @Override
@@ -34,7 +47,9 @@ public class ChalkItem extends Item {
             }
 
             //Calculate radius and add a new ring.
-            float radius = MathHelper.sqrt((float) context.getBlockPos().withY(0).getSquaredDistance(pos.withY(0)));
+            float radius = ((float) context.getHitPos().withAxis(Direction.Axis.Y, 0).distanceTo(pos.toCenterPos().withAxis(Direction.Axis.Y, 0)));
+
+            radius = Math.round(radius * 4.0f) / 4.0f;
 
             //Add ring to circle.
             TheWorkNetworkEvents.sendEvent(pos, context.getWorld(), new AddRingEvent(radius, entity.circle));

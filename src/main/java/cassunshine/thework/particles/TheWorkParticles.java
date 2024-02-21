@@ -9,9 +9,10 @@ import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
 
 public class TheWorkParticles {
-    public static int radialColor = Integer.MAX_VALUE;
+    public static int particleColor = Integer.MAX_VALUE;
 
     public static final DefaultParticleType RADIAL_ELEMENT = register(new Identifier(TheWorkMod.ModID, "radial_element"), FabricParticleTypes.simple());
+    public static final DefaultParticleType LINK_ELEMENT = register(new Identifier(TheWorkMod.ModID, "link_element"), FabricParticleTypes.simple());
 
     public static void initialize() {
 

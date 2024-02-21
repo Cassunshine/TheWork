@@ -12,6 +12,7 @@ import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import cassunshine.thework.utils.TheWorkUtils;
+import net.minecraft.client.particle.Particle;
 import net.minecraft.client.render.LightmapTextureManager;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
@@ -20,6 +21,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.BlockItem;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -74,10 +76,11 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         RenderingUtilities.setupNormal(0, 1, 0);
 
 
-        if (!circle.isActive)
+        if (!circle.isActive) {
             RenderingUtilities.setupColor(240, 240, 240, 255);
-        else
+        } else {
             RenderingUtilities.setupColor(230, 240, 255, 255);
+        }
 
         RenderingUtilities.setupWobble(circle.isActive ? 0.01f : 0);
 
@@ -129,7 +132,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             if (nodeThis.nodeType != AlchemyNodeTypes.NONE)
                 specialRenders.add(nodeThis);
             else
-                drawPip(ring.radius - 0.1f - LINE_THICKNESS, nodeThis.getAngle(), 0.2f + LINE_THICKNESS);
+                drawPip(ring.radius - 0.03f - LINE_THICKNESS, nodeThis.getAngle(), 0.06f + LINE_THICKNESS);
 
             var pathThis = ring.paths[i];
 
@@ -151,7 +154,9 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             //TODO - Check perf on this
             RenderingUtilities.setupRenderLayer(getLayer(node.ring.circle));
 
-            drawFullCircle(0.5f, customRenderer == null ? 8 : customRenderer.circleSides);
+            RenderingUtilities.rotateMatrix(0, customRenderer.extraRotationAngle, 0);
+            drawFullCircle(0.5f, customRenderer.circleSides);
+            RenderingUtilities.rotateMatrix(0, -customRenderer.extraRotationAngle, 0);
 
             //Render item
             if (!node.heldStack.isEmpty()) {
@@ -175,8 +180,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             }
 
             //Run custom renderer
-            if (customRenderer != null)
-                customRenderer.render(node);
+            customRenderer.render(node);
 
         } catch (Exception e) {
             TheWorkMod.LOGGER.error(e.toString());
@@ -194,7 +198,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
 
         var delta = destinationPosition.subtract(sourcePosition);
 
-        float angle = (float)MathHelper.atan2(-delta.z, delta.x);
+        float angle = (float) MathHelper.atan2(-delta.z, delta.x);
         angle += MathHelper.PI * 0.5f;
 
         float length = link.length;
@@ -203,7 +207,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         RenderingUtilities.translateMatrix(sourcePosition.x, 0, sourcePosition.z);
         RenderingUtilities.rotateMatrix(0, angle, 0);
 
-        if(link.sourceNode.nodeType != AlchemyNodeTypes.NONE) {
+        if (link.sourceNode.nodeType != AlchemyNodeTypes.NONE) {
             RenderingUtilities.translateMatrix(0, 0, 0.5f);
         } else {
             RenderingUtilities.translateMatrix(0, 0, LINE_THICKNESS * 2);
@@ -225,7 +229,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
         float circleMax = radius - LINE_THICKNESS;
 
         //extra THICC for triangles bc my rendering code is bad
-        if(segments == 3)
+        if (segments == 3)
             circleMax -= LINE_THICKNESS;
 
         for (int i = 0; i < segments; i++) {

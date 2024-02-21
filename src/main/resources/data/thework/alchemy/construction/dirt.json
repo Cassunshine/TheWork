@@ -1,0 +1,17 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:dirt": 2
+  }
+}

@@ -23,6 +23,8 @@ public interface AlchemyCircleComponent {
      */
     void deactivate();
 
+    void onDestroy();
+
     NbtCompound writeNbt(NbtCompound nbt);
 
     void readNbt(NbtCompound nbt);

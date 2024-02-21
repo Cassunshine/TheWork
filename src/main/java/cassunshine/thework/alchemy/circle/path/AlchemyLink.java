@@ -4,7 +4,9 @@ import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.elements.Element;
+import cassunshine.thework.particles.TheWorkParticles;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Vec3d;
 
 /**
  * Connects two nodes that aren't on the same ring.
@@ -24,15 +26,26 @@ public class AlchemyLink extends AlchemyPath {
 
     @Override
     public void spawnParticle(Element element, float progress) {
+        Vec3d startPos = sourceNode.getPositionReal().add(0, 0.1f, 0);
+        Vec3d endPos = destinationNode.getPositionReal().add(0, 0.1f, 0);
 
+        /*Vec3d delta = endPos.subtract(startPos).normalize();
+
+        if(sourceNode.nodeType != AlchemyNodeTypes.NONE)
+            startPos.add(delta);
+        if(destinationNode.nodeType != AlchemyNodeTypes.NONE)
+            endPos.subtract(delta);*/
+
+        TheWorkParticles.particleColor = element.color;
+        sourceNode.ring.circle.blockEntity.getWorld().addParticle(TheWorkParticles.LINK_ELEMENT, startPos.x, startPos.y, startPos.z, endPos.x, endPos.y, endPos.z);
     }
 
     public void updateLength() {
-        length = (float)sourceNode.getPosition().distanceTo(destinationNode.getPosition());
+        length = (float) sourceNode.getPosition().distanceTo(destinationNode.getPosition());
 
-        if(sourceNode.nodeType != AlchemyNodeTypes.NONE)
+        if (sourceNode.nodeType != AlchemyNodeTypes.NONE)
             length -= 0.5f;
-        if(destinationNode.nodeType != AlchemyNodeTypes.NONE)
+        if (destinationNode.nodeType != AlchemyNodeTypes.NONE)
             length -= 0.5f;
     }
 

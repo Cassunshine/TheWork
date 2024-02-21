@@ -21,6 +21,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 public class AlchemyCircleBlock extends BlockWithEntity {
@@ -110,4 +111,29 @@ public class AlchemyCircleBlock extends BlockWithEntity {
         return sentEvent ? ActionResult.SUCCESS : ActionResult.FAIL;
     }
 
+    @Override
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        var maybeBE = world.getBlockEntity(pos, TheWorkBlockEntities.ALCHEMY_CIRCLE_TYPE);
+
+        if (maybeBE.isPresent())
+            maybeBE.get().circle.onDestroy();
+
+
+        return super.onBreak(world, pos, state, player);
+    }
+
+    @Override
+    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
+        var maybeBE = world.getBlockEntity(pos, TheWorkBlockEntities.ALCHEMY_CIRCLE_TYPE);
+
+        if (maybeBE.isPresent())
+            maybeBE.get().circle.onDestroy();
+
+        super.onDestroyedByExplosion(world, pos, explosion);
+    }
+
+    @Override
+    public float getHardness() {
+        return super.getHardness();
+    }
 }

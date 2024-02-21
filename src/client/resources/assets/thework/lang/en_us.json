@@ -1,5 +1,6 @@
 {
  "item.thework.chalk" : "Chalk",
+ "item.thework.alchemist_notebook" : "Alchemist's Notebook",
  "block.thework.alchemy_jar": "Alchemic Jar",
 
  "element.thework.ignis" : "Ignis",
@@ -7,5 +8,9 @@
  "element.thework.aqua" : "Aqua",
  "element.thework.ventus" : "Ventus",
 
- "element.thework.vita" : "Vita"
+ "element.thework.vita" : "Vita",
+
+ "ui.alchemist_notebook.title" : "Alchemist's Notebook",
+ "ui.alchemist_notebook.page.node.title" : "Nodes"
+
 }

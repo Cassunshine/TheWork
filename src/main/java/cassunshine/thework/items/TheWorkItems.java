@@ -16,12 +16,16 @@ public class TheWorkItems {
     private static final HashMap<Class<?>, Identifier> CLASS_TO_ITEM_ID = new HashMap<>();
 
     public static final ChalkItem CHALK_ITEM = new ChalkItem();
+    public static final AlchemistNotebookItem ALCHEMIST_NOTEBOOK_ITEM = new AlchemistNotebookItem();
+
 
     public static void initialize() {
         registerItem(CHALK_ITEM, "chalk");
-        registerItem(new ChemistryObjectItem(FurnaceBurnerChemistryObject.IDENTIFIER), FurnaceBurnerChemistryObject.IDENTIFIER);
+        registerItem(ALCHEMIST_NOTEBOOK_ITEM, "alchemist_notebook");
 
-        CLASS_TO_ITEM_ID.put(FurnaceBurnerChemistryObject.class, FurnaceBurnerChemistryObject.IDENTIFIER);
+        //registerItem(new ChemistryObjectItem(FurnaceBurnerChemistryObject.IDENTIFIER), FurnaceBurnerChemistryObject.IDENTIFIER);
+
+        //CLASS_TO_ITEM_ID.put(FurnaceBurnerChemistryObject.class, FurnaceBurnerChemistryObject.IDENTIFIER);
     }
 
 

@@ -1,5 +1,6 @@
 package cassunshine.thework.alchemy.circle.layout;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
@@ -23,8 +24,14 @@ public class AlchemyCircleLayout {
     public final ArrayList<RingLayout> rings = new ArrayList<>();
 
     public AlchemyCircleLayout(AlchemyCircle circle, Predicate<AlchemyNode> predicate) {
-        for (AlchemyRing ring : circle.rings)
-            rings.add(new RingLayout(ring, predicate));
+        for (AlchemyRing ring : circle.rings){
+            for (AlchemyNode node : ring.nodes) {
+                if(predicate.test(node)) {
+                    rings.add(new RingLayout(ring, predicate));
+                    break;
+                }
+            }
+        }
 
         fullSignature = TheWorkUtils.generateSignature(rings, r -> r.signature);
 

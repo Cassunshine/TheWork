@@ -1,9 +1,11 @@
 package cassunshine.thework.alchemy.circle.node.type;
 
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
+import cassunshine.thework.blocks.AlchemyJarBlock;
 import cassunshine.thework.recipes.TheWorkRecipes;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
+import net.minecraft.util.math.MathHelper;
 
 public class DeconstructNodeType extends AlchemyNodeType {
 
@@ -11,24 +13,28 @@ public class DeconstructNodeType extends AlchemyNodeType {
     public void activate(AlchemyNode node) {
         super.activate(node);
 
-        if (!(node.typeData instanceof DeconstructNodeData data)) return;
-
-        data.cooldown = 0;
+        node.typeData.putInt("cooldown", 20);
     }
 
     @Override
     public void activeTick(AlchemyNode node) {
         super.activeTick(node);
 
-        if (!(node.typeData instanceof DeconstructNodeData data)) return;
+        var data = node.typeData;
 
-        if (data.cooldown > 0) {
-            data.cooldown--;
+        if (data.getInt("cooldown") > 0) {
+            data.putInt("cooldown", data.getInt("cooldown") - 1);
             return;
         }
 
         if (node.heldStack.isEmpty()) {
-            data.cooldown = 20;
+            data.putInt("cooldown", Integer.MAX_VALUE);
+            return;
+        }
+
+        var jarInv = AlchemyJarBlock.getInventoryForStack(node.heldStack);
+        if (jarInv != null) {
+            jarInv.transferSingle(node.inventory, 1);
             return;
         }
 
@@ -47,34 +53,17 @@ public class DeconstructNodeType extends AlchemyNodeType {
         //Destroy item.
         node.heldStack.decrement(1);
 
-        //Add elements to inventory now that its destroyed.
-        for (int i = 0; i < recipe.output().length; i++) {
-            var output = recipe.output()[i];
-            node.inventory.put(output.element(), output.amount());
+        var outputs = recipe.output();
+        var movedOutputs = 0.0f;
+
+        //Add elements to the output now that the item is destroyed.
+        for (int i = 0; i < outputs.length; i++) {
+            var output = outputs[i];
+            node.linkOutput.put(output.element(), output.amount());
+            movedOutputs += output.amount();
         }
 
         //Set on cooldown.
-        data.cooldown = recipe.time();
-    }
-
-    @Override
-    public Data getData() {
-        return new DeconstructNodeData();
-    }
-
-    public static class DeconstructNodeData extends Data {
-
-        public int cooldown;
-
-        @Override
-        public NbtCompound writeNbt(NbtCompound nbt) {
-            nbt.putInt("cooldown", cooldown);
-            return nbt;
-        }
-
-        @Override
-        public void readNbt(NbtCompound nbt) {
-            cooldown = nbt.getInt("cooldown");
-        }
+        data.putInt("cooldown", Math.max(recipe.time(), (int) Math.floor(movedOutputs)));
     }
 }

@@ -1,0 +1,8 @@
+{
+  "input" : "minecraft:oak_log",
+  "time" : 10,
+  "output" : {
+    "terra" : 4,
+    "aqua" : 6
+  }
+}

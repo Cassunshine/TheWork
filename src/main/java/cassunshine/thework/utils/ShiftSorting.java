@@ -13,32 +13,11 @@ public class ShiftSorting {
      */
     public static <T> int findShiftValue(T[] array, Function<T, Integer> indexer) {
         int[] indexes = new int[array.length];
-        int[] bestSort = new int[array.length];
-        int[] currentSort = new int[array.length];
 
+        for (int i = 0; i < indexes.length; i++)
+            indexes[i] = indexer.apply(array[i]);
 
-        int bestSortOffset = 0;
-
-        //Fill in index list, and best sort as original
-        for (int i = 0; i < array.length; i++)
-            indexes[i] = bestSort[i] = currentSort[i] = indexer.apply(array[i]);
-
-        //Generate shifted arrays, and compare. Keep only the best.
-        for (int i = 0; i < array.length; i++) {
-            //Rotate the current array 1 time.
-            rotateArray(currentSort, 1);
-
-            int compare = compareArrays(bestSort, currentSort);
-
-            if (compare < 0) {
-                bestSortOffset = i;
-
-                //Copy current sort into best for future comparisons.
-                System.arraycopy(currentSort, 0, bestSort, 0, bestSort.length);
-            }
-        }
-
-        return bestSortOffset;
+        return performShiftSort(indexes);
     }
 
     /**
@@ -46,21 +25,30 @@ public class ShiftSorting {
      */
     public static <T> int findShiftValue(ArrayList<T> list, Function<T, Integer> indexer) {
         int[] indexes = new int[list.size()];
-        int[] bestSort = new int[list.size()];
-        int[] currentSort = new int[list.size()];
+
+        for (int i = 0; i < indexes.length; i++)
+            indexes[i] = indexer.apply(list.get(i));
+
+        return performShiftSort(indexes);
+    }
+
+    private static <T> int performShiftSort(int[] indexes) {
+        int[] bestSort = new int[indexes.length];
+        int[] currentSort = new int[indexes.length];
+
+        System.arraycopy(indexes, 0, bestSort, 0, indexes.length);
+        System.arraycopy(indexes, 0, currentSort, 0, indexes.length);
 
         int bestSortOffset = 0;
 
-        //Fill in index list, and best sort as original
-        for (int i = 0; i < list.size(); i++)
-            indexes[i] = bestSort[i] = currentSort[i] = indexer.apply(list.get(i));
-
         //Generate shifted arrays, and compare. Keep only the best.
-        for (int i = 1; i < list.size(); i++) {
+        for (int i = 1; i < indexes.length; i++) {
             //Rotate the current array 1 time.
             rotateArray(currentSort, 1);
 
-            if (compareArrays(bestSort, currentSort) < 0) {
+            int compare = compareArrays(bestSort, currentSort);
+
+            if (compare > 0) {
                 bestSortOffset = i;
 
                 //Copy current sort into best for future comparisons.

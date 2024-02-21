@@ -87,6 +87,11 @@ public abstract class AlchemyPath implements AlchemyCircleComponent {
     }
 
     @Override
+    public void onDestroy() {
+
+    }
+
+    @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
 
         NbtList elementTypes = new NbtList();

@@ -45,9 +45,14 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public final ElementInventory inventory = new ElementInventory();
 
     /**
+     * Inventory to move to the .
+     */
+    public final ElementInventory ringOutput = new ElementInventory();
+
+    /**
      * Inventory to move to outputs.
      */
-    public final ElementInventory output = new ElementInventory();
+    public final ElementInventory linkOutput = new ElementInventory();
 
 
     /**
@@ -58,7 +63,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
     /**
      * Custom data for this node, stored by the type.
      */
-    public AlchemyNodeType.Data typeData = AlchemyNodeType.Data.NONE;
+    public NbtCompound typeData = new NbtCompound();
 
     /**
      * Interaction point entity for nodes that hold items
@@ -71,7 +76,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
      */
     public ItemStack heldStack = ItemStack.EMPTY;
 
-    public AlchemyLink outputLink = null;
+    public AlchemyLink link = null;
 
     public Identifier rune = NULL_RUNE;
 
@@ -86,6 +91,10 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     public Vec3d getPosition() {
         return ring.circle.blockEntity.fullPosition.add(MathHelper.sin(getAngle()) * ring.radius, 0, MathHelper.cos(getAngle()) * ring.radius);
+    }
+
+    public Vec3d getPositionReal() {
+        return ring.circle.blockEntity.fullPosition.add(MathHelper.sin(getAngle()) * ring.radius, ring.circle.blockEntity.getPos().getY(), MathHelper.cos(getAngle()) * ring.radius);
     }
 
     private String[] getBookPages(ItemUsageContext context) {
@@ -113,10 +122,12 @@ public class AlchemyNode implements AlchemyCircleComponent {
         if (newType == nodeType && this.rune == rune) return;
 
         //Only spawn an interaction entity if the type requires, and there is no rune set.
-        if (newType.holdsItems && rune.equals(NULL_RUNE)) {
-            if (interactionPoint == null) interactionPoint = ring.circle.blockEntity.addInteractionPoint(getPosition().add(0, ring.circle.blockEntity.getPos().getY() + 1 / 64.0f, 0));
+        if (newType.heldItemFilter != null) {
+            if (interactionPoint == null)
+                interactionPoint = ring.circle.blockEntity.addInteractionPoint(getPosition().add(0, ring.circle.blockEntity.getPos().getY() + 1 / 64.0f, 0));
         } else {
-            if (interactionPoint != null) interactionPoint = ring.circle.blockEntity.removeInteractionPoint(interactionPoint);
+            if (interactionPoint != null)
+                interactionPoint = ring.circle.blockEntity.removeInteractionPoint(interactionPoint);
         }
 
         //Pop off any existing items.
@@ -126,7 +137,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
         }
 
         nodeType = newType;
-        typeData = newType.getData();
+        typeData = newType.getDefaultData();
 
         this.rune = rune;
 
@@ -269,18 +280,31 @@ public class AlchemyNode implements AlchemyCircleComponent {
         nodeType.deactivate(this);
 
         inventory.clear();
-        output.clear();
+        ringOutput.clear();
+        linkOutput.clear();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (heldStack.isEmpty())
+            return;
+
+        var pos = getPositionReal();
+
+        TheWorkUtils.dropItem(ring.circle.blockEntity.getWorld(), heldStack, (float) pos.x, (float) pos.y + 0.5f, (float) pos.z);
     }
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putString("type", nodeType.id.toString());
-        nbt.put("typeData", typeData.writeNbt(new NbtCompound()));
+        nbt.put("type_data", typeData);
 
         nbt.putString("rune", rune.toString());
 
         nbt.put("item", heldStack.writeNbt(new NbtCompound()));
         nbt.put("inventory", inventory.writeNbt(new NbtCompound()));
+        nbt.put("ring_output", ringOutput.writeNbt(new NbtCompound()));
+        nbt.put("link_output", linkOutput.writeNbt(new NbtCompound()));
 
         return nbt;
     }
@@ -288,13 +312,14 @@ public class AlchemyNode implements AlchemyCircleComponent {
     @Override
     public void readNbt(NbtCompound nbt) {
         nodeType = AlchemyNodeTypes.get(new Identifier(nbt.getString("type")));
-        typeData = nodeType.getData();
-        typeData.readNbt(nbt.getCompound("typeData"));
+        typeData = nbt.getCompound("typeData");
 
         rune = new Identifier(nbt.getString("rune"));
 
         heldStack = ItemStack.fromNbt(nbt.getCompound("item"));
         inventory.readNbt(nbt.getCompound("inventory"));
+        ringOutput.readNbt(nbt.getCompound("ring_output"));
+        linkOutput.readNbt(nbt.getCompound("link_output"));
     }
 
     @Override
@@ -318,7 +343,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
         if (!isInteractionInRange(context)) return TheWorkNetworkEvents.NONE;
 
         //If the type holds items, swap item with player item.
-        if (nodeType.holdsItems)
+        if (nodeType.heldItemFilter != null && (context.getStack().isEmpty() || nodeType.heldItemFilter.test(context.getStack())))
             return swapItemWithPlayer(context);
 
         return TheWorkNetworkEvents.NONE;
@@ -326,7 +351,8 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     @Override
     public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
-        if (nodeType.holdsItems) interactionPoint = blockEntity.addInteractionPoint(getPosition().add(0, blockEntity.getPos().getY() + 1 / 64.0f, 0));
+        if (nodeType.heldItemFilter != null)
+            interactionPoint = blockEntity.addInteractionPoint(getPosition().add(0, blockEntity.getPos().getY() + 1 / 64.0f, 0));
     }
 }
 

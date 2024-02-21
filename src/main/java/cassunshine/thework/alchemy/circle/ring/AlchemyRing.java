@@ -1,6 +1,5 @@
 package cassunshine.thework.alchemy.circle.ring;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
@@ -11,6 +10,7 @@ import cassunshine.thework.alchemy.circle.path.AlchemyRingPath;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.elements.Element;
 import cassunshine.thework.elements.Elements;
+import cassunshine.thework.elements.inventory.ElementInventory;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -67,7 +67,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
     }
 
     private void regenerateNodesAndPaths() {
-        int nodeCount = radius <= 1 ? 0 : ((int) (radius / 2.0f)) * 4;
+        int nodeCount = radius <= 1 ? 0 : ((int) (radius)) * 4;
         float lengthPerPath = circumference / nodeCount;
 
         nodes = new AlchemyNode[nodeCount];
@@ -150,16 +150,22 @@ public class AlchemyRing implements AlchemyCircleComponent {
 
     @Override
     public void activate() {
-        for (AlchemyNode node : nodes)
+        for (AlchemyNode node : nodes) {
             node.activate();
+            if (node.link != null)
+                node.link.activate();
+        }
         for (AlchemyPath path : paths)
             path.activate();
     }
 
     @Override
     public void activeTick() {
-        for (AlchemyNode node : nodes)
+        for (AlchemyNode node : nodes) {
             node.activeTick();
+            if (node.link != null)
+                node.link.activeTick();
+        }
         for (AlchemyPath path : paths)
             path.activeTick();
 
@@ -170,32 +176,17 @@ public class AlchemyRing implements AlchemyCircleComponent {
             var nodeThis = getNode(i);
             var path = paths[i];
             var nextNode = getNode(getNextNodeIndex(i));
+            var link = nodeThis.link;
 
-            //Move new elements from node to path.
-            for (int elementNumber = 1; elementNumber < Elements.getElementCount(); elementNumber++) {
-                var element = Elements.getElement(elementNumber);
-
-                //Only move in discreet packets of 1 at a time.
-                if (!nodeThis.output.give(element, 1))
-                    continue;
-
-                //Add to path.
-                path.addElement(element, 0);
+            //Move elements from the link inventory along the link, if it exists.
+            if (link != null) {
+                transferElements(nodeThis.linkOutput, link);
+            } else {
+                nodeThis.linkOutput.transfer(nodeThis.ringOutput, Float.POSITIVE_INFINITY);
             }
 
-            //Move elements still in inventory to the link, if any.
-            if (nodeThis.outputLink != null) {
-                for (int elementNumber = 1; elementNumber < Elements.getElementCount(); elementNumber++) {
-                    var element = Elements.getElement(elementNumber);
-
-                    //Only move in discreet packets of 1 at a time.
-                    if (!nodeThis.inventory.give(element, 1))
-                        continue;
-
-                    //Add to path.
-                    nodeThis.outputLink.addElement(element, 0);
-                }
-            }
+            //Move elements from the output inventory along the ring.
+            transferElements(nodeThis.ringOutput, path);
 
             //Collect elements that have finished moving along the path.
             finishedPathElements.clear();
@@ -208,15 +199,55 @@ public class AlchemyRing implements AlchemyCircleComponent {
 
                 //TODO - Release leftover.
             }
+
+            if (link != null) {
+                //Collect elements that have finished moving along the path.
+                finishedPathElements.clear();
+                link.removeFinishedElements(finishedPathElements);
+
+                //Loop over all elements at the end of the path.
+                for (Element element : finishedPathElements) {
+                    //Put the element in the node, recording the leftover.
+                    var leftover = link.destinationNode.inventory.put(element, 1);
+
+                    //TODO - Release leftover.
+                }
+            }
+        }
+    }
+
+    private void transferElements(ElementInventory inventory, AlchemyPath path) {
+        for (int elementNumber = 1; elementNumber < Elements.getElementCount(); elementNumber++) {
+            var element = Elements.getElement(elementNumber);
+
+            //Only move in discreet packets of 1 at a time.
+            if (!inventory.give(element, 1))
+                continue;
+
+            //Add to path.
+            path.addElement(element, 0);
+            break;
         }
     }
 
     @Override
     public void deactivate() {
-        for (AlchemyNode node : nodes)
+        for (AlchemyNode node : nodes) {
             node.deactivate();
+            if (node.link != null)
+                node.link.deactivate();
+        }
         for (AlchemyPath path : paths)
             path.deactivate();
+    }
+
+    @Override
+    public void onDestroy() {
+        for (AlchemyNode node : nodes) {
+            node.onDestroy();
+            if (node.link != null)
+                node.link.onDestroy();
+        }
     }
 
     @Override

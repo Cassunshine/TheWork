@@ -12,8 +12,10 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -67,8 +69,12 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
                         if (link.sourceNode == node || link.destinationNode == node)
                             links.remove(j);
+
+                        link.onDestroy();
                     }
                 }
+
+                ring.onDestroy();
 
                 return;
             }
@@ -102,18 +108,36 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
             if (link.sourceNode == newLink.sourceNode && link.destinationNode == newLink.destinationNode) {
                 links.remove(i);
-                link.sourceNode.outputLink = null;
+                link.sourceNode.link = null;
                 return;
             }
         }
 
         links.add(newLink);
+        updateLinkLengths();
+    }
+
+
+    private void spawnActiveParticles() {
+        var random = blockEntity.getWorld().random;
+        if (random.nextInt() % 10 > 3)
+            return;
+
+        Vec3d basePosition = blockEntity.getPos().toCenterPos();
+        float randomRadius = MathHelper.sqrt(random.nextFloat()) * (blockEntity.circle.rings.get(blockEntity.circle.rings.size() - 1).radius);
+        float randomAngle = random.nextFloat() * MathHelper.TAU;
+
+        float tangent = randomAngle + MathHelper.HALF_PI;
+
+        basePosition = basePosition.add(MathHelper.sin(randomAngle) * randomRadius, -0.5f, MathHelper.cos(randomAngle) * randomRadius);
+
+        blockEntity.getWorld().addParticle(ParticleTypes.ENCHANT, basePosition.x, basePosition.y + 3, basePosition.z, MathHelper.sin(tangent), -3, MathHelper.cos(tangent));
     }
 
     public void updateLinkLengths() {
         for (AlchemyLink link : links) {
             link.updateLength();
-            link.sourceNode.outputLink = link;
+            link.sourceNode.link = link;
         }
     }
 
@@ -132,6 +156,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         if (constructNodeLayout.recipe != null)
             constructNodeLayout.tryProduceItem();
+
+        spawnActiveParticles();
     }
 
     @Override
@@ -140,6 +166,12 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         for (AlchemyRing ring : rings)
             ring.deactivate();
+    }
+
+    @Override
+    public void onDestroy() {
+        for (AlchemyRing ring : rings)
+            ring.onDestroy();
     }
 
     @Override
@@ -230,12 +262,14 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         if (context.getBlockPos().equals(blockEntity.getPos()))
             return new ActivateToggleEvent(this);
 
+        if (isActive)
+            return TheWorkNetworkEvents.NONE;
+
         //Try to do normal interaction on the rings.
         for (AlchemyRing ring : rings) {
             var event = ring.generateInteractEvent(context);
             if (event != TheWorkNetworkEvents.NONE) return event;
         }
-
 
         return TheWorkNetworkEvents.NONE;
     }

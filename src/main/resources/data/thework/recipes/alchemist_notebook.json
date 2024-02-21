@@ -1,0 +1,14 @@
+{
+  "type" : "minecraft:crafting_shapeless",
+  "ingredients" : [
+    {
+      "item" : "minecraft:book"
+    },
+    {
+      "item" : "thework:chalk"
+    }
+  ],
+  "result": {
+    "item": "thework:alchemist_notebook"
+  }
+}
