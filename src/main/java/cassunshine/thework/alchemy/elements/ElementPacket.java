@@ -1,4 +1,4 @@
-package cassunshine.thework.elements;
+package cassunshine.thework.alchemy.elements;
 
 public record ElementPacket(Element element, float amount) {
     @Override

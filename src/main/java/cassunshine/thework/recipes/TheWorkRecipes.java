@@ -2,10 +2,10 @@ package cassunshine.thework.recipes;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.chemistry.ChemistryWorkType;
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.ElementPacket;
-import cassunshine.thework.elements.Elements;
-import cassunshine.thework.elements.inventory.ElementInventory;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.ElementPacket;
+import cassunshine.thework.alchemy.elements.Elements;
+import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.utils.ShiftSorting;
 import cassunshine.thework.utils.TheWorkUtils;
 import com.google.common.collect.ImmutableMap;

@@ -1,10 +1,9 @@
-package cassunshine.thework.elements.inventory;
+package cassunshine.thework.alchemy.elements.inventory;
 
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.Elements;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.Elements;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.Arrays;
 import java.util.function.Predicate;

@@ -1,10 +1,9 @@
 package cassunshine.thework.alchemy.circle.layout;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
-import cassunshine.thework.elements.Elements;
+import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.utils.ShiftSorting;
 import cassunshine.thework.utils.TheWorkUtils;
 

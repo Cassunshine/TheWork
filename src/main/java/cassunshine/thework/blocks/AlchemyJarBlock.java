@@ -1,7 +1,7 @@
 package cassunshine.thework.blocks;
 
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.inventory.ElementInventory;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockRenderType;
@@ -12,10 +12,8 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;

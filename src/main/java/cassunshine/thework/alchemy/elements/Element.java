@@ -1,4 +1,4 @@
-package cassunshine.thework.elements;
+package cassunshine.thework.alchemy.elements;
 
 import net.minecraft.util.Identifier;
 

@@ -8,9 +8,9 @@ import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.path.AlchemyPath;
 import cassunshine.thework.alchemy.circle.path.AlchemyRingPath;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.Elements;
-import cassunshine.thework.elements.inventory.ElementInventory;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.Elements;
+import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -93,7 +93,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
     //This ignores the Y axis.
     private float getAngle(Vec3d position) {
         position = position.withAxis(Direction.Axis.Y, 0);
-        var delta = circle.blockEntity.fullPosition.subtract(position);
+        var delta = circle.blockEntity.flatPosition.subtract(position);
 
         var atan2 = MathHelper.atan2(-delta.z, delta.x);
         atan2 += MathHelper.HALF_PI;
@@ -132,12 +132,12 @@ public class AlchemyRing implements AlchemyCircleComponent {
             var pathStart = nodeThis.getAngle();
             var pathEnd = nodeNext.getAngle();
 
-            if (nodeThis.nodeType != AlchemyNodeTypes.NONE) {
+            if (nodeThis.sides != 0) {
                 pathLength -= 0.5f;
                 pathStart += isClockwise ? -nodeWidthAngle : nodeWidthAngle;
             }
 
-            if (nodeNext.nodeType != AlchemyNodeTypes.NONE) {
+            if (nodeNext.sides != 0) {
                 pathLength -= 0.5f;
                 pathEnd += isClockwise ? nodeWidthAngle : -nodeWidthAngle;
             }
@@ -297,7 +297,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
         }
 
         var flatHitPos = context.getHitPos().withAxis(Direction.Axis.Y, 0);
-        var hitRadius = flatHitPos.distanceTo(circle.blockEntity.fullPosition);
+        var hitRadius = flatHitPos.distanceTo(circle.blockEntity.flatPosition);
 
         var relativeRadius = hitRadius - radius;
 

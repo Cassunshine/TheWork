@@ -5,7 +5,7 @@ import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
 import cassunshine.thework.alchemy.circle.events.circle.CreateLinkEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetTypeAndRuneEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetSidesAndRune;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -36,7 +36,7 @@ public class TheWorkNetworkEvents {
 
         register(AlchemyRingClockwiseSetEvent.IDENTIFIER, AlchemyRingClockwiseSetEvent::new);
 
-        register(AlchemyNodeSetTypeAndRuneEvent.IDENTIFIER, AlchemyNodeSetTypeAndRuneEvent::new);
+        register(AlchemyNodeSetSidesAndRune.IDENTIFIER, AlchemyNodeSetSidesAndRune::new);
         register(AlchemyNodeSetItemEvent.IDENTIFIER, AlchemyNodeSetItemEvent::new);
 
     }

@@ -97,6 +97,7 @@ public class RenderingUtilities {
     public static void translateMatrix(float x, float y, float z) {
         stack.translate(x, y, z);
     }
+
     public static void translateMatrix(double x, double y, double z) {
         stack.translate(x, y, z);
     }
@@ -106,6 +107,10 @@ public class RenderingUtilities {
         stack.multiply(new Quaternionf().rotationX(x));
         stack.multiply(new Quaternionf().rotationY(y));
         stack.multiply(new Quaternionf().rotationZ(z));
+    }
+
+    public static void scaleMatrix(float x, float y, float z) {
+        stack.scale(x, y, z);
     }
 
     public static float getWobble() {

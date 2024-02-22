@@ -1,6 +1,5 @@
 package cassunshine.thework.alchemy.circle;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.layout.AlchemyCircleLayout;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.recipes.ConstructionRecipe;
@@ -55,7 +54,7 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
         }
 
 
-        var centerPos = circle.blockEntity.fullPosition.add(0, circle.blockEntity.getPos().getY() + 1, 0);
+        var centerPos = circle.blockEntity.flatPosition.add(0, circle.blockEntity.getPos().getY() + 1, 0);
 
         for (ItemStack output : recipe.outputs) {
             TheWorkUtils.dropItem(circle.blockEntity.getWorld(), output.copy(), centerPos.x, centerPos.y, centerPos.z);

@@ -1,18 +1,14 @@
 package cassunshine.thework.blockentities.alchemycircle;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
-import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
-import cassunshine.thework.blocks.AlchemyCircleBlock;
 import cassunshine.thework.entities.InteractionPointEntity;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.FenceBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemUsage;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +32,7 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
     private final ArrayList<InteractionPointEntity> newPoints = new ArrayList<>();
 
 
-    public final Vec3d fullPosition;
+    public final Vec3d flatPosition;
 
     public final AlchemyCircle circle;
 
@@ -45,7 +41,7 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
 
         circle = new AlchemyCircle(this);
 
-        fullPosition = new Vec3d(pos.getX() + 0.5f, 0, pos.getZ() + 0.5f);
+        flatPosition = new Vec3d(pos.getX() + 0.5f, 0, pos.getZ() + 0.5f);
     }
 
 

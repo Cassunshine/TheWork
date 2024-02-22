@@ -7,6 +7,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
@@ -23,5 +24,14 @@ public class AlchemistNotebookItem extends Item {
 
         TheWorkNetworking.openAlchemistBook((ServerPlayerEntity) user);
         return TypedActionResult.success(user.getStackInHand(hand));
+    }
+
+
+    public static void setRune(Identifier rune){
+
+    }
+
+    public static void setType(Identifier type){
+
     }
 }

@@ -1,11 +1,7 @@
 package cassunshine.thework.recipes;
 
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.ElementPacket;
-import cassunshine.thework.utils.TheWorkUtils;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import cassunshine.thework.alchemy.elements.ElementPacket;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
 
 public class ConstructionRecipe {
 

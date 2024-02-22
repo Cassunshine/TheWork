@@ -58,8 +58,8 @@ public class CreateLinkEvent extends AlchemyCircleEvent {
         var nodeA = circle.rings.get(ringAIndex).getNode(nodeAIndex);
         var nodeB = circle.rings.get(ringBIndex).getNode(nodeBIndex);
 
-        var posA = nodeA.getPosition();
-        var posB = nodeB.getPosition();
+        var posA = nodeA.getPositionFlat();
+        var posB = nodeB.getPositionFlat();
 
         var distance = (float) posA.distanceTo(posB);
 

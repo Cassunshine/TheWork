@@ -1,6 +1,6 @@
 package cassunshine.thework.recipes;
 
-import cassunshine.thework.elements.ElementPacket;
+import cassunshine.thework.alchemy.elements.ElementPacket;
 import net.minecraft.util.Identifier;
 
 import java.util.Arrays;

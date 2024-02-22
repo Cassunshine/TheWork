@@ -3,10 +3,11 @@ package cassunshine.thework.items;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.chemistry.ChemistryObject;
 import cassunshine.thework.alchemy.chemistry.FurnaceBurnerChemistryObject;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
 
 import java.util.HashMap;
@@ -20,8 +21,8 @@ public class TheWorkItems {
 
 
     public static void initialize() {
-        registerItem(CHALK_ITEM, "chalk");
-        registerItem(ALCHEMIST_NOTEBOOK_ITEM, "alchemist_notebook");
+        registerItem(CHALK_ITEM, "chalk", ItemGroups.TOOLS);
+        registerItem(ALCHEMIST_NOTEBOOK_ITEM, "alchemist_notebook", ItemGroups.TOOLS);
 
         //registerItem(new ChemistryObjectItem(FurnaceBurnerChemistryObject.IDENTIFIER), FurnaceBurnerChemistryObject.IDENTIFIER);
 
@@ -29,8 +30,10 @@ public class TheWorkItems {
     }
 
 
-    public static void registerItem(Item item, String name) {
+    public static void registerItem(Item item, String name, RegistryKey<ItemGroup> group) {
         Registry.register(Registries.ITEM, new Identifier(TheWorkMod.ModID, name), item);
+        if(group != null)
+            ItemGroupEvents.modifyEntriesEvent(group).register(c -> c.add(new ItemStack(item)));
     }
 
     public static void registerItem(Item item, Identifier id) {

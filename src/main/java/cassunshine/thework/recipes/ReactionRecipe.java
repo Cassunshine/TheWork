@@ -1,7 +1,7 @@
 package cassunshine.thework.recipes;
 
 import cassunshine.thework.alchemy.chemistry.ChemistryWorkType;
-import cassunshine.thework.elements.ElementPacket;
+import cassunshine.thework.alchemy.elements.ElementPacket;
 
 import java.util.Arrays;
 

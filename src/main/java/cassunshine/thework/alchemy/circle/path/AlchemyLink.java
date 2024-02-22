@@ -3,7 +3,7 @@ package cassunshine.thework.alchemy.circle.path;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
-import cassunshine.thework.elements.Element;
+import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.particles.TheWorkParticles;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.Vec3d;
@@ -41,7 +41,7 @@ public class AlchemyLink extends AlchemyPath {
     }
 
     public void updateLength() {
-        length = (float) sourceNode.getPosition().distanceTo(destinationNode.getPosition());
+        length = (float) sourceNode.getPositionFlat().distanceTo(destinationNode.getPositionFlat());
 
         if (sourceNode.nodeType != AlchemyNodeTypes.NONE)
             length -= 0.5f;
@@ -67,7 +67,7 @@ public class AlchemyLink extends AlchemyPath {
         sourceNode = circle.rings.get(nbt.getInt("sourceRingIndex")).getNode(nbt.getInt("sourceNodeIndex"));
         destinationNode = circle.rings.get(nbt.getInt("destinationRingIndex")).getNode(nbt.getInt("destinationNodeIndex"));
 
-        length = (float) sourceNode.getPosition().distanceTo(destinationNode.getPosition());
+        length = (float) sourceNode.getPositionFlat().distanceTo(destinationNode.getPositionFlat());
 
         updateLength();
     }

@@ -11,6 +11,11 @@
  "element.thework.vita" : "Vita",
 
  "ui.alchemist_notebook.title" : "Alchemist's Notebook",
- "ui.alchemist_notebook.page.node.title" : "Nodes"
+ "ui.alchemist_notebook.page.node.title" : "Nodes",
+ "ui.alchemist_notebook.page.beta.title" : "Nodes",
+
+ "ui.alchemist_notebook.page.beta.sides" : "Sides",
+ "ui.alchemist_notebook.page.beta.rune" : "Rune"
+
 
 }

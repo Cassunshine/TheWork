@@ -5,20 +5,20 @@ import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 
-public class AlchemyNodeSetTypeAndRuneEvent extends AlchemyNodeEvent {
+public class AlchemyNodeSetSidesAndRune extends AlchemyNodeEvent {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "node_set_rune_and_type");
 
-    public Identifier type;
+    public int sides;
     public Identifier rune;
 
-    public AlchemyNodeSetTypeAndRuneEvent() {
+    public AlchemyNodeSetSidesAndRune() {
         super(IDENTIFIER);
     }
 
-    public AlchemyNodeSetTypeAndRuneEvent(Identifier type, Identifier rune, AlchemyNode node) {
+    public AlchemyNodeSetSidesAndRune(int sides, Identifier rune, AlchemyNode node) {
         super(node, IDENTIFIER);
 
-        this.type = type;
+        this.sides = sides;
         this.rune = rune;
     }
 
@@ -27,7 +27,7 @@ public class AlchemyNodeSetTypeAndRuneEvent extends AlchemyNodeEvent {
     public void writePacket(PacketByteBuf buf) {
         super.writePacket(buf);
 
-        buf.writeIdentifier(type);
+        buf.writeInt(sides);
         buf.writeIdentifier(rune);
     }
 
@@ -35,13 +35,13 @@ public class AlchemyNodeSetTypeAndRuneEvent extends AlchemyNodeEvent {
     public void readPacket(PacketByteBuf buf) {
         super.readPacket(buf);
 
-        type = buf.readIdentifier();
+        sides = buf.readInt();
         rune = buf.readIdentifier();
     }
 
     @Override
     public void applyToNode(AlchemyNode node) {
-        node.setTypeAndRune(type, rune);
+        node.setSidesAndRune(sides, rune);
         node.ring.updatePathLengths();
         node.ring.circle.updateLinkLengths();
     }

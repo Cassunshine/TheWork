@@ -2,15 +2,14 @@ package cassunshine.thework.alchemy.circle.path;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
-import cassunshine.thework.elements.Element;
-import cassunshine.thework.elements.Elements;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.*;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
 

@@ -1,6 +1,6 @@
 package cassunshine.thework.alchemy.chemistry;
 
-import cassunshine.thework.elements.inventory.ElementInventory;
+import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
