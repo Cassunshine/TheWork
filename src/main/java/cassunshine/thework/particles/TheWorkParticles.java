@@ -13,6 +13,8 @@ public class TheWorkParticles {
 
     public static final DefaultParticleType RADIAL_ELEMENT = register(new Identifier(TheWorkMod.ModID, "radial_element"), FabricParticleTypes.simple());
     public static final DefaultParticleType LINK_ELEMENT = register(new Identifier(TheWorkMod.ModID, "link_element"), FabricParticleTypes.simple());
+    public static final DefaultParticleType BOLT_ELEMENT = register(new Identifier(TheWorkMod.ModID, "bolt_element"), FabricParticleTypes.simple());
+
 
     public static void initialize() {
 

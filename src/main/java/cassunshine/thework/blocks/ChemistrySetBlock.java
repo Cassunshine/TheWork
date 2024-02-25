@@ -54,7 +54,8 @@ public class ChemistrySetBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return BlockWithEntity.validateTicker(type, TheWorkBlockEntities.CHEMISTRY_SET_TYPE, (w, p, s, b) -> b.tick());
+        return null;
+        //return BlockWithEntity.validateTicker(type, TheWorkBlockEntities.CHEMISTRY_SET_TYPE, (w, p, s, b) -> b.tick());
     }
 
     @Override

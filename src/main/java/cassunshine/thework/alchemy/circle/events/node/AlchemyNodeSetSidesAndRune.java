@@ -41,6 +41,7 @@ public class AlchemyNodeSetSidesAndRune extends AlchemyNodeEvent {
 
     @Override
     public void applyToNode(AlchemyNode node) {
+        super.applyToNode(node);
         node.setSidesAndRune(sides, rune);
         node.ring.updatePathLengths();
         node.ring.circle.updateLinkLengths();

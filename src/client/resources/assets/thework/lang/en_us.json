@@ -1,7 +1,19 @@
 {
  "item.thework.chalk" : "Chalk",
+ "item.thework.gray_chalk" : "Gray Chalk",
+ "item.thework.black_chalk" : "Black Chalk",
+ "item.thework.brown_chalk" : "Brown Chalk",
+ "item.thework.red_chalk" : "Red Chalk",
+ "item.thework.orange_chalk" : "Orange Chalk",
+ "item.thework.yellow_chalk" : "Yellow Chalk",
+ "item.thework.green_chalk" : "Green Chalk",
+ "item.thework.blue_chalk" : "Blue Chalk",
+ "item.thework.purple_chalk" : "Purple Chalk",
+ "item.thework.pink_chalk" : "Pink Chalk",
+
  "item.thework.alchemist_notebook" : "Alchemist's Notebook",
  "block.thework.alchemy_jar": "Alchemic Jar",
+ "block.thework.distillery": "Distillery",
 
  "element.thework.ignis" : "Ignis",
  "element.thework.terra" : "Terra",

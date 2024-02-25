@@ -1,9 +1,12 @@
 package cassunshine.thework.alchemy.circle.path;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
+import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
+import cassunshine.thework.alchemy.circle.events.path.AlchemyRingPathSetColorEvent;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.Elements;
+import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -34,6 +37,8 @@ public abstract class AlchemyPath implements AlchemyCircleComponent {
      * The physical length of this path.
      */
     public float length = 1;
+
+    public int color = 0xFFFFFFFF;
 
 
     public AlchemyPath(float length) {
@@ -67,6 +72,11 @@ public abstract class AlchemyPath implements AlchemyCircleComponent {
     }
 
     @Override
+    public int getColor() {
+        return color;
+    }
+
+    @Override
     public void activate() {
 
     }
@@ -79,6 +89,8 @@ public abstract class AlchemyPath implements AlchemyCircleComponent {
 
     @Override
     public void deactivate() {
+
+
         //Discard all elements,
         elements.clear();
 

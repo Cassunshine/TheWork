@@ -67,7 +67,7 @@ public class ElementInventory {
     }
 
     /**
-     * Transfers up to the specified amount from this inventory into the target.
+     * Transfers up to the specified amount of each element from this inventory into the target.
      */
     public void transfer(ElementInventory target, float amount) {
 

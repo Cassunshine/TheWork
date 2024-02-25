@@ -10,6 +10,7 @@ import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MatrixUtil;
 import net.minecraft.world.World;
 import org.joml.Quaternionf;
@@ -54,6 +55,13 @@ public class RenderingUtilities {
         g = green;
         b = blue;
         a = alpha;
+    }
+
+    public static void setupColor(int color) {
+        r = ColorHelper.Argb.getRed(color);
+        g = ColorHelper.Argb.getGreen(color);
+        b = ColorHelper.Argb.getBlue(color);
+        a = 255;
     }
 
     public static void setupNormal(float x, float y, float z) {

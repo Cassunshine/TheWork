@@ -41,7 +41,7 @@ public class AlchemyLink extends AlchemyPath {
     }
 
     public void updateLength() {
-        length = (float) sourceNode.getPositionFlat().distanceTo(destinationNode.getPositionFlat());
+        length = (float) sourceNode.getPositionRelative().distanceTo(destinationNode.getPositionRelative());
 
         if (sourceNode.nodeType != AlchemyNodeTypes.NONE)
             length -= 0.5f;

@@ -34,4 +34,13 @@ public class AlchemyRingPath extends AlchemyPath {
         TheWorkParticles.particleColor = element.color;
         ring.circle.blockEntity.getWorld().addParticle(TheWorkParticles.RADIAL_ELEMENT, position.x, position.y, position.z, ring.radius, angle, endAngle);
     }
+
+    @Override
+    public void deactivate() {
+        //Throw all elements from this ring into the backfire.
+        for (ElementInstance element : elements)
+            ring.circle.addBackfire(element.element, 1);
+
+        super.deactivate();
+    }
 }

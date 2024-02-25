@@ -3,6 +3,7 @@ package cassunshine.thework.blockentities.alchemycircle;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
 import cassunshine.thework.entities.InteractionPointEntity;
+import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
@@ -143,13 +144,16 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
     //Handles interaction with the alchemy circle given a context.
     public static boolean generateAndSendEvent(AlchemyCircleBlockEntity entity, ItemUsageContext context) {
         var event = entity.generateEvent(context);
+        return sendCircleEvent(entity, event);
+    }
 
+    public static boolean sendCircleEvent(AlchemyCircleBlockEntity entity, TheWorkNetworkEvent event) {
         if (event == TheWorkNetworkEvents.SUCCESS) {
             //Do nothing, but return as if we did so the item plays the swing animation.
             return true;
         }
 
-        TheWorkNetworkEvents.sendEvent(entity.pos, context.getWorld(), event);
+        TheWorkNetworkEvents.sendEvent(entity.pos, entity.getWorld(), event);
         return event != TheWorkNetworkEvents.NONE;
     }
 
@@ -219,7 +223,7 @@ public class AlchemyCircleBlockEntity extends BlockEntity {
     }
 
     private TheWorkNetworkEvent generateEvent(ItemUsageContext context) {
-        if (context.getStack().getItem() == TheWorkItems.CHALK_ITEM)
+        if (context.getStack().getItem() instanceof ChalkItem)
             return generateChalkEvent(context);
 
         return generateInteractEvent(context);

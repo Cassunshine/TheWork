@@ -21,7 +21,7 @@ public class ChemistryObjectItem extends Item {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
-        var position = context.getBlockPos().add(context.getSide().getVector());
+        /*var position = context.getBlockPos().add(context.getSide().getVector());
         var blockEntity = context.getWorld().getBlockEntity(context.getBlockPos());
         ChemistrySetBlockEntity chemistrySet = null;
 
@@ -55,7 +55,7 @@ public class ChemistryObjectItem extends Item {
                 context.getPlayer().getStackInHand(context.getHand()).decrement(1);
                 return ActionResult.SUCCESS;
             }
-        }
+        }*/
 
         return ActionResult.PASS;
     }

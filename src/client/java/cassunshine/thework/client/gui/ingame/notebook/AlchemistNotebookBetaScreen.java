@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.network.handler.PacketBundler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 
 public class AlchemistNotebookBetaScreen extends AlchemistNotebookScreen {
 
@@ -111,8 +112,8 @@ public class AlchemistNotebookBetaScreen extends AlchemistNotebookScreen {
 
         drawnNode.size = 60;
 
-        drawnNode.x = 80;
-        drawnNode.y = 80;
+        drawnNode.x = width / 2;
+        drawnNode.y = height / 2;
 
         circleSidesLeftButton.setX(drawnNode.x - circleSidesLeftButton.getWidth());
         circleSidesLeftButton.setY(drawnNode.y + drawnNode.size / 2);
@@ -140,6 +141,10 @@ public class AlchemistNotebookBetaScreen extends AlchemistNotebookScreen {
         super.render(context, mouseX, mouseY, delta);
     }
 
+    @Override
+    public void renderInGameBackground(DrawContext context) {
+        context.fillGradient(0, 0, this.width, this.height, 0x3C0F0F0F, 0x3C0F0F0F);
+    }
 
     private void syncNbt() {
         var pkt = PacketByteBufs.create();

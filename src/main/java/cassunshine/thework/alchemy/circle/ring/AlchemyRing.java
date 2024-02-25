@@ -2,7 +2,9 @@ package cassunshine.thework.alchemy.circle.ring;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
+import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
+import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingSetColorEvent;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.path.AlchemyPath;
@@ -11,6 +13,7 @@ import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
+import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -60,6 +63,8 @@ public class AlchemyRing implements AlchemyCircleComponent {
      * Array of all paths in the ring, in order of appearance.
      */
     public AlchemyRingPath[] paths = new AlchemyRingPath[0];
+
+    public int color = 0xFFFFFFFF;
 
 
     public AlchemyRing(AlchemyCircle circle) {
@@ -149,6 +154,11 @@ public class AlchemyRing implements AlchemyCircleComponent {
     }
 
     @Override
+    public int getColor() {
+        return color;
+    }
+
+    @Override
     public void activate() {
         for (AlchemyNode node : nodes) {
             node.activate();
@@ -194,23 +204,37 @@ public class AlchemyRing implements AlchemyCircleComponent {
 
             //Loop over all elements at the end of the path.
             for (Element element : finishedPathElements) {
+                //If rolled number is lower than the chaos, backfire this element.
+                if (circle.blockEntity.getWorld().random.nextFloat() < circle.circleChaosSquare) {
+                    circle.addBackfire(element, 1);
+                    continue;
+                }
+
                 //Put the element in the node, recording the leftover.
                 var leftover = nextNode.inventory.put(element, 1);
 
-                //TODO - Release leftover.
+                //Backfire anything that didn't fit.
+                circle.addBackfire(element, leftover);
             }
 
             if (link != null) {
-                //Collect elements that have finished moving along the path.
+                //Collect elements that have finished moving along the link.
                 finishedPathElements.clear();
                 link.removeFinishedElements(finishedPathElements);
 
-                //Loop over all elements at the end of the path.
+                //Loop over all elements at the end of the link.
                 for (Element element : finishedPathElements) {
+                    //If rolled number is lower than the chaos, backfire this element.
+                    if (circle.blockEntity.getWorld().random.nextFloat() < circle.circleChaosSquare) {
+                        circle.addBackfire(element, 1);
+                        continue;
+                    }
+
                     //Put the element in the node, recording the leftover.
                     var leftover = link.destinationNode.inventory.put(element, 1);
 
-                    //TODO - Release leftover.
+                    //Backfire anything that didn't fit.
+                    circle.addBackfire(element, leftover);
                 }
             }
         }
@@ -268,6 +292,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
         nbt.putBoolean("clockwise", isClockwise);
         nbt.put("nodes", nodesList);
         nbt.put("paths", pathsList);
+        nbt.putInt("color", color);
 
         return nbt;
     }
@@ -275,6 +300,7 @@ public class AlchemyRing implements AlchemyCircleComponent {
     @Override
     public void readNbt(NbtCompound nbt) {
         setRadius(nbt.getFloat("radius"));
+        color = nbt.getInt("color");
         isClockwise = nbt.contains("clockwise", NbtElement.BYTE_TYPE) ? nbt.getBoolean("clockwise") : true;
         var nodesList = nbt.getList("nodes", NbtElement.COMPOUND_TYPE);
         var pathsList = nbt.getList("paths", NbtElement.COMPOUND_TYPE);
@@ -303,6 +329,9 @@ public class AlchemyRing implements AlchemyCircleComponent {
 
         //If chalk hit point is too far, do nothing.
         if (Math.abs(relativeRadius) > 1.0f) return TheWorkNetworkEvents.NONE;
+
+        if (context.getStack().getItem() instanceof ChalkItem cI && color != cI.color)
+            AlchemyCircleBlockEntity.sendCircleEvent(circle.blockEntity, new AlchemyRingSetColorEvent(cI.color, this));
 
         return new AlchemyRingClockwiseSetEvent(relativeRadius >= 0, this);
     }

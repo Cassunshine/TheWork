@@ -2,17 +2,21 @@ package cassunshine.thework.alchemy.circle.node;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircleComponent;
+import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
 import cassunshine.thework.alchemy.circle.events.circle.CreateLinkEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetColorEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetSidesAndRune;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeType;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.circle.path.AlchemyLink;
+import cassunshine.thework.alchemy.circle.path.AlchemyPath;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.entities.InteractionPointEntity;
+import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
@@ -37,6 +41,8 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public final AlchemyRing ring;
 
     public final int index;
+
+    public int color = 0xFFFFFFFF;
 
     /**
      * Inventory holding all the elements the node currently has.
@@ -222,13 +228,20 @@ public class AlchemyNode implements AlchemyCircleComponent {
         var nodeNBT = stack.getOrCreateNbt().getCompound("node");
         var rune = TheWorkRunes.getRuneByID(nodeNBT.getInt("rune_id"));
 
+        if (context.getStack().getItem() instanceof ChalkItem cI && color != cI.color)
+            AlchemyCircleBlockEntity.sendCircleEvent(ring.circle.blockEntity, new AlchemyNodeSetColorEvent(cI.color, this));
+
         return new AlchemyNodeSetSidesAndRune(nodeNBT.getInt("sides"), rune, this);
+    }
+
+    @Override
+    public int getColor() {
+        return color;
     }
 
     @Override
     public void activate() {
         nodeType.activate(this);
-
     }
 
     @Override
@@ -239,6 +252,14 @@ public class AlchemyNode implements AlchemyCircleComponent {
     @Override
     public void deactivate() {
         nodeType.deactivate(this);
+
+        if (link != null)
+            for (AlchemyPath.ElementInstance element : link.elements)
+                ring.circle.addBackfire(element.element, 1);
+
+        ring.circle.addBackfire(inventory);
+        ring.circle.addBackfire(ringOutput);
+        ring.circle.addBackfire(linkOutput);
 
         inventory.clear();
         ringOutput.clear();
@@ -259,6 +280,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public NbtCompound writeNbt(NbtCompound nbt) {
         nbt.putInt("sides", sides);
         nbt.put("type_data", typeData);
+        nbt.putInt("color", color);
 
         nbt.putString("rune", rune.toString());
 
@@ -274,6 +296,9 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public void readNbt(NbtCompound nbt) {
         sides = nbt.getInt("sides");
         typeData = nbt.getCompound("typeData");
+        color = nbt.getInt("color");
+
+        nodeType = AlchemyNodeTypes.get(sides);
 
         rune = new Identifier(nbt.getString("rune"));
 
@@ -287,6 +312,9 @@ public class AlchemyNode implements AlchemyCircleComponent {
     public TheWorkNetworkEvent generateChalkEvent(ItemUsageContext context) {
         if (!isInteractionInRange(context))
             return TheWorkNetworkEvents.NONE;
+
+        if (context.getStack().getItem() instanceof ChalkItem cI && color != cI.color && nodeType != AlchemyNodeTypes.NONE)
+            return new AlchemyNodeSetColorEvent(cI.color, this);
 
         var linkInteraction = generateLinkEvent(context);
         if (linkInteraction != TheWorkNetworkEvents.NONE)
@@ -312,6 +340,7 @@ public class AlchemyNode implements AlchemyCircleComponent {
 
     @Override
     public void regenerateInteractionPoints(AlchemyCircleBlockEntity blockEntity) {
+        nodeType = AlchemyNodeTypes.get(sides);
         if (nodeType.heldItemFilter != null)
             interactionPoint = blockEntity.addInteractionPoint(getPositionFlat().add(0, blockEntity.getPos().getY() + 1 / 64.0f, 0));
     }

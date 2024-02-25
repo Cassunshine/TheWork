@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "thework:block/distillery",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "thework:block/distillery"
+    },
+    "facing=south": {
+      "model": "thework:block/distillery",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "thework:block/distillery",
+      "y": 270
+    }
+  }
+}

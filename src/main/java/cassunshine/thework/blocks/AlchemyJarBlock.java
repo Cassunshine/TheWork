@@ -1,7 +1,11 @@
 package cassunshine.thework.blocks;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
+import cassunshine.thework.blockentities.TheWorkBlockEntities;
+import cassunshine.thework.blockentities.jar.AlchemyJarBlockEntity;
+import cassunshine.thework.items.TheWorkItems;
 import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.BlockRenderType;
@@ -9,21 +13,27 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class AlchemyJarBlock extends BlockWithEntity {
 
-    private final VoxelShape SHAPE = VoxelShapes.cuboid(3 / 16.0f, 0, 3 / 16.0f, 13 / 16.0f, 12 / 16.0f, 13 / 16.0f);
+    public static final VoxelShape SHAPE = VoxelShapes.cuboid(3 / 16.0f, 0, 3 / 16.0f, 13 / 16.0f, 12 / 16.0f, 13 / 16.0f);
 
     protected AlchemyJarBlock() {
         super(FabricBlockSettings.create().breakInstantly().nonOpaque());
@@ -37,7 +47,7 @@ public class AlchemyJarBlock extends BlockWithEntity {
     @Nullable
     @Override
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
-        return null;
+        return new AlchemyJarBlockEntity(pos, state);
     }
 
     @Override
@@ -50,10 +60,23 @@ public class AlchemyJarBlock extends BlockWithEntity {
         return SHAPE;
     }
 
-    //TODO - Keep inventory
+    //TODO - Fix this because vanilla loot tables :(
     @Override
     public List<ItemStack> getDroppedStacks(BlockState state, LootContextParameterSet.Builder builder) {
-        return super.getDroppedStacks(state, builder);
+        var def = super.getDroppedStacks(state, builder);
+
+        var stack = new ItemStack(BlockItem.BLOCK_ITEMS.get(this));
+        def.add(stack);
+        stack.setNbt(builder.get(LootContextParameters.BLOCK_ENTITY).createNbt());
+        return def;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        super.onPlaced(world, pos, state, placer, itemStack);
+
+        world.getBlockEntity(pos, TheWorkBlockEntities.ALCHEMY_JAR_TYPE).get().readNbt(itemStack.getNbt());
+        world.getBlockEntity(pos).markDirty();
     }
 
     public static ElementInventory getInventoryForStack(ItemStack stack) {

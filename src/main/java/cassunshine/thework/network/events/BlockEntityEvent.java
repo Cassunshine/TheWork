@@ -5,7 +5,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public abstract class BlockEntityEvent extends TheWorkNetworkEvent {
+public abstract class BlockEntityEvent extends BlockPosEvent {
     public BlockEntityEvent(Identifier id) {
         super(id);
     }

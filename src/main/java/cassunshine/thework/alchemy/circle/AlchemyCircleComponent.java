@@ -7,6 +7,10 @@ import net.minecraft.nbt.NbtCompound;
 
 public interface AlchemyCircleComponent {
 
+    /**
+     * Gets the color of this circle component.
+     */
+    int getColor();
 
     /**
      * Called when the alchemy circle activates.

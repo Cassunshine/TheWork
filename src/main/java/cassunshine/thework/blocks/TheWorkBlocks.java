@@ -16,16 +16,17 @@ import net.minecraft.util.Identifier;
 public class TheWorkBlocks {
 
     public static final Block ALCHEMY_CIRCLE_BLOCK = new AlchemyCircleBlock();
-    public static final Block CHEMISTRY_SET_BLOCK = new ChemistrySetBlock();
+    public static final Block DISTILLERY_BLOCK = new DistilleryBlock();
 
     public static final Block ALCHEMY_JAR_BLOCK = new AlchemyJarBlock();
 
 
     public static void initialize() {
         registerBlock(ALCHEMY_CIRCLE_BLOCK, "alchemy_circle");
-        registerBlock(CHEMISTRY_SET_BLOCK, "chemistry_set");
+        registerBlockWithItem(DISTILLERY_BLOCK, "distillery", ItemGroups.FUNCTIONAL);
 
-        registerBlockWithItem(ALCHEMY_JAR_BLOCK, "alchemy_jar", ItemGroups.FUNCTIONAL);
+        registerBlockWithItem(ALCHEMY_JAR_BLOCK, "alchemy_jar", new FabricItemSettings().maxCount(1), ItemGroups.FUNCTIONAL);
+
     }
 
     private static void registerBlock(Block b, String name) {
@@ -34,7 +35,6 @@ public class TheWorkBlocks {
 
     private static void registerBlockWithItem(Block b, String name, RegistryKey<ItemGroup> group) {
         registerBlockWithItem(b, name, new FabricItemSettings(), group);
-
     }
 
     private static void registerBlockWithItem(Block b, String name, Item.Settings itemSettings, RegistryKey<ItemGroup> group) {

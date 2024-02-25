@@ -15,6 +15,7 @@ public class TheWorkParticleRenderers {
     public static void initialize() {
         ParticleFactoryRegistry.getInstance().register(TheWorkParticles.RADIAL_ELEMENT, p -> new BasicParticleFactory<>(p, RadialParticle::new));
         ParticleFactoryRegistry.getInstance().register(TheWorkParticles.LINK_ELEMENT, p -> new BasicParticleFactory<>(p, PathParticle::new));
+        //ParticleFactoryRegistry.getInstance().register(TheWorkParticles.BOLT_ELEMENT, p -> new BasicParticleFactory<>(p, BoltParticle::new));
     }
 
 
@@ -22,9 +23,9 @@ public class TheWorkParticleRenderers {
         Particle generate(ClientWorld world, double x, double y, double z, double velocityX, double velocityY, double velocityZ);
     }
 
-    private static class BasicParticleFactory<T extends ParticleEffect> implements ParticleFactory<T> {
+    public static class BasicParticleFactory<T extends ParticleEffect> implements ParticleFactory<T> {
 
-        private final SpriteProvider spriteProvider;
+        public static SpriteProvider spriteProvider;
         private final ParticleGenerator<T> generator;
 
         public BasicParticleFactory(SpriteProvider spriteProvider, ParticleGenerator<T> supplier) {

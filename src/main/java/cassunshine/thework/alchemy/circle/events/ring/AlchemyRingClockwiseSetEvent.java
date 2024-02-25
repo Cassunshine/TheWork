@@ -39,5 +39,6 @@ public class AlchemyRingClockwiseSetEvent extends AlchemyRingEvent {
     public void applyToRing(AlchemyRing ring) {
         ring.isClockwise = isClockwise;
         ring.updatePathLengths();
+        ring.circle.regenerateLayouts();
     }
 }

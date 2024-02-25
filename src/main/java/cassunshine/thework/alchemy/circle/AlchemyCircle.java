@@ -1,11 +1,20 @@
 package cassunshine.thework.alchemy.circle;
 
+import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.balance.BalanceUtils;
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetColorEvent;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.path.AlchemyLink;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
+import cassunshine.thework.alchemy.elements.Element;
+import cassunshine.thework.alchemy.elements.Elements;
+import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
+import cassunshine.thework.entities.BackfireEntity;
+import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.minecraft.item.ItemUsageContext;
@@ -37,9 +46,21 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public AlchemyCircleConstructLayout constructNodeLayout;
 
     /**
+     * Holds all the elements added by the circle's components when de-activating. Will spawn backfire entities to empty this.
+     */
+    private final ElementInventory backfireInventory = new ElementInventory();
+
+    /**
      * Stores if the circle is currently in an active alchemical reaction.
      */
     public boolean isActive = false;
+
+    public int color = 0xFFFFFFFF;
+
+
+    int backfireCooldown = 0;
+    public float circleChaos = 0;
+    public float circleChaosSquare = 0;
 
     public AlchemyCircle(AlchemyCircleBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
@@ -47,12 +68,17 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public void regenerateLayouts() {
         constructNodeLayout = new AlchemyCircleConstructLayout(this);
+
+
+        circleChaos = BalanceUtils.calculateCircleChaos(this);
+        circleChaosSquare = circleChaos * circleChaos;
+        //TheWorkMod.LOGGER.error("CHAOS IS " + circleChaos);
     }
 
     /**
      * Adds a new ring at the specified radius to the circle.
      */
-    public void addRing(float radius) {
+    public void addRing(float radius, int color) {
 
         //Search for existing ring of similar size. If one exists, remove it, instead.
         for (int i = 0; i < rings.size(); i++) {
@@ -75,7 +101,6 @@ public class AlchemyCircle implements AlchemyCircleComponent {
                 }
 
                 ring.onDestroy();
-
                 return;
             }
         }
@@ -83,6 +108,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         //Add ring, if none nearby exist.
         var ring = new AlchemyRing(this);
         ring.setRadius(radius);
+        ring.color = color;
 
         rings.add(ring);
         sortRings();
@@ -103,12 +129,16 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public void addLink(AlchemyLink newLink) {
 
+        if (newLink.sourceNode == newLink.destinationNode)
+            return;
+
         for (int i = links.size() - 1; i >= 0; i--) {
             var link = links.get(i);
 
             if (link.sourceNode == newLink.sourceNode && link.destinationNode == newLink.destinationNode) {
                 links.remove(i);
                 link.sourceNode.link = null;
+                updateLinkLengths();
                 return;
             }
         }
@@ -139,6 +169,56 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             link.updateLength();
             link.sourceNode.link = link;
         }
+
+        regenerateLayouts();
+    }
+
+    public void addBackfire(Element element, float amount) {
+        //Ignore client-side, server will spawn backfire.
+        if (blockEntity.getWorld().isClient)
+            return;
+
+        backfireInventory.put(element, amount);
+    }
+
+
+    public void addBackfire(ElementInventory inventory) {
+        //Ignore client-side, server will spawn backfire.
+        if (blockEntity.getWorld().isClient)
+            return;
+
+        inventory.transfer(backfireInventory, Float.POSITIVE_INFINITY);
+    }
+
+    public void dumpBackfireInventory() {
+
+        var pos = blockEntity.getPos().toCenterPos();
+
+        //Spawn backfire entities
+        for (int i = 0; i < Elements.getElementCount(); i++) {
+            var element = Elements.getElement(i);
+
+            var amount = backfireInventory.get(element);
+
+            if (amount > 0) {
+
+                var entity = new BackfireEntity(null, blockEntity.getWorld());
+                entity.setPos(pos.x, pos.y, pos.z);
+                entity.element = element;
+                entity.amount = amount;
+                entity.minRadius = rings.get(rings.size() - 1).radius;
+                entity.maxRadius = Math.max(entity.minRadius + 15, entity.minRadius * 1.5f); //idk if this will ever even happen but /shrug
+
+                blockEntity.getWorld().spawnEntity(entity);
+            }
+        }
+
+        backfireInventory.clear();
+    }
+
+    @Override
+    public int getColor() {
+        return color;
     }
 
     @Override
@@ -147,6 +227,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         for (AlchemyRing ring : rings)
             ring.activate();
+
+        backfireCooldown = 20;
     }
 
     @Override
@@ -158,14 +240,27 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             constructNodeLayout.tryProduceItem();
 
         spawnActiveParticles();
+
+        backfireCooldown--;
+
+        if (backfireCooldown == 0) {
+            dumpBackfireInventory();
+            backfireCooldown = 20;
+        }
+
     }
 
     @Override
     public void deactivate() {
+        if (!isActive)
+            return;
+
         isActive = false;
 
         for (AlchemyRing ring : rings)
             ring.deactivate();
+
+        dumpBackfireInventory();
     }
 
     @Override
@@ -187,6 +282,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         nbt.put("rings", ringsList);
         nbt.put("links", linkList);
+        nbt.putInt("color", color);
+
         return nbt;
     }
 
@@ -216,6 +313,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         sortRings();
         updateLinkLengths();
+
+        color = nbt.getInt("color");
     }
 
     @Override
@@ -228,6 +327,10 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
         //Try to interact with chalk, first, adding a new ring.
         if (context.getBlockPos().equals(blockEntity.getPos())) {
+
+            if (context.getStack().getItem() instanceof ChalkItem cI && color != cI.color)
+                AlchemyCircleBlockEntity.sendCircleEvent(blockEntity, new AlchemyCircleSetColorEvent(cI.color, this));
+
             var tag = context.getStack().getOrCreateNbt();
             if (!tag.contains("last_circle", NbtElement.LONG_TYPE)) {
                 tag.putLong("last_circle", blockEntity.getPos().asLong());
@@ -242,8 +345,10 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
                 tag.remove("last_circle");
 
-                //Otherwise, add a new ring.
-                return new AddRingEvent(dist, blockEntity.circle);
+                //This will always be true but java casting thingy, so.
+                if (context.getStack().getItem() instanceof ChalkItem cI)
+                    //Otherwise, add a new ring.
+                    return new AddRingEvent(dist, cI.color, blockEntity.circle);
             }
         }
 

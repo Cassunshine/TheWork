@@ -43,5 +43,4 @@ public class TheWorkNetworking {
 
         stack.setNbt(buf.readNbt());
     }
-
 }

@@ -12,6 +12,7 @@ import net.minecraft.util.math.MathHelper;
 
 public class TheWorkEntities {
     public static EntityType<InteractionPointEntity> INTERACTION_POINT_TYPE = register("interaction_point", FabricEntityTypeBuilder.create().entityFactory(InteractionPointEntity::new).trackRangeBlocks(MathHelper.ceil(PlayerEntity.getReachDistance(true))).build());
+    public static EntityType<BackfireEntity> BACKFIRE_ENTITY_TYPE = register("backfire_entity", FabricEntityTypeBuilder.create().entityFactory(BackfireEntity::new).trackRangeChunks(3).build());
 
     public static void initialize() {
 

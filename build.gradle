@@ -56,9 +56,11 @@ dependencies {
 	modRuntimeOnly "maven.modrinth:cloth-config:13.0.121+fabric"
 	modRuntimeOnly "maven.modrinth:modmenu:9.0.0"
 	modRuntimeOnly "maven.modrinth:sodium:mc1.20.4-0.5.8"
+	modRuntimeOnly "maven.modrinth:indium:1.0.30+mc1.20.4"
 	modRuntimeOnly "maven.modrinth:lithium:mc1.20.4-0.12.1"
 	modRuntimeOnly "maven.modrinth:iris:1.6.17+1.20.4"
 	modRuntimeOnly "maven.modrinth:nbttooltip:1.8.0"
+	modRuntimeOnly "maven.modrinth:emi:1.1.2+1.20.4+fabric"
 
 	// Uncomment the following line to enable the deprecated Fabric API modules. 
 	// These are included in the Fabric API production distribution and allow you to update your mod to the latest modules at a later more convenient time.

@@ -5,21 +5,30 @@ import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.ClickType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 public class ChalkItem extends Item {
-    public ChalkItem() {
+    public final int color;
+
+    public ChalkItem(int color) {
         super(new FabricItemSettings());
+
+        this.color = color;
     }
 
     @Override
@@ -29,7 +38,7 @@ public class ChalkItem extends Item {
 
     @Override
     public ItemStack getRecipeRemainder(ItemStack stack) {
-        return new ItemStack(TheWorkItems.CHALK_ITEM);
+        return new ItemStack(this);
     }
 
     @Override
@@ -52,7 +61,7 @@ public class ChalkItem extends Item {
             radius = Math.round(radius * 4.0f) / 4.0f;
 
             //Add ring to circle.
-            TheWorkNetworkEvents.sendEvent(pos, context.getWorld(), new AddRingEvent(radius, entity.circle));
+            TheWorkNetworkEvents.sendEvent(pos, context.getWorld(), new AddRingEvent(radius, color, entity.circle));
 
             context.getStack().getNbt().remove("last_circle");
 

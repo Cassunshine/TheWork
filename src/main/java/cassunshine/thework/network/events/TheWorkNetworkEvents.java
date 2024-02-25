@@ -1,12 +1,16 @@
 package cassunshine.thework.network.events;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.alchemy.backfire.PlaceBlockBackfireEffect;
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
+import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
 import cassunshine.thework.alchemy.circle.events.circle.CreateLinkEvent;
+import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetColorEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetSidesAndRune;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
+import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingSetColorEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -39,6 +43,11 @@ public class TheWorkNetworkEvents {
         register(AlchemyNodeSetSidesAndRune.IDENTIFIER, AlchemyNodeSetSidesAndRune::new);
         register(AlchemyNodeSetItemEvent.IDENTIFIER, AlchemyNodeSetItemEvent::new);
 
+        register(AlchemyCircleSetColorEvent.IDENTIFIER, AlchemyCircleSetColorEvent::new);
+        register(AlchemyRingSetColorEvent.IDENTIFIER, AlchemyRingSetColorEvent::new);
+        register(AlchemyNodeSetColorEvent.IDENTIFIER, AlchemyNodeSetColorEvent::new);
+
+        register(PlaceBlockBackfireEffect.Event.IDENTIFIER, PlaceBlockBackfireEffect.Event::new);
     }
 
 
@@ -49,7 +58,7 @@ public class TheWorkNetworkEvents {
 
     public static void sendEvent(BlockPos position, World world, TheWorkNetworkEvent event) {
         //Do nothing if the world doesn't exist, or if the event is NONE.
-        if (world == null || event == NONE)
+        if (world == null || event == NONE || event == SUCCESS)
             return;
 
         //Only send packet on server.
@@ -59,8 +68,7 @@ public class TheWorkNetworkEvents {
             return;
         }
 
-        //If running on logical server, relay to players.
-
+        //If running on logical server, run on self.
         event.applyToWorld(world);
 
         //Write packet.

@@ -2,19 +2,27 @@ package cassunshine.thework.rendering.model;
 
 import cassunshine.thework.TheWorkMod;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.minecraft.client.util.ModelIdentifier;
 import net.minecraft.util.Identifier;
 
 public class TheWorkModelPlugin implements ModelLoadingPlugin {
 
-    public static final ChemistrySetModel CHEMISTRY_SET_MODEL = new ChemistrySetModel();
-    public static final Identifier CHEMISTRY_SET_MODEL_ID = new Identifier(TheWorkMod.ModID, "block/chemistry_set");
+    private static AlchemyJarModel jarModel;
+    public static final Identifier ALCHEMICAL_JAR_BLOCK_MODEL = new ModelIdentifier(TheWorkMod.ModID, "block/alchemy_jar", "");
+    public static final Identifier ALCHEMICAL_JAR_ITEM_MODEL = new ModelIdentifier(TheWorkMod.ModID, "alchemy_jar", "inventory");
 
     @Override
     public void onInitializeModelLoader(Context pluginContext) {
-        /*pluginContext.modifyModelOnLoad().register((original, context) -> {
-            if (context.id().equals(CHEMISTRY_SET_MODEL_ID))
-                return CHEMISTRY_SET_MODEL;
+        pluginContext.modifyModelOnLoad().register((original, context) -> {
+            if (context.id().equals(ALCHEMICAL_JAR_ITEM_MODEL)) {
+                return new AlchemyJarModel(original);
+            }
+
+            if(context.id().getNamespace().equals(TheWorkMod.ModID)){
+                //TheWorkMod.LOGGER.error(context.id().toString());
+            }
+
             return original;
-        });*/
+        });
     }
 }

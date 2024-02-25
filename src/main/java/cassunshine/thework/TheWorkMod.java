@@ -1,5 +1,6 @@
 package cassunshine.thework;
 
+import cassunshine.thework.alchemy.backfire.BackfireEffects;
 import cassunshine.thework.alchemy.chemistry.ChemistryObjects;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.blockentities.TheWorkBlockEntities;
@@ -42,6 +43,8 @@ public class TheWorkMod implements ModInitializer {
         TheWorkBlocks.initialize();
         TheWorkBlockEntities.initialize();
         TheWorkNetworking.initialize();
+
+        BackfireEffects.initialize();
 
         ServerTickEvents.START_SERVER_TICK.register(this::serverTickLogic);
 

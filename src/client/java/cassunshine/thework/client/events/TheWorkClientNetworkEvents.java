@@ -1,9 +1,13 @@
 package cassunshine.thework.client.events;
 
+import cassunshine.thework.alchemy.backfire.BackfireEffects;
+import cassunshine.thework.alchemy.backfire.PlaceBlockBackfireEffect;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.rendering.particles.BoltParticle;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,6 +23,10 @@ public class TheWorkClientNetworkEvents {
 
                 //Make the client process the event. it when available.
                 client.execute(() -> event.applyToWorld(client.world));
+
+                if (event instanceof BackfireEffects.ElementalBackfireEvent backfireEvent) {
+                    onBackfireEvent(backfireEvent);
+                }
             });
         }
 
@@ -32,6 +40,21 @@ public class TheWorkClientNetworkEvents {
             theWorkNetworkEvent.writePacket(packet);
 
             ClientPlayNetworking.send(theWorkNetworkEvent.id, packet);
+        }
+    }
+
+    private static void onBackfireEvent(BackfireEffects.ElementalBackfireEvent event) {
+        if (event instanceof PlaceBlockBackfireEffect.Event blockBackfireEffect) {
+            var client = MinecraftClient.getInstance();
+
+            client.execute(() -> {
+                client.particleManager.addParticle(new BoltParticle(
+                        client.world,
+                        blockBackfireEffect.originPos.x, blockBackfireEffect.originPos.y, blockBackfireEffect.originPos.z,
+                        blockBackfireEffect.hitPos.x, blockBackfireEffect.hitPos.y, blockBackfireEffect.hitPos.z,
+                        blockBackfireEffect.element
+                ));
+            });
         }
     }
 

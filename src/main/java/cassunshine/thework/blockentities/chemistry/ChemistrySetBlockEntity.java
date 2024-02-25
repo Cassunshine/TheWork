@@ -30,7 +30,7 @@ public class ChemistrySetBlockEntity extends BlockEntity {
     };
 
     public ChemistrySetBlockEntity(BlockPos pos, BlockState state) {
-        super(TheWorkBlockEntities.CHEMISTRY_SET_TYPE, pos, state);
+        super(null, pos, state);
     }
 
     public void tick() {

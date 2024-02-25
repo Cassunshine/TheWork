@@ -1,41 +1,51 @@
 {
-	"schemaVersion": 1,
-	"id": "thework",
-	"version": "${version}",
-	"name": "thework",
-	"description": "This is an example description! Tell everyone what your mod is about!",
-	"authors": [
-		"Me!"
-	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/thework/icon.png",
-	"environment": "*",
-	"entrypoints": {
-		"main": [
-          "cassunshine.thework.TheWorkMod"
-		],
-		"client": [
-          "cassunshine.thework.TheWorkClient"
-		]
-	},
-	"mixins": [
-		"thework.mixins.json",
-		{
-			"config": "thework.client.mixins.json",
-			"environment": "client"
-		}
-	],
-	"depends": {
-		"fabricloader": ">=0.15.6",
-		"minecraft": "~1.20.4",
-		"java": ">=17",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
-	}
+  "schemaVersion": 1,
+  "id": "thework",
+  "version": "${version}",
+  "name": "The Work",
+  "description": "Use Alchemy to deconstruct blocks and items, then reconstruct them again into something else!",
+  "authors": [
+    "Cassunshine - Codebase",
+    "Vix (furrysys) - Art",
+    "Foxsys - <3"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Cassunshine/TheWork",
+    "sources": "https://github.com/Cassunshine/TheWork"
+  },
+  "license": "CC0-1.0",
+  "icon": "assets/thework/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "cassunshine.thework.TheWorkMod"
+    ],
+    "client": [
+      "cassunshine.thework.TheWorkClient"
+    ]
+  },
+  "mixins": [
+    "thework.mixins.json",
+    {
+      "config": "thework.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.6",
+    "minecraft": "~1.20.4",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "sodium": "*",
+    "indium": "*"
+  },
+  "custom": {
+    "modmenu": {
+      "links" : {
+        "modmenu.discord" : "https://discord.gg/4RpgjJMXae"
+      }
+    }
+  }
 }

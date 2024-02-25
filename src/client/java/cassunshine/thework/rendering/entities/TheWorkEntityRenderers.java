@@ -8,6 +8,7 @@ public class TheWorkEntityRenderers {
 
     public static void initialize() {
         EntityRendererRegistry.register(TheWorkEntities.INTERACTION_POINT_TYPE, EmptyEntityRenderer::new);
+        EntityRendererRegistry.register(TheWorkEntities.BACKFIRE_ENTITY_TYPE, EmptyEntityRenderer::new);
     }
 
 }
