@@ -1,25 +1,22 @@
-package cassunshine.thework.client.gui.ingame.notebook;
+package cassunshine.thework.client.gui.ingame.notebook.pages;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
+import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.client.gui.ingame.notebook.drawables.NodeDrawer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ButtonTextures;
-import net.minecraft.client.gui.screen.GameModeSelectionScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.OrderedText;
-import net.minecraft.text.StringVisitable;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-
-import java.util.Objects;
 
 public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "node_page");
@@ -45,7 +42,7 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
     }
 
     @Override
-    protected void init(AlchemistNotebookScreen screen, int x, int y, int width, int height) {
+    public void init(AlchemistNotebookScreen screen, int x, int y, int width, int height) {
         super.init(screen, x, y, width, height);
 
         var nbt = screen.stack.getOrCreateNbt();
@@ -123,7 +120,8 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
         drawnNode.size = MathHelper.floor(width * 0.6f);
 
         drawnNode.x = x + width / 2;
-        drawnNode.y = y + 100;
+        drawnNode.y = y + height / 3;
+
 
         circleSidesLeftButton.setX(drawnNode.x - circleSidesLeftButton.getWidth());
         circleSidesLeftButton.setY(drawnNode.y + drawnNode.size / 2 + 5);

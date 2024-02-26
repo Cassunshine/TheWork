@@ -1,7 +1,7 @@
-package cassunshine.thework.client.gui.ingame.notebook;
+package cassunshine.thework.client.gui.ingame.notebook.pages;
 
 import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.client.networking.TheWorkClientNetworking;
+import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.item.ItemStack;
@@ -13,14 +13,26 @@ import net.minecraft.util.Identifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class AlchemistNotebookPage extends Screen {
 
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "basic");
-    private static final HashMap<Identifier, Function<NbtCompound, AlchemistNotebookPage>> GENERATORS = new HashMap<>() {{
+    private static final HashMap<Identifier, Function<NbtCompound, AlchemistNotebookPage>> NBT_GENERATORS = new HashMap<>() {{
         put(IDENTIFIER, AlchemistNotebookPage::new);
-        put(AlchemistNotebookNodePage.IDENTIFIER, AlchemistNotebookNodePage::new);
     }};
+
+    private static final HashMap<Identifier, Supplier<AlchemistNotebookPage>> GENERATORS = new HashMap<>() {{
+        put(AlchemistNotebookNodePage.IDENTIFIER, AlchemistNotebookNodePage::new);
+        put(LegendNotebookPage.IDENTIFIER, LegendNotebookPage::new);
+        put(DeconstructTutorialPage.IDENTIFIER, DeconstructTutorialPage::new);
+    }};
+
+    public static final Identifier[] DEFAULT_PAGES = new Identifier[]{
+            AlchemistNotebookNodePage.IDENTIFIER,
+            LegendNotebookPage.IDENTIFIER,
+            DeconstructTutorialPage.IDENTIFIER
+    };
 
     public Identifier typeId;
     public Identifier drawing;
@@ -37,7 +49,7 @@ public class AlchemistNotebookPage extends Screen {
         this.drawing = drawing;
     }
 
-    protected void init(AlchemistNotebookScreen screen, int x, int y, int width, int height) {
+    public void init(AlchemistNotebookScreen screen, int x, int y, int width, int height) {
 
     }
 
@@ -61,46 +73,38 @@ public class AlchemistNotebookPage extends Screen {
     }
 
     public static ArrayList<AlchemistNotebookPage> getPages(ItemStack stack) {
+        var nbt = stack.getOrCreateNbt();
 
-        if (!stack.hasNbt()) {
-            var nbt = stack.getOrCreateNbt();
+        var nbtList = nbt.getList("pages", NbtElement.COMPOUND_TYPE);
+        var list = new ArrayList<AlchemistNotebookPage>();
 
-            nbt.putInt("current_page", 0);
-
-            var list = new ArrayList<AlchemistNotebookPage>() {{
-                add(new AlchemistNotebookNodePage());
-                add(new AlchemistNotebookPage(IDENTIFIER, new Identifier(TheWorkMod.ModID, "textures/pages/page-basics.png")));
-                add(new AlchemistNotebookPage(IDENTIFIER, new Identifier(TheWorkMod.ModID, "textures/pages/page-runes.png")));
-            }};
-
-            nbt.put("pages", pagesToNbt(list));
-
-            TheWorkClientNetworking.updateBook(nbt);
-            return list;
-        } else {
-            var nbt = stack.getOrCreateNbt();
-
-            var nbtList = nbt.getList("pages", NbtElement.COMPOUND_TYPE);
-            var list = new ArrayList<AlchemistNotebookPage>();
-
-            for (int i = 0; i < nbtList.size(); i++) {
-                var compound = nbtList.getCompound(i);
-                var type = new Identifier(compound.getString("type"));
-
-                var factoryResult = GENERATORS.get(type).apply(compound);
-                list.add(factoryResult);
-            }
-
-            return list;
+        for (Identifier page : DEFAULT_PAGES) {
+            var factoryResult = GENERATORS.get(page).get();
+            list.add(factoryResult);
         }
+
+        for (int i = 0; i < nbtList.size(); i++) {
+            var compound = nbtList.getCompound(i);
+            var type = new Identifier(compound.getString("type"));
+
+            var factoryResult = NBT_GENERATORS.get(type).apply(compound);
+            list.add(factoryResult);
+        }
+
+        return list;
     }
 
 
     public static NbtList pagesToNbt(ArrayList<AlchemistNotebookPage> pages) {
         var list = new NbtList();
 
-        for (AlchemistNotebookPage page : pages)
+        for (int i = 0; i < pages.size(); i++) {
+            if (i < DEFAULT_PAGES.length)
+                continue;
+
+            AlchemistNotebookPage page = pages.get(i);
             list.add(page.writeNbt(new NbtCompound()));
+        }
 
         return list;
     }

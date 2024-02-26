@@ -85,6 +85,7 @@ public class AlchemyCircleBlockEntityRenderer implements BlockEntityRenderer<Alc
             TheWorkMod.LOGGER.error(e.toString());
         }
 
+        RenderingUtilities.setupWobble(0);
         RenderingUtilities.popMat();
     }
 }

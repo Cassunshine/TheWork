@@ -1,7 +1,7 @@
 package cassunshine.thework.rendering.items;
 
 import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookPage;
+import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import cassunshine.thework.utils.TheWorkUtils;
@@ -71,7 +71,7 @@ public class AlchemistNotebookRenderer {
                 bookAngle = 0.9f;
 
                 RenderingUtilities.translateMatrix(0.5f, 0.48f, 0.55f);
-                RenderingUtilities.scaleMatrix(0.6f, 0.6f, 0.6f);
+                RenderingUtilities.scaleMatrix(0.5f, 0.5f, 0.5f);
 
                 break;
             }
@@ -82,9 +82,9 @@ public class AlchemistNotebookRenderer {
 
                 RenderingUtilities.setupNormal(0, 1, 0);
 
-                RenderingUtilities.scaleMatrix(0.8f, 0.8f, 0.8f);
+                RenderingUtilities.scaleMatrix(0.7f, 0.7f, 0.7f);
 
-                RenderingUtilities.translateMatrix(0.7f, 0.05f, 0);
+                RenderingUtilities.translateMatrix(0.6f, 0.2f, 0);
                 RenderingUtilities.rotateMatrix(0, MathHelper.HALF_PI, 0);
                 RenderingUtilities.setupLightOverlay(LightmapTextureManager.MAX_BLOCK_LIGHT_COORDINATE, overlay);
 
@@ -129,18 +129,18 @@ public class AlchemistNotebookRenderer {
             if (useNormals)
                 RenderingUtilities.setupNormal(1, 0, 0);
 
-            RenderingUtilities.saneVertex(0, 1, 0, 0 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 8 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 0, 0, 0 / TEXTURE_SIZE, 0);
+            RenderingUtilities.saneVertex(0, 1, 0, 1 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 2 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 2 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0, 1 / 3.0f, 1);
 
             if (useNormals)
                 RenderingUtilities.setupNormal(-1, 0, 0);
 
-            RenderingUtilities.saneVertex(0, 0, 0, 0 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 8 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0, 0 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
+            RenderingUtilities.saneVertex(0, 0, 0, 3 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 2 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 2 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 1, 0, 1 / 3.0f, 0);
 
             RenderingUtilities.popMat();
         }
@@ -152,18 +152,18 @@ public class AlchemistNotebookRenderer {
             if (useNormals)
                 RenderingUtilities.setupNormal(-1, 0, 0);
 
-            RenderingUtilities.saneVertex(0, 0, 0, 8 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 16 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 16 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
+            RenderingUtilities.saneVertex(0, 0, 0, 2 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 3 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 3 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 1, 0, 2 / 3.0f, 0);
 
             if (useNormals)
                 RenderingUtilities.setupNormal(1, 0, 0);
 
-            RenderingUtilities.saneVertex(0, 1, 0, 0 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 8 / TEXTURE_SIZE, 0);
-            RenderingUtilities.saneVertex(0, 0, 0, 0 / TEXTURE_SIZE, 0);
+            RenderingUtilities.saneVertex(0, 1, 0, 1 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 2 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 2 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 0, 0, 1 / 3.0f, 0);
 
             RenderingUtilities.popMat();
         }
@@ -230,17 +230,17 @@ public class AlchemistNotebookRenderer {
             RenderingUtilities.rotateMatrix(0, leftAngle, 0);
 
             RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(BOOK_TEXTURE));
-            RenderingUtilities.saneVertex(0, 1, 0, 8 / TEXTURE_SIZE, 32 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 16 / TEXTURE_SIZE, 32 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 16 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 0, 0, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
+            RenderingUtilities.saneVertex(0, 1, 0, 0, 1);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 1 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 1 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 0, 0, 0, 0);
 
             if (left != null && left.drawing != null) {
                 RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(left.drawing));
 
                 RenderingUtilities.saneVertex(0.001f, 1, 0, 1, 0);
-                RenderingUtilities.saneVertex(0.001f, 1, 0.5f, 0, 0);
-                RenderingUtilities.saneVertex(0.001f, 0, 0.5f, 0, 1);
+                RenderingUtilities.saneVertex(0.001f, 1, 0.75f, 0, 0);
+                RenderingUtilities.saneVertex(0.001f, 0, 0.75f, 0, 1);
                 RenderingUtilities.saneVertex(0.001f, 0, 0, 1, 1);
             }
 
@@ -257,18 +257,18 @@ public class AlchemistNotebookRenderer {
             RenderingUtilities.rotateMatrix(0, rightAngle, 0);
 
             RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(BOOK_TEXTURE));
-            RenderingUtilities.saneVertex(0, 0, 0, 8 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 0, 0.5f, 16 / TEXTURE_SIZE, 16 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0.5f, 16 / TEXTURE_SIZE, 32 / TEXTURE_SIZE);
-            RenderingUtilities.saneVertex(0, 1, 0, 8 / TEXTURE_SIZE, 32 / TEXTURE_SIZE);
+            RenderingUtilities.saneVertex(0, 0, 0, 0, 0);
+            RenderingUtilities.saneVertex(0, 0, 0.75f, 1 / 3.0f, 0);
+            RenderingUtilities.saneVertex(0, 1, 0.75f, 1 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 1, 0, 0, 1);
 
 
             if (right != null && right.drawing != null) {
                 RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(right.drawing));
 
                 RenderingUtilities.saneVertex(-0.001f, 0, 0, 0, 1);
-                RenderingUtilities.saneVertex(-0.001f, 0, 0.5f, 1, 1);
-                RenderingUtilities.saneVertex(-0.001f, 1, 0.5f, 1, 0);
+                RenderingUtilities.saneVertex(-0.001f, 0, 0.75f, 1, 1);
+                RenderingUtilities.saneVertex(-0.001f, 1, 0.75f, 1, 0);
                 RenderingUtilities.saneVertex(-0.001f, 1, 0, 0, 0);
             }
 

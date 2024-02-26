@@ -10,6 +10,7 @@ public class AlchemyNodeTypes {
     public static final AlchemyNodeType NONE = new AlchemyNodeType();
 
     public static final AlchemyNodeType DECONSTRUCT = new DeconstructNodeType().withItemHolding(i -> true);
+    public static final AlchemyNodeType RESEARCH = new ResearchNodeType();
 
     public static final AlchemyNodeType CONSTRUCT = new ConstructNodeType();
 
@@ -22,7 +23,7 @@ public class AlchemyNodeTypes {
                 NONE,       //2
                 TRANSFER,   //3
                 DECONSTRUCT,       //4
-                NONE,       //5
+                RESEARCH,       //5
                 CONSTRUCT,       //6
                 NONE,       //7
                 NONE,       //8

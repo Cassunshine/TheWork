@@ -1,11 +1,11 @@
 package cassunshine.thework.alchemy.circle;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.balance.BalanceUtils;
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AlchemyCircleSetColorEvent;
-import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetColorEvent;
+import cassunshine.thework.alchemy.circle.layout.AlchemyCircleConstructLayout;
+import cassunshine.thework.alchemy.circle.layout.AlchemyCircleResearchLayout;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.path.AlchemyLink;
 import cassunshine.thework.alchemy.circle.ring.AlchemyRing;
@@ -44,6 +44,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public final ArrayList<AlchemyLink> links = new ArrayList<>();
 
     public AlchemyCircleConstructLayout constructNodeLayout;
+    public AlchemyCircleResearchLayout researchLayout;
 
     /**
      * Holds all the elements added by the circle's components when de-activating. Will spawn backfire entities to empty this.
@@ -68,7 +69,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public void regenerateLayouts() {
         constructNodeLayout = new AlchemyCircleConstructLayout(this);
-
+        researchLayout = new AlchemyCircleResearchLayout(this);
 
         circleChaos = BalanceUtils.calculateCircleChaos(this);
         circleChaosSquare = circleChaos * circleChaos;
@@ -229,6 +230,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
             ring.activate();
 
         backfireCooldown = 20;
+
+        researchLayout.activate();
     }
 
     @Override

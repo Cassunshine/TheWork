@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
@@ -28,6 +29,7 @@ public class TheWorkRecipes {
 
     private static ImmutableMap<Identifier, DeconstructionRecipe> DECONSTRUCTION_RECIPES = ImmutableMap.of();
     private static ImmutableMap<String, ConstructionRecipe> CONSTRUCTION_RECIPES = ImmutableMap.of();
+    private static ImmutableMap<Item, ConstructionRecipe> CONSTRUCTION_RECIPES_BY_ITEM = ImmutableMap.of();
 
     private static ArrayList<ReactionRecipe> REACTIONS = new ArrayList<>();
 
@@ -41,6 +43,10 @@ public class TheWorkRecipes {
 
     public static ConstructionRecipe getConstruction(String signature) {
         return CONSTRUCTION_RECIPES.get(signature);
+    }
+
+    public static ConstructionRecipe getConstruction(Item item) {
+        return CONSTRUCTION_RECIPES_BY_ITEM.get(item);
     }
 
     /**
@@ -111,7 +117,8 @@ public class TheWorkRecipes {
 
     private static void loadConstructionRecipes(ResourceManager resourceManager) {
         Map<Identifier, Resource> recipes = resourceManager.findResources("alchemy/construction", p -> p.getPath().endsWith(".json"));
-        ImmutableMap.Builder<String, ConstructionRecipe> builder = ImmutableMap.builder();
+        ImmutableMap.Builder<String, ConstructionRecipe> constructRecipes = ImmutableMap.builder();
+        ImmutableMap.Builder<Item, ConstructionRecipe> constructRecipesByItem = ImmutableMap.builder();
 
         for (var entry : recipes.entrySet()) {
             var value = entry.getValue();
@@ -161,13 +168,17 @@ public class TheWorkRecipes {
                 }
 
                 var recipe = new ConstructionRecipe(rings, outputs, TheWorkUtils.generateSignature(rings, r -> TheWorkUtils.generateSignature(r, e -> e.element().id.toString())));
-                builder.put(recipe.signature, recipe);
+                constructRecipes.put(recipe.signature, recipe);
+
+                if (recipe.outputs.length == 1)
+                    constructRecipesByItem.put(recipe.outputs[0].getItem(), recipe);
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
             }
         }
 
-        CONSTRUCTION_RECIPES = builder.build();
+        CONSTRUCTION_RECIPES = constructRecipes.build();
+        CONSTRUCTION_RECIPES_BY_ITEM = constructRecipesByItem.build();
     }
 
     private static void loadReactionRecipes(ResourceManager resourceManager) {

@@ -1,5 +1,6 @@
 package cassunshine.thework.client.gui.ingame.notebook;
 
+import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.client.networking.TheWorkClientNetworking;
 import cassunshine.thework.rendering.items.AlchemistNotebookRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -36,7 +37,7 @@ public class AlchemistNotebookScreen extends Screen {
         var nbt = stack.getOrCreateNbt();
         var page = nbt.getInt("current_page");
 
-        page = MathHelper.clamp(page + 1, 0, (pages.size() / 2));
+        page = MathHelper.clamp(page + 1, 0, MathHelper.ceil(pages.size() / 2.0f) - 1);
 
         nbt.putInt("current_page", page);
         syncNbt();
@@ -82,8 +83,8 @@ public class AlchemistNotebookScreen extends Screen {
         int centerX = MathHelper.floor(width / 2.0f);
         int centerY = MathHelper.floor(height / 2.0f);
 
-        int pageHeight = MathHelper.floor(height * 0.9f);
-        int pageWidth = MathHelper.floor(pageHeight * 0.5f);
+        int pageHeight = 64 * MathHelper.floor((height - 50) / 64.0f);
+        int pageWidth = MathHelper.floor(pageHeight * 0.75f);
 
         int heightDifference = MathHelper.floor(height - pageHeight);
 
@@ -121,8 +122,8 @@ public class AlchemistNotebookScreen extends Screen {
         int centerX = MathHelper.floor(width / 2.0f);
         int centerY = MathHelper.floor(height / 2.0f);
 
-        int pageHeight = MathHelper.floor(height * 0.9f);
-        int pageWidth = MathHelper.floor(pageHeight * 0.5f);
+        int pageHeight = 64 * MathHelper.floor((height - 50) / 64.0f);
+        int pageWidth = MathHelper.floor(pageHeight * 0.75f);
 
         int heightDifference = MathHelper.floor(height - pageHeight);
 
@@ -131,22 +132,22 @@ public class AlchemistNotebookScreen extends Screen {
         AlchemistNotebookPage pageLeft = pages.get(currentPage);
         AlchemistNotebookPage pageRight = currentPage + 1 >= pages.size() ? null : pages.get(currentPage + 1);
 
-        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 8, 16, 8, 16, 32, 32);
-        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX, heightDifference / 2, pageWidth, pageHeight, 8, 16, 8, 16, 32, 32);
+        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 0, 0, 48, 64, 144, 64);
+        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX, heightDifference / 2, pageWidth, pageHeight, 0, 0, 48, 64, 144, 64);
+
 
         if (pageLeft != null && pageLeft.drawing != null) {
-            context.drawTexture(pageLeft.drawing, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 0, 0, 128, 256, 128, 256);
+            context.drawTexture(pageLeft.drawing, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 0, 0, 192, 256, 192, 256);
         }
 
         if (pageRight != null && pageRight.drawing != null) {
-            context.drawTexture(pageRight.drawing, centerX, heightDifference / 2, pageWidth, pageHeight, 0, 0, 128, 256, 128, 256);
+            context.drawTexture(pageRight.drawing, centerX, heightDifference / 2, pageWidth, pageHeight, 0, 0, 192, 256, 192, 256);
         }
 
         if (pageLeft != null)
             pageLeft.render(this, context, mouseX, mouseY, delta);
         if (pageRight != null)
             pageRight.render(this, context, mouseX, mouseY, delta);
-
 
         super.render(context, mouseX, mouseY, delta);
     }

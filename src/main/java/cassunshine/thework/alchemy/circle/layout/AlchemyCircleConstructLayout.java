@@ -1,5 +1,6 @@
-package cassunshine.thework.alchemy.circle;
+package cassunshine.thework.alchemy.circle.layout;
 
+import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.layout.AlchemyCircleLayout;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.recipes.ConstructionRecipe;
