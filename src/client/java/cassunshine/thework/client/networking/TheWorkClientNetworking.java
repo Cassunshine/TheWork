@@ -1,20 +1,20 @@
 package cassunshine.thework.client.networking;
 
-import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.client.events.TheWorkClientNetworkEvents;
-import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookBetaScreen;
+import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.TheWorkNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 
 public class TheWorkClientNetworking {
-    
+
     public static void initialize() {
         TheWorkClientNetworkEvents.initialize();
 
@@ -32,7 +32,14 @@ public class TheWorkClientNetworking {
 
         net.minecraft.item.ItemStack finalStack = stack;
         minecraftClient.execute(() -> {
-            minecraftClient.setScreen(new AlchemistNotebookBetaScreen(finalStack));
+            minecraftClient.setScreen(new AlchemistNotebookScreen(finalStack));
         });
+    }
+
+    public static void updateBook(NbtCompound compound) {
+        var buf = PacketByteBufs.create();
+        buf.writeNbt(compound);
+
+        ClientPlayNetworking.send(TheWorkNetworking.CLIENT_UPDATED_NOTEBOOK, buf);
     }
 }

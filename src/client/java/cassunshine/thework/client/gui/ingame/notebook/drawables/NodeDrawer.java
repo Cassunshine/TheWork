@@ -19,6 +19,8 @@ public class NodeDrawer implements Drawable {
 
     private Identifier rune;
 
+    public int color;
+
     public NodeDrawer(int sides, int runeID) {
         setSides(sides);
         setRuneID(runeID);
@@ -39,14 +41,14 @@ public class NodeDrawer implements Drawable {
         RenderingUtilities.setupConsumers(context.getVertexConsumers());
         RenderingUtilities.setupRenderLayer(AlchemyCircleRenderer.getLayer());
         RenderingUtilities.setupNormal(0, 0, 1);
-        RenderingUtilities.setupColor(255, 255, 255, 255);
+        RenderingUtilities.setupColor(color);
 
         RenderingUtilities.pushMat();
 
         RenderingUtilities.translateMatrix(x, y, 0);
         RenderingUtilities.rotateMatrix(0, 0, MathHelper.PI);
         RenderingUtilities.rotateMatrix(MathHelper.HALF_PI, 0, 0);
-        RenderingUtilities.scaleMatrix(size, size, size);
+        RenderingUtilities.scaleMatrix(-size, size, size);
 
         AlchemyCircleRenderer.drawSidedCircleAndRune(0.5f, sides, rune);
         AlchemyCircleRenderer.runDeferTasks();

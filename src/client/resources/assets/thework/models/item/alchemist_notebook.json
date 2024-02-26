@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "minecraft:builtin/entity",
   "textures": {
     "layer0" : "thework:item/alchemist_notebook"
   }

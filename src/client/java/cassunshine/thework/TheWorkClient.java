@@ -7,6 +7,7 @@ import cassunshine.thework.rendering.blockentities.AlchemyJarBlockEntityRenderer
 import cassunshine.thework.rendering.blockentities.TheWorkBlockEntityRenderers;
 import cassunshine.thework.rendering.blockentities.alchemy_block.nodes.AlchemyNodeTypeRenderers;
 import cassunshine.thework.rendering.entities.TheWorkEntityRenderers;
+import cassunshine.thework.rendering.items.AlchemistNotebookRenderer;
 import cassunshine.thework.rendering.model.TheWorkModelPlugin;
 import cassunshine.thework.rendering.particles.TheWorkParticleRenderers;
 import net.fabricmc.api.ClientModInitializer;
@@ -45,6 +46,8 @@ public class TheWorkClient implements ClientModInitializer {
 
         ModelLoadingPlugin.register(new TheWorkModelPlugin());
         //BuiltinItemRendererRegistry.INSTANCE.register(BlockItem.BLOCK_ITEMS.get(TheWorkBlocks.ALCHEMY_JAR_BLOCK), AlchemyJarBlockEntityRenderer::renderItem);
+        BuiltinItemRendererRegistry.INSTANCE.register(TheWorkItems.ALCHEMIST_NOTEBOOK_ITEM, AlchemistNotebookRenderer::renderItem);
+
     }
 
     public static double getTime() {
