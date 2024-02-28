@@ -39,6 +39,10 @@ public class NodeDrawer implements Drawable {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         RenderingUtilities.setupStack(context.getMatrices());
         RenderingUtilities.setupConsumers(context.getVertexConsumers());
+        render();
+    }
+
+    public void render() {
         RenderingUtilities.setupRenderLayer(AlchemyCircleRenderer.getLayer());
         RenderingUtilities.setupNormal(0, 0, 1);
         RenderingUtilities.setupColor(color);

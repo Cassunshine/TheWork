@@ -1,8 +1,11 @@
 package cassunshine.thework.client.gui.ingame.notebook;
 
+import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookNodePage;
 import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPage;
+import cassunshine.thework.client.gui.ingame.notebook.pages.RecipePage;
 import cassunshine.thework.client.networking.TheWorkClientNetworking;
 import cassunshine.thework.rendering.items.AlchemistNotebookRenderer;
+import cassunshine.thework.rendering.util.RenderingUtilities;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.Element;
@@ -10,7 +13,10 @@ import net.minecraft.client.gui.Selectable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.PageTurnWidget;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
@@ -28,7 +34,11 @@ public class AlchemistNotebookScreen extends Screen {
     public AlchemistNotebookScreen(ItemStack stack) {
         super(Text.translatable("ui.alchemist_notebook.title"));
 
-        this.pages = AlchemistNotebookPage.getPages(stack);
+        this.pages = new ArrayList<>() {{
+            add(new AlchemistNotebookNodePage(stack.getOrCreateNbt()));
+        }};
+
+        AlchemistNotebookPage.generateRecipePages(pages, stack.getOrCreateNbt());
         this.stack = stack;
     }
 
@@ -50,12 +60,11 @@ public class AlchemistNotebookScreen extends Screen {
         var nbt = stack.getOrCreateNbt();
         var page = nbt.getInt("current_page");
 
-        page = MathHelper.clamp(page - 1, 0, (pages.size() / 2) - 1);
+        page = MathHelper.clamp(page - 1, 0, 9999999);
 
         nbt.putInt("current_page", page);
         syncNbt();
 
-        clearChildren();
         init();
     }
 
@@ -77,30 +86,44 @@ public class AlchemistNotebookScreen extends Screen {
     }
 
     @Override
-    protected void init() {
+    public void init() {
+        clearChildren();
         super.init();
 
         int centerX = MathHelper.floor(width / 2.0f);
         int centerY = MathHelper.floor(height / 2.0f);
 
-        int pageHeight = 64 * MathHelper.floor((height - 50) / 64.0f);
-        int pageWidth = MathHelper.floor(pageHeight * 0.75f);
 
-        int heightDifference = MathHelper.floor(height - pageHeight);
+        int heightDifference = MathHelper.floor(height - AlchemistNotebookPage.PAGE_HEIGHT);
 
-        TURN_RIGHT_WIDGET = this.addDrawableChild(new PageTurnWidget(centerX - 11 + 20 + pageWidth, centerY, true, (button) -> nextPage(), true));
-        TURN_LEFT_WIDGET = this.addDrawableChild(new PageTurnWidget(centerX - 13 - 20 - pageWidth, centerY, false, (button) -> previousPage(), true));
+        TURN_RIGHT_WIDGET = this.addDrawableChild(new PageTurnWidget(centerX - 11 + 20 + AlchemistNotebookPage.PAGE_WIDTH, centerY, true, (button) -> nextPage(), true));
+        TURN_LEFT_WIDGET = this.addDrawableChild(new PageTurnWidget(centerX - 13 - 20 - AlchemistNotebookPage.PAGE_WIDTH, centerY, false, (button) -> previousPage(), true));
 
         var nbt = stack.getOrCreateNbt();
         var currentPage = nbt.getInt("current_page") * 2;
 
-        AlchemistNotebookPage pageLeft = pages.get(currentPage);
-        AlchemistNotebookPage pageRight = currentPage + 1 >= pages.size() ? null : pages.get(currentPage + 1);
+        if (currentPage >= pages.size()) {
+            currentPage = 0;
+            nbt.putInt("current_page", 0);
+            syncNbt();
+        }
 
-        if (pageLeft != null)
-            pageLeft.init(this, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight);
-        if (pageRight != null)
-            pageRight.init(this, centerX, heightDifference / 2, pageWidth, pageHeight);
+        try {
+            AlchemistNotebookPage pageLeft = pages.get(currentPage);
+            AlchemistNotebookPage pageRight = currentPage + 1 >= pages.size() ? null : pages.get(currentPage + 1);
+
+            if (pageLeft != null)
+                pageLeft.addInteractables(this, centerX - AlchemistNotebookPage.PAGE_WIDTH, heightDifference / 2);
+            if (pageRight != null)
+                pageRight.addInteractables(this, centerX, heightDifference / 2);
+        } catch (Exception e) {
+            //Ignore
+        }
+    }
+
+    @Override
+    public <T extends Element & Selectable> T addSelectableChild(T child) {
+        return super.addSelectableChild(child);
     }
 
     @Override
@@ -117,37 +140,46 @@ public class AlchemistNotebookScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         context.fillGradient(0, 0, this.width, this.height, 0x39000000, 0x39000000);
 
+        RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.GUI;
+
         var nbt = stack.getOrCreateNbt();
 
         int centerX = MathHelper.floor(width / 2.0f);
         int centerY = MathHelper.floor(height / 2.0f);
 
-        int pageHeight = 64 * MathHelper.floor((height - 50) / 64.0f);
-        int pageWidth = MathHelper.floor(pageHeight * 0.75f);
-
-        int heightDifference = MathHelper.floor(height - pageHeight);
+        int heightDifference = MathHelper.floor(height - AlchemistNotebookPage.PAGE_HEIGHT);
 
         var currentPage = nbt.getInt("current_page") * 2;
 
-        AlchemistNotebookPage pageLeft = pages.get(currentPage);
-        AlchemistNotebookPage pageRight = currentPage + 1 >= pages.size() ? null : pages.get(currentPage + 1);
-
-        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 0, 0, 48, 64, 144, 64);
-        context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX, heightDifference / 2, pageWidth, pageHeight, 0, 0, 48, 64, 144, 64);
-
-
-        if (pageLeft != null && pageLeft.drawing != null) {
-            context.drawTexture(pageLeft.drawing, centerX - pageWidth, heightDifference / 2, pageWidth, pageHeight, 0, 0, 192, 256, 192, 256);
+        if (currentPage >= pages.size()) {
+            currentPage = 0;
+            nbt.putInt("current_page", 0);
+            syncNbt();
         }
 
-        if (pageRight != null && pageRight.drawing != null) {
-            context.drawTexture(pageRight.drawing, centerX, heightDifference / 2, pageWidth, pageHeight, 0, 0, 192, 256, 192, 256);
-        }
+        try {
+            AlchemistNotebookPage pageLeft = pages.get(currentPage);
+            AlchemistNotebookPage pageRight = currentPage + 1 >= pages.size() ? null : pages.get(currentPage + 1);
 
-        if (pageLeft != null)
-            pageLeft.render(this, context, mouseX, mouseY, delta);
-        if (pageRight != null)
-            pageRight.render(this, context, mouseX, mouseY, delta);
+            context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX - AlchemistNotebookPage.PAGE_WIDTH, heightDifference / 2, AlchemistNotebookPage.PAGE_WIDTH, AlchemistNotebookPage.PAGE_HEIGHT, 0, 0, 48, 64, 144, 64);
+            context.drawTexture(AlchemistNotebookRenderer.BOOK_TEXTURE, centerX, heightDifference / 2, AlchemistNotebookPage.PAGE_WIDTH, AlchemistNotebookPage.PAGE_HEIGHT, 0, 0, 48, 64, 144, 64);
+
+            if (pageLeft != null) {
+                context.getMatrices().push();
+                context.getMatrices().translate(centerX - AlchemistNotebookPage.PAGE_WIDTH, heightDifference / 2.0f, 0);
+                pageLeft.render();
+                context.getMatrices().pop();
+            }
+
+            if (pageRight != null) {
+                context.getMatrices().push();
+                context.getMatrices().translate(centerX, heightDifference / 2.0f, 0);
+                pageRight.render();
+                context.getMatrices().pop();
+            }
+        } catch (Exception e) {
+            //Ignore
+        }
 
         super.render(context, mouseX, mouseY, delta);
     }

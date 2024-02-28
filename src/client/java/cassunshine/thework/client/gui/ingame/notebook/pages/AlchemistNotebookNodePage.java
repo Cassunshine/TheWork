@@ -4,6 +4,9 @@ import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.client.gui.ingame.notebook.drawables.NodeDrawer;
+import cassunshine.thework.rendering.alchemy.AlchemyCircleRenderer;
+import cassunshine.thework.rendering.util.RenderingUtilities;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -11,6 +14,8 @@ import net.minecraft.client.gui.screen.ButtonTextures;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.gui.widget.TexturedButtonWidget;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.text.OrderedText;
@@ -19,7 +24,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
-    public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "node_page");
 
     private ButtonWidget circleSidesLeftButton;
     private ButtonWidget circleSidesRightButton;
@@ -33,20 +37,7 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
 
     private NbtCompound drawnNodeNbt;
 
-    public AlchemistNotebookNodePage(NbtCompound compound) {
-        super(compound);
-    }
-
-    public AlchemistNotebookNodePage() {
-        super(IDENTIFIER, null);
-    }
-
-    @Override
-    public void init(AlchemistNotebookScreen screen, int x, int y, int width, int height) {
-        super.init(screen, x, y, width, height);
-
-        var nbt = screen.stack.getOrCreateNbt();
-
+    public AlchemistNotebookNodePage(NbtCompound nbt) {
         drawnNodeNbt = nbt.contains("node", NbtElement.COMPOUND_TYPE) ? nbt.getCompound("node") : new NbtCompound();
         var sides = drawnNodeNbt.contains("sides", NbtElement.INT_TYPE) ? drawnNodeNbt.getInt("sides") : 8;
         var runeID = drawnNodeNbt.contains("rune_id", NbtElement.INT_TYPE) ? drawnNodeNbt.getInt("rune_id") : 0;
@@ -56,7 +47,14 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
         nbt.put("node", drawnNodeNbt);
 
         drawnNode = new NodeDrawer(sides, runeID);
+        drawnNode.x = PAGE_WIDTH / 2;
+        drawnNode.y = PAGE_HEIGHT / 3;
+        drawnNode.color = 0xFF000000;
 
+    }
+
+    @Override
+    public void addInteractables(AlchemistNotebookScreen screen, int x, int y) {
         circleSidesLeftButton = new TexturedButtonWidget(
                 32, 32,
                 new ButtonTextures(new Identifier("transferable_list/unselect"), new Identifier("transferable_list/unselect_highlighted")),
@@ -105,7 +103,6 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
 
         circleSidesLabel.setTextColor(0xFFCFCFCF);
         circleRuneLabel.setTextColor(0xFFCFCFCF);
-        drawnNode.color = 0xFF000000;
 
         //screen.addDrawable(circleSidesLabel);
         screen.addDrawableChild(circleSidesLeftButton);
@@ -115,62 +112,42 @@ public class AlchemistNotebookNodePage extends AlchemistNotebookPage {
         screen.addDrawableChild(circleRuneLeftButton);
         screen.addDrawableChild(circleRuneRightButton);
 
-        screen.addDrawable(drawnNode);
+        //screen.addDrawable(drawnNode);
 
-        drawnNode.size = MathHelper.floor(width * 0.6f);
+        drawnNode.size = MathHelper.floor(PAGE_WIDTH * 0.6f);
 
-        drawnNode.x = x + width / 2;
-        drawnNode.y = y + height / 3;
-
-
-        circleSidesLeftButton.setX(drawnNode.x - circleSidesLeftButton.getWidth());
-        circleSidesLeftButton.setY(drawnNode.y + drawnNode.size / 2 + 5);
-        circleSidesRightButton.setX(drawnNode.x + circleSidesRightButton.getWidth() / 4);
-        circleSidesRightButton.setY(drawnNode.y + drawnNode.size / 2 + 5);
+        circleSidesLeftButton.setX(x + drawnNode.x - circleSidesLeftButton.getWidth());
+        circleSidesLeftButton.setY(y + drawnNode.y + drawnNode.size / 2 + 5);
+        circleSidesRightButton.setX(x + drawnNode.x + circleSidesRightButton.getWidth() / 4);
+        circleSidesRightButton.setY(circleSidesLeftButton.getY());
 
         circleSidesLabel.alignCenter();
         //circleSidesLabel.setWidth(drawnNode.size);
         circleSidesLabel.setX(drawnNode.x - circleSidesLabel.getWidth() / 2 + 2);
-        circleSidesLabel.setY(circleSidesRightButton.getY() + circleSidesRightButton.getHeight() / 2 - circleSidesLabel.getHeight() / 2);
+        circleSidesLabel.setY(drawnNode.y + drawnNode.size / 2 + 17);
 
-        circleRuneLeftButton.setX(drawnNode.x - circleRuneLeftButton.getWidth());
-        circleRuneLeftButton.setY(drawnNode.y + drawnNode.size / 2 + circleSidesLeftButton.getHeight());
-        circleRuneRightButton.setX(drawnNode.x + circleRuneRightButton.getWidth() / 4);
+        circleRuneLeftButton.setX(x + drawnNode.x - circleRuneLeftButton.getWidth());
+        circleRuneLeftButton.setY(y + drawnNode.y + drawnNode.size / 2 + circleSidesLeftButton.getHeight());
+        circleRuneRightButton.setX(x + drawnNode.x + circleRuneRightButton.getWidth() / 4);
         circleRuneRightButton.setY(circleRuneLeftButton.getY());
 
         circleRuneLabel.alignCenter();
         //circleRuneLabel.setWidth(drawnNode.size);
         circleRuneLabel.setX(drawnNode.x - circleRuneLabel.getWidth() / 2 + 2);
-        circleRuneLabel.setY(circleRuneRightButton.getY() + circleRuneRightButton.getHeight() / 2 - circleRuneLabel.getHeight() / 2);
+        circleRuneLabel.setY(drawnNode.y + drawnNode.size / 2 + 44);
+
+        drawnNode.x = PAGE_WIDTH / 2;
+        drawnNode.y = PAGE_HEIGHT / 3;
     }
 
-    private void drawTextCustom(DrawContext context, TextWidget widget) {
-        Text text = widget.getMessage();
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        int widgetX = widget.getX() + Math.round(0.5f * (float) (widget.getWidth() - textRenderer.getWidth(text)));
-        int widgetY = widget.getY() + (widget.getHeight() - 9) / 2;
-        OrderedText orderedText = text.asOrderedText();
-        context.drawText(textRenderer, orderedText, widgetX, widgetY, 0xFF000000, false);
-    }
 
     @Override
-    public void render(AlchemistNotebookScreen screen, DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(screen, context, mouseX, mouseY, delta);
+    public void render() {
+        drawnNode.render();
 
-        drawTextCustom(context, circleSidesLabel);
-        drawTextCustom(context, circleRuneLabel);
-    }
-
-    @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-
-
-        return nbt;
-    }
-
-    @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+        if (RenderingUtilities.SPACE == RenderingUtilities.RenderingSpace.GUI) {
+            RenderingUtilities.drawText(circleSidesLabel, false);
+            RenderingUtilities.drawText(circleRuneLabel, false);
+        }
     }
 }

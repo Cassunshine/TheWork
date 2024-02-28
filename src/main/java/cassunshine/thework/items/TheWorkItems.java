@@ -1,13 +1,13 @@
 package cassunshine.thework.items;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.items.notebook.AlchemistNotebookItem;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.*;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
 
 import java.util.HashMap;
 

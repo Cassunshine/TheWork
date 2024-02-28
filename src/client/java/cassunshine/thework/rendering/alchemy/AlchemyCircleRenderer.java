@@ -31,8 +31,8 @@ import java.util.Random;
  */
 public class AlchemyCircleRenderer {
 
-    private static final float LINE_THICKNESS = 1 / 16.0f;
-    private static final float HALF_LINE_THICKNESS = LINE_THICKNESS / 2.0f;
+    public static final float LINE_THICKNESS = 1 / 16.0f;
+    public static final float HALF_LINE_THICKNESS = LINE_THICKNESS / 2.0f;
 
     private static final Identifier ALCHEMY_CIRCLE_TEXTURE = new Identifier(TheWorkMod.ModID, "textures/other/alchemy_circle.png");
 
@@ -123,8 +123,6 @@ public class AlchemyCircleRenderer {
      * Draws an alchemy node.
      */
     public static void drawAlchemyNode(AlchemyNode node) {
-
-
         RenderingUtilities.pushMat();
 
         RenderingUtilities.setupColor(node.color);
@@ -176,7 +174,7 @@ public class AlchemyCircleRenderer {
                         RenderingUtilities.translateMatrix(0, MathHelper.sin((time * 2) % MathHelper.TAU) * 0.1f, 0);
                         RenderingUtilities.rotateMatrix(0, time * 2.0f, 0);
 
-                        RenderingUtilities.renderItem(node.heldStack, node.ring.circle.blockEntity.getWorld(), LightmapTextureManager.MAX_LIGHT_COORDINATE, OverlayTexture.DEFAULT_UV);
+                        RenderingUtilities.renderItem(node.heldStack, node.ring.circle.blockEntity.getWorld());
 
                         RenderingUtilities.popMat();
                     });
@@ -197,7 +195,7 @@ public class AlchemyCircleRenderer {
         RenderingUtilities.popMat();
     }
 
-    private static void drawLink(AlchemyLink link) {
+    public static void drawLink(AlchemyLink link) {
         var sourcePosition = link.sourceNode.getPositionRelative();
         var delta = link.destinationNode.getPositionRelative().subtract(sourcePosition);
 
@@ -229,17 +227,25 @@ public class AlchemyCircleRenderer {
      * Draws a circle with the specified number of sides and a rune.
      */
     public static void drawSidedCircleAndRune(float radius, int sides, Identifier rune) {
+        drawSidedCircleAndRune(radius, sides, rune, 0);
+    }
+
+    /**
+     * Draws a circle with the specified number of sides and a rune.
+     */
+    public static void drawSidedCircleAndRune(float radius, int sides, Identifier rune, float runeAngle) {
         RenderingUtilities.pushMat();
 
         if (sides == 4) {
-            //RenderingUtilities.rotateMatrix(0, MathHelper.HALF_PI * 0.5f, 0);
             drawSidedCircle(radius, sides);
-            //RenderingUtilities.rotateMatrix(0, -MathHelper.HALF_PI * 0.5f, 0);
         } else {
             drawSidedCircle(radius, sides);
         }
 
-        drawRune(rune);
+        RenderingUtilities.rotateMatrix(0, runeAngle, 0);
+
+        if (!rune.equals(TheWorkRunes.NULL))
+            drawRune(rune);
 
         RenderingUtilities.popMat();
     }
@@ -265,7 +271,7 @@ public class AlchemyCircleRenderer {
         //});
     }
 
-    private static void drawPippedCircleSegment(float radius, float startAngle, float endAngle, int segments, int pips, float pipOffset, float pipHeight) {
+    public static void drawPippedCircleSegment(float radius, float startAngle, float endAngle, int segments, int pips, float pipOffset, float pipHeight) {
         drawCircleSegment(radius, startAngle, endAngle, segments);
 
         if (Math.abs(pipHeight) > 0.001f)
@@ -301,7 +307,7 @@ public class AlchemyCircleRenderer {
     /**
      * Draws the segment of a circle with the given number of sides.
      */
-    private static void drawCircleSegment(float radius, float startAngle, float endAngle, int segments) {
+    public static void drawCircleSegment(float radius, float startAngle, float endAngle, int segments) {
         float circleMax = radius - LINE_THICKNESS;
 
         for (int i = 0; i < segments; i++) {
@@ -326,7 +332,7 @@ public class AlchemyCircleRenderer {
     /**
      * Draws pips along a segment of a circle.
      */
-    private static void drawPipSegment(float radius, float startAngle, float endAngle, int pips, float pipHeight, boolean offsetPips) {
+    public static void drawPipSegment(float radius, float startAngle, float endAngle, int pips, float pipHeight, boolean offsetPips) {
         for (int i = 0; i < pips; i++) {
             float progressThis = (offsetPips ? i + 0.5f : i) / (float) pips;
             float angleThis = TheWorkUtils.lerpRadians(progressThis, startAngle, endAngle);
@@ -339,7 +345,7 @@ public class AlchemyCircleRenderer {
     /**
      * Draws a single pip.
      */
-    private static void drawPip(float radius, float angle, float pipHeight) {
+    public static void drawPip(float radius, float angle, float pipHeight) {
         float tangent = angle + MathHelper.HALF_PI;
         float tanX = MathHelper.sin(tangent) * HALF_LINE_THICKNESS;
         float tanY = MathHelper.cos(tangent) * HALF_LINE_THICKNESS;

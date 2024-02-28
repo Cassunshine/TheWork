@@ -2,6 +2,9 @@ package cassunshine.thework.rendering.util;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -9,6 +12,8 @@ import net.minecraft.client.render.block.BlockRenderManager;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.OrderedText;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MatrixUtil;
@@ -31,6 +36,8 @@ public class RenderingUtilities {
 
     private static int light;
     private static int overlay;
+
+    public static RenderingSpace SPACE;
 
     public static void setupStack(MatrixStack stack) {
         RenderingUtilities.stack = stack;
@@ -75,23 +82,43 @@ public class RenderingUtilities {
     }
 
     public static void saneVertex(float x, float y, float z, float u, float v) {
-        consumer.vertex(stack.peek().getPositionMatrix(), x + getWobble(), y, z + getWobble()).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ).next();
+        consumer.vertex(stack.peek().getPositionMatrix(), x + getWobble(), y, z + getWobble()).color(r, g, b, a).texture(u, v).overlay(overlay).light(light);
+
+        if (normalX == 0 && normalY == 0 && normalZ == 0)
+            consumer.normal(0, 1, 0);
+        else
+            consumer.normal(stack.peek().getNormalMatrix(), normalX, normalY, normalZ);
+
+        consumer.next();
+    }
+
+    public static void saneVertexNoNormal(float x, float y, float z, float u, float v) {
+        consumer.vertex(stack.peek().getPositionMatrix(), x + getWobble(), y, z + getWobble()).color(r, g, b, a).texture(u, v).overlay(overlay).light(light).normal(normalX, normalY, normalZ).next();
     }
 
     public static void saneVertex(double x, double y, double z, float u, float v) {
         saneVertex((float) x, (float) y, (float) z, u, v);
     }
 
-    public static void renderItem(ItemStack stack, World world, int light, int overlay) {
+    public static void renderItem(ItemStack stack, World world) {
+        renderItem(stack, ModelTransformationMode.GROUND, world);
+    }
+
+    public static void renderItem(ItemStack stack, ModelTransformationMode mode, World world) {
         if (stack.isEmpty())
             return;
-        MinecraftClient.getInstance().getItemRenderer().renderItem(stack, ModelTransformationMode.GROUND, light, overlay, RenderingUtilities.stack, consumers, world, 0);
+        MinecraftClient.getInstance().getItemRenderer().renderItem(stack, mode, light, overlay, RenderingUtilities.stack, consumers, world, 0);
     }
+
 
     public static void renderBlock(BlockState state, int light, int overlay) {
         MinecraftClient.getInstance().getBlockRenderManager().renderBlockAsEntity(state, stack, consumers, light, overlay);
     }
 
+
+    public static MatrixStack getMatStack() {
+        return stack;
+    }
 
     public static void pushMat() {
         stack.push();
@@ -127,4 +154,30 @@ public class RenderingUtilities {
         return (renderRandom.nextFloat() - 0.5f) * wobbleAmount;
     }
 
+    public static void drawText(Text text, boolean withShadow) {
+        var renderer = MinecraftClient.getInstance().textRenderer;
+
+        renderer.draw(text, 0, 0, ColorHelper.Argb.getArgb(a, r, g, b), withShadow, stack.peek().getPositionMatrix(), consumers, TextRenderer.TextLayerType.NORMAL, 0xFFFFFFF, light);
+    }
+
+    public static void drawTextCentered(Text text, boolean withShadow) {
+        var renderer = MinecraftClient.getInstance().textRenderer;
+        var width = renderer.getWidth(text);
+
+        renderer.draw(text, -width / 2.0f, 0, ColorHelper.Argb.getArgb(a, r, g, b), withShadow, stack.peek().getPositionMatrix(), consumers, TextRenderer.TextLayerType.NORMAL, 0xFFFFFFF, light);
+    }
+
+    public static void drawText(TextWidget widget, boolean withShadow) {
+
+        var renderer = MinecraftClient.getInstance().textRenderer;
+        var width = widget.getWidth();
+
+        Text text = widget.getMessage();
+        renderer.draw(text, widget.getX(), widget.getY(), ColorHelper.Argb.getArgb(a, r, g, b), withShadow, stack.peek().getPositionMatrix(), consumers, TextRenderer.TextLayerType.NORMAL, 0xFFFFFFF, light);
+    }
+
+    public enum RenderingSpace {
+        WORLD,
+        GUI
+    }
 }

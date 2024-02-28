@@ -1,8 +1,10 @@
 package cassunshine.thework.rendering.items;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookNodePage;
 import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
+import cassunshine.thework.client.gui.ingame.notebook.pages.RecipePage;
 import cassunshine.thework.rendering.util.RenderingUtilities;
 import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.client.render.LightmapTextureManager;
@@ -11,6 +13,7 @@ import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -20,9 +23,15 @@ import java.util.ArrayList;
 public class AlchemistNotebookRenderer {
     public static final Identifier BOOK_TEXTURE = new Identifier(TheWorkMod.ModID, "textures/item/alchemist_notebook.png");
 
+    public static VertexConsumerProvider provider;
+    public static MatrixStack stack;
+
     public static final float TEXTURE_SIZE = 32;
 
     public static void renderItem(ItemStack stack, ModelTransformationMode modelTransformationMode, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light, int overlay) {
+
+        AlchemistNotebookRenderer.provider = vertexConsumerProvider;
+        AlchemistNotebookRenderer.stack = matrixStack;
 
         RenderingUtilities.setupStack(matrixStack);
         RenderingUtilities.setupConsumers(vertexConsumerProvider);
@@ -52,6 +61,7 @@ public class AlchemistNotebookRenderer {
                 RenderingUtilities.translateMatrix(0.4f, 0.5f, 0.75f);
                 RenderingUtilities.scaleMatrix(0.3f, 0.3f, 0.3f);
                 RenderingUtilities.rotateMatrix(0, -0.4f, 0);
+                RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.WORLD;
                 break;
             }
             case FIRST_PERSON_LEFT_HAND: {
@@ -64,6 +74,7 @@ public class AlchemistNotebookRenderer {
                 RenderingUtilities.translateMatrix(0.525f, 0.5f, 0.75f);
                 RenderingUtilities.scaleMatrix(0.3f, 0.3f, 0.3f);
                 RenderingUtilities.rotateMatrix(0, 0.4f, 0);
+                RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.WORLD;
                 break;
             }
             case THIRD_PERSON_LEFT_HAND:
@@ -72,7 +83,7 @@ public class AlchemistNotebookRenderer {
 
                 RenderingUtilities.translateMatrix(0.5f, 0.48f, 0.55f);
                 RenderingUtilities.scaleMatrix(0.5f, 0.5f, 0.5f);
-
+                RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.WORLD;
                 break;
             }
             case GUI: {
@@ -90,6 +101,7 @@ public class AlchemistNotebookRenderer {
 
                 RenderingUtilities.rotateMatrix(0.4f, 0, 0);
                 RenderingUtilities.translateMatrix(0, 0, -0.5f);
+                RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.WORLD;
 
                 break;
             }
@@ -100,6 +112,9 @@ public class AlchemistNotebookRenderer {
 
                 RenderingUtilities.rotateMatrix(0.4f, 0, 0);
                 RenderingUtilities.translateMatrix(0, 0, -0.1f);
+                RenderingUtilities.SPACE = RenderingUtilities.RenderingSpace.WORLD;
+
+                drawPages = false;
 
                 break;
             }
@@ -111,7 +126,11 @@ public class AlchemistNotebookRenderer {
         ArrayList<AlchemistNotebookPage> pages = null;
 
         if (drawPages) {
-            pages = AlchemistNotebookPage.getPages(stack);
+            pages = new ArrayList<>() {{
+                add(new AlchemistNotebookNodePage(nbt));
+            }};
+
+            AlchemistNotebookPage.generateRecipePages(pages, nbt);
         }
 
         renderBook(bookAngle, useNormal, drawPages, pages, currentPage);
@@ -137,7 +156,7 @@ public class AlchemistNotebookRenderer {
             if (useNormals)
                 RenderingUtilities.setupNormal(-1, 0, 0);
 
-            RenderingUtilities.saneVertex(0, 0, 0, 3 / 3.0f, 1);
+            RenderingUtilities.saneVertex(0, 0, 0, 1 / 3.0f, 1);
             RenderingUtilities.saneVertex(0, 0, 0.75f, 2 / 3.0f, 1);
             RenderingUtilities.saneVertex(0, 1, 0.75f, 2 / 3.0f, 0);
             RenderingUtilities.saneVertex(0, 1, 0, 1 / 3.0f, 0);
@@ -173,7 +192,6 @@ public class AlchemistNotebookRenderer {
             float decPageFrac = 0.02f;
 
             float angleFrac = 0.01f;
-
 
             for (int i = 0; i < decorativePages; i++) {
                 float leftFrac = angleFrac;
@@ -221,6 +239,8 @@ public class AlchemistNotebookRenderer {
 
     private static void drawPage(boolean useNormals, float leftAngle, float rightAngle, AlchemistNotebookPage left, AlchemistNotebookPage right) {
 
+        RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(BOOK_TEXTURE));
+
         //Left page
         {
             if (useNormals)
@@ -235,18 +255,20 @@ public class AlchemistNotebookRenderer {
             RenderingUtilities.saneVertex(0, 0, 0.75f, 1 / 3.0f, 0);
             RenderingUtilities.saneVertex(0, 0, 0, 0, 0);
 
-            if (left != null && left.drawing != null) {
-                RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(left.drawing));
+            RenderingUtilities.popMat();
+            RenderingUtilities.pushMat();
 
-                RenderingUtilities.saneVertex(0.001f, 1, 0, 1, 0);
-                RenderingUtilities.saneVertex(0.001f, 1, 0.75f, 0, 0);
-                RenderingUtilities.saneVertex(0.001f, 0, 0.75f, 0, 1);
-                RenderingUtilities.saneVertex(0.001f, 0, 0, 1, 1);
+            if (left != null) {
+                RenderingUtilities.rotateMatrix(0, MathHelper.HALF_PI + leftAngle, 0);
+                RenderingUtilities.scaleMatrix(1 / (float) AlchemistNotebookPage.PAGE_HEIGHT, 1 / (float) AlchemistNotebookPage.PAGE_HEIGHT, 1 / (float) AlchemistNotebookPage.PAGE_HEIGHT);
+                RenderingUtilities.translateMatrix(-AlchemistNotebookPage.PAGE_WIDTH, AlchemistNotebookPage.PAGE_HEIGHT, 1f);
+                RenderingUtilities.scaleMatrix(1, -1, 1);
+                left.render();
             }
 
             RenderingUtilities.popMat();
-
         }
+        RenderingUtilities.setupColor(0xFFFFFFF);
 
         //Right page
         {
@@ -262,19 +284,20 @@ public class AlchemistNotebookRenderer {
             RenderingUtilities.saneVertex(0, 1, 0.75f, 1 / 3.0f, 1);
             RenderingUtilities.saneVertex(0, 1, 0, 0, 1);
 
+            RenderingUtilities.popMat();
+            RenderingUtilities.pushMat();
 
-            if (right != null && right.drawing != null) {
-                RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(right.drawing));
 
-                RenderingUtilities.saneVertex(-0.001f, 0, 0, 0, 1);
-                RenderingUtilities.saneVertex(-0.001f, 0, 0.75f, 1, 1);
-                RenderingUtilities.saneVertex(-0.001f, 1, 0.75f, 1, 0);
-                RenderingUtilities.saneVertex(-0.001f, 1, 0, 0, 0);
+            if (right != null) {
+                RenderingUtilities.rotateMatrix(0, -MathHelper.HALF_PI + rightAngle, 0);
+                RenderingUtilities.scaleMatrix(1 / (float) AlchemistNotebookPage.PAGE_HEIGHT, 1 / (float) AlchemistNotebookPage.PAGE_HEIGHT, 1 / (float) AlchemistNotebookPage.PAGE_HEIGHT);
+                RenderingUtilities.translateMatrix(0, AlchemistNotebookPage.PAGE_HEIGHT, 1f);
+                RenderingUtilities.scaleMatrix(1, -1, 1);
+                right.render();
             }
 
             RenderingUtilities.popMat();
         }
-
-        RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutout(BOOK_TEXTURE));
+        RenderingUtilities.setupColor(0xFFFFFFF);
     }
 }

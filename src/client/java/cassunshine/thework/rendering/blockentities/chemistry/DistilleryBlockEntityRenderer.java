@@ -38,12 +38,12 @@ public class DistilleryBlockEntityRenderer implements BlockEntityRenderer<Distil
 
         if (!entity.fuelStack.isEmpty()) {
             matrices.push();
-            matrices.translate(6 / 16.0f, 1.5/16.0f, 0.5f);
+            matrices.translate(6 / 16.0f, 1.5 / 16.0f, 0.5f);
 
             var bs = entity.getWorld().getBlockState(entity.getPos());
             matrices.multiply(bs.get(DistilleryBlock.FACING).getRotationQuaternion());
 
-            RenderingUtilities.renderItem(entity.fuelStack, entity.getWorld(), light, overlay);
+            RenderingUtilities.renderItem(entity.fuelStack, entity.getWorld());
 
             matrices.pop();
         }
