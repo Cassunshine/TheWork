@@ -3,6 +3,9 @@ package cassunshine.thework.alchemy.circle.layout;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.layout.AlchemyCircleLayout;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
+import cassunshine.thework.network.TheWorkNetworking;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
 import cassunshine.thework.recipes.ConstructionRecipe;
 import cassunshine.thework.recipes.TheWorkRecipes;
 import cassunshine.thework.utils.TheWorkUtils;
@@ -55,10 +58,13 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
         }
 
 
-        var centerPos = circle.blockEntity.flatPosition.add(0, circle.blockEntity.getPos().getY() + 1, 0);
+        var be = circle.blockEntity;
+        var pos = be.getPos();
+        var centerPos = pos.toCenterPos();
 
         for (ItemStack output : recipe.outputs) {
             TheWorkUtils.dropItem(circle.blockEntity.getWorld(), output.copy(), centerPos.x, centerPos.y, centerPos.z);
+            TheWorkNetworkEvents.sendEvent(pos, be.getWorld(), new WitnessRecipeEvent(pos, output.getItem()));
         }
     }
 }

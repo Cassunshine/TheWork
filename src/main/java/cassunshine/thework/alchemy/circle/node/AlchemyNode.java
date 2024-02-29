@@ -222,16 +222,21 @@ public class AlchemyNode implements AlchemyCircleComponent {
     private TheWorkNetworkEvent generateChangeSidesAndRuneEvent(ItemUsageContext context) {
         var stack = context.getPlayer().getStackInHand(context.getHand() == Hand.MAIN_HAND ? Hand.OFF_HAND : Hand.MAIN_HAND);
 
-        if (!stack.isOf(TheWorkItems.ALCHEMIST_NOTEBOOK_ITEM) || !stack.hasNbt() || !stack.getOrCreateNbt().contains("node", NbtElement.COMPOUND_TYPE))
+        if (!stack.isOf(TheWorkItems.ALCHEMIST_NOTEBOOK_ITEM) || !stack.hasNbt())
             return TheWorkNetworkEvents.NONE;
 
-        var nodeNBT = stack.getOrCreateNbt().getCompound("node");
-        var rune = TheWorkRunes.getRuneByID(nodeNBT.getInt("rune_id"));
+        var itemNbt = stack.getOrCreateNbt();
+        var sectionNbt = itemNbt.getCompound("sections");
+        var mechanicsNbt = sectionNbt.getCompound("thework:mechanics");
+        var nodePageNbt = mechanicsNbt.getCompound("thework:node_select");
+
+        var newSides = nodePageNbt.getInt("sides");
+        var id = new Identifier(nodePageNbt.getString("rune_id"));
 
         if (context.getStack().getItem() instanceof ChalkItem cI && color != cI.color)
             AlchemyCircleBlockEntity.sendCircleEvent(ring.circle.blockEntity, new AlchemyNodeSetColorEvent(cI.color, this));
 
-        return new AlchemyNodeSetSidesAndRune(nodeNBT.getInt("sides"), rune, this);
+        return new AlchemyNodeSetSidesAndRune(newSides, id, this);
     }
 
     @Override

@@ -1,8 +1,8 @@
 package cassunshine.thework.client.gui.ingame.notebook.drawables;
 
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
-import cassunshine.thework.rendering.alchemy.AlchemyCircleRenderer;
-import cassunshine.thework.rendering.util.RenderingUtilities;
+import cassunshine.thework.client.rendering.alchemy.AlchemyCircleRenderer;
+import cassunshine.thework.client.rendering.util.RenderingUtilities;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.util.Identifier;
@@ -14,26 +14,10 @@ public class NodeDrawer implements Drawable {
 
     public int size;
 
-    public int sides = 0;
-    public int runeID = 0;
-
-    private Identifier rune;
+    public int sides = 8;
+    public Identifier runeID = TheWorkRunes.NULL;
 
     public int color;
-
-    public NodeDrawer(int sides, int runeID) {
-        setSides(sides);
-        setRuneID(runeID);
-    }
-
-    public void setSides(int sides) {
-        this.sides = sides;
-    }
-
-    public void setRuneID(int runeID) {
-        this.runeID = runeID;
-        this.rune = TheWorkRunes.getRuneByID(runeID);
-    }
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
@@ -54,7 +38,7 @@ public class NodeDrawer implements Drawable {
         RenderingUtilities.rotateMatrix(MathHelper.HALF_PI, 0, 0);
         RenderingUtilities.scaleMatrix(-size, size, size);
 
-        AlchemyCircleRenderer.drawSidedCircleAndRune(0.5f, sides, rune);
+        AlchemyCircleRenderer.drawSidedCircleAndRune(0.5f, sides, runeID);
         AlchemyCircleRenderer.runDeferTasks();
 
         RenderingUtilities.popMat();

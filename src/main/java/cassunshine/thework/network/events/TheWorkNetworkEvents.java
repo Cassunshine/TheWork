@@ -11,6 +11,7 @@ import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetItemEvent;
 import cassunshine.thework.alchemy.circle.events.node.AlchemyNodeSetSidesAndRune;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingClockwiseSetEvent;
 import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingSetColorEvent;
+import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -48,6 +49,9 @@ public class TheWorkNetworkEvents {
         register(AlchemyNodeSetColorEvent.IDENTIFIER, AlchemyNodeSetColorEvent::new);
 
         register(PlaceBlockBackfireEffect.Event.IDENTIFIER, PlaceBlockBackfireEffect.Event::new);
+
+
+        register(WitnessRecipeEvent.IDENTIFIER, WitnessRecipeEvent::new);
     }
 
 

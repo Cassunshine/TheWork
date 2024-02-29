@@ -49,4 +49,28 @@ public class TheWorkRunes {
     public static Identifier getRuneByID(int id) {
         return RUNES_BY_ID[id];
     }
+
+    private static int getRuneNumericalId(Identifier id) {
+        for (int i = 0; i < RUNES_BY_ID.length; i++)
+            if (RUNES_BY_ID[i].equals(id))
+                return i;
+        return -1;
+    }
+
+    public static Identifier getPreviousRune(Identifier id) {
+        int index = getRuneNumericalId(id);
+        index = index - 1;
+
+        if (index == -1)
+            return RUNES_BY_ID[RUNES_BY_ID.length - 1];
+
+        return RUNES_BY_ID[index];
+    }
+
+    public static Identifier getNextRune(Identifier id) {
+        int index = getRuneNumericalId(id);
+        index = (index + 1) % getRuneCount();
+
+        return RUNES_BY_ID[index];
+    }
 }

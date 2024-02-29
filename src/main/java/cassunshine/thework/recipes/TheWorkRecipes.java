@@ -46,6 +46,9 @@ public class TheWorkRecipes {
     }
 
     public static ConstructionRecipe getConstruction(Item item) {
+        if (item == null)
+            return null;
+
         return CONSTRUCTION_RECIPES_BY_ITEM.get(item);
     }
 

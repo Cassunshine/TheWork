@@ -20,12 +20,14 @@ public class AlchemyCircleResearchLayout extends AlchemyCircleLayout {
 
 
     public void activate() {
+        if (rings.isEmpty())
+            return;
+
         var world = circle.blockEntity.getWorld();
         var be = circle.blockEntity;
 
         var entityList = world.getEntitiesByClass(ItemEntity.class, new Box(circle.blockEntity.getPos()), p -> true);
-
-        if (entityList == null)
+        if (entityList == null || entityList.isEmpty())
             return;
 
         //Pick random item entity.

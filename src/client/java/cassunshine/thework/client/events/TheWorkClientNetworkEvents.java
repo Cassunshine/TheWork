@@ -4,7 +4,7 @@ import cassunshine.thework.alchemy.backfire.BackfireEffects;
 import cassunshine.thework.alchemy.backfire.PlaceBlockBackfireEffect;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
-import cassunshine.thework.rendering.particles.BoltParticle;
+import cassunshine.thework.client.rendering.particles.BoltParticle;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
