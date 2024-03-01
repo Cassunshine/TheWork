@@ -1,4 +1,4 @@
-package cassunshine.thework.recipes;
+package cassunshine.thework.data.recipes;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.chemistry.ChemistryWorkType;
@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
@@ -102,7 +103,7 @@ public class TheWorkRecipes {
                     Element element = Elements.getElement(new Identifier(TheWorkMod.ModID, jsonEntry.getKey()));
                     if (element == null) throw new Exception("Element " + jsonEntry.getKey() + "not found");
 
-                    float amount = jsonEntry.getValue().getAsFloat();
+                    int amount = jsonEntry.getValue().getAsInt();
 
                     outputsList[index++] = (new ElementPacket(element, amount));
                 }
@@ -211,7 +212,7 @@ public class TheWorkRecipes {
 
                     var index = 0;
                     for (var key : inputJson.keySet()) {
-                        var val = inputJson.get(key).getAsFloat();
+                        var val = inputJson.get(key).getAsInt();
                         inputPackets[index++] = new ElementPacket(Elements.getElement(new Identifier(TheWorkMod.ModID, key)), val);
                     }
 
@@ -227,7 +228,7 @@ public class TheWorkRecipes {
 
                     var index = 0;
                     for (var key : outputJson.keySet()) {
-                        var val = outputJson.get(key).getAsFloat();
+                        var val = outputJson.get(key).getAsInt();
                         outputPackets[index++] = new ElementPacket(Elements.getElement(new Identifier(TheWorkMod.ModID, key)), val);
                     }
 
@@ -240,6 +241,104 @@ public class TheWorkRecipes {
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
             }
+        }
+    }
+
+    public static void writeSync(PacketByteBuf buf) {
+
+        //Deconstruction
+        {
+            buf.writeInt(DECONSTRUCTION_RECIPES.size());
+
+            for (var entry : DECONSTRUCTION_RECIPES.entrySet()) {
+                buf.writeIdentifier(entry.getKey());
+
+                var value = entry.getValue();
+                var output = value.output();
+
+                buf.writeInt(value.time());
+
+                buf.writeInt(output.length);
+                for (ElementPacket elementPacket : output) {
+                    buf.writeIdentifier(elementPacket.element().id);
+                    buf.writeInt(elementPacket.amount());
+                }
+            }
+        }
+
+        //Construction
+        {
+            buf.writeInt(CONSTRUCTION_RECIPES.size());
+
+            //NOTE - we don't need to write the key for construction recipes, the key is just their signature, which the client should calculate anyway.
+            for (var entry : CONSTRUCTION_RECIPES.entrySet()) {
+
+                var value = entry.getValue();
+
+                //Outputs
+                buf.writeInt(value.outputs.length);
+                for (ItemStack output : value.outputs)
+                    buf.writeItemStack(output);
+
+                //Inputs
+                buf.writeInt(value.inputRings.length);
+                for (var ring : value.inputRings) {
+                    buf.writeInt(ring.length);
+                    for (ElementPacket elementPacket : ring) {
+                        buf.writeIdentifier(elementPacket.element().id);
+                        buf.writeInt(elementPacket.amount());
+                    }
+                }
+            }
+        }
+    }
+
+    public static void readSync(PacketByteBuf buf) {
+        //Deconstruction
+        {
+            ImmutableMap.Builder<Identifier, DeconstructionRecipe> builder = new ImmutableMap.Builder<>();
+            int numEntries = buf.readInt();
+            for (int i = 0; i < numEntries; i++) {
+                var id = buf.readIdentifier();
+
+                var time = buf.readInt();
+                var output = new ElementPacket[buf.readInt()];
+                for (int j = 0; j < output.length; j++) {
+                    output[j] = new ElementPacket(Elements.getElement(buf.readIdentifier()), buf.readInt());
+                }
+
+                var recipe = new DeconstructionRecipe(id, time, output);
+                builder.put(id, recipe);
+            }
+
+            DECONSTRUCTION_RECIPES = builder.build();
+        }
+
+        //Construction
+        {
+            ImmutableMap.Builder<String, ConstructionRecipe> builder = new ImmutableMap.Builder<>();
+            int numEntries = buf.readInt();
+            for (int i = 0; i < numEntries; i++) {
+                var inputs = new ItemStack[buf.readInt()];
+                for (int j = 0; j < inputs.length; j++) {
+                    inputs[j] = buf.readItemStack();
+                }
+
+                var outputs = new ElementPacket[buf.readInt()][];
+                for (int j = 0; j < outputs.length; j++) {
+                    var ring = new ElementPacket[buf.readInt()];
+                    for (int k = 0; k < ring.length; k++) {
+                        ring[k] = new ElementPacket(Elements.getElement(buf.readIdentifier()), buf.readInt());
+                    }
+
+                    outputs[j] = ring;
+                }
+
+                var recipe = new ConstructionRecipe(outputs, inputs, TheWorkUtils.generateSignature(outputs, r -> TheWorkUtils.generateSignature(r, e -> e.element().id.toString())));
+                builder.put(recipe.signature, recipe);
+            }
+
+            CONSTRUCTION_RECIPES = builder.build();
         }
     }
 }

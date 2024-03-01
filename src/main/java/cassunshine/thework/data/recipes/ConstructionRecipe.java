@@ -1,4 +1,4 @@
-package cassunshine.thework.recipes;
+package cassunshine.thework.data.recipes;
 
 import cassunshine.thework.alchemy.elements.ElementPacket;
 import net.minecraft.item.ItemStack;

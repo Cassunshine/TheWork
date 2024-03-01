@@ -85,6 +85,6 @@ public class ChemistrySetModel implements UnbakedModel, BakedModel, FabricBakedM
 
     @Override
     public void emitBlockQuads(BlockRenderView blockView, BlockState state, BlockPos pos, Supplier<Random> randomSupplier, RenderContext context) {
-        TheWorkMod.LOGGER.error("BLEH");
+
     }
 }

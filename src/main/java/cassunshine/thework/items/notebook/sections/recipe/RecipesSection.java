@@ -1,26 +1,23 @@
 package cassunshine.thework.items.notebook.sections.recipe;
 
 import cassunshine.thework.TheWorkMod;
-import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.items.notebook.NotebookData;
 import cassunshine.thework.items.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.items.notebook.pages.RecipePage;
 import cassunshine.thework.items.notebook.sections.AlchemistNotebookSection;
-import cassunshine.thework.recipes.TheWorkRecipes;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
 import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-
-import java.util.HashSet;
 
 public class RecipesSection extends AlchemistNotebookSection {
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "recipes");
+
+    public int knownRecipes = 0;
 
     public RecipesSection(NotebookData data) {
         super(data, IDENTIFIER, new ItemStack(Blocks.GRASS_BLOCK.asItem()));
@@ -43,11 +40,19 @@ public class RecipesSection extends AlchemistNotebookSection {
                 continue;
 
             //Add a page for that recipe.
-            pages.add(new RecipePage(id));
+            pages.add(new RecipePage(this, id));
         }
 
         //Read page data.
         super.readNbt(nbt);
+
+        for (AlchemistNotebookPage page : pages) {
+            if (!(page instanceof RecipePage recipePage))
+                continue;
+
+            if (recipePage.isCorrect)
+                knownRecipes++;
+        }
     }
 
     public boolean knowsItem(Item item) {
@@ -72,9 +77,9 @@ public class RecipesSection extends AlchemistNotebookSection {
         if (recipe == null || page != null)
             return null;
 
-        var newPage = new RecipePage(id);
+        var newPage = new RecipePage(this, id);
 
-        pages.add(new RecipePage(id));
+        pages.add(newPage);
 
         data.currentSection = data.sections.indexOf(this);
         data.currentPage = 0;
@@ -97,5 +102,18 @@ public class RecipesSection extends AlchemistNotebookSection {
             return;
 
         page.cheatRecipe();
+    }
+
+    public void onRecipeObtained(Item item) {
+        knownRecipes = 0;
+        for (AlchemistNotebookPage page : pages) {
+            if (!(page instanceof RecipePage recipePage))
+                continue;
+
+            if (recipePage.isCorrect)
+                knownRecipes++;
+        }
+
+        data.onRecipeObtained(item);
     }
 }

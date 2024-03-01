@@ -2,10 +2,8 @@ package cassunshine.thework.alchemy.circle.node.type;
 
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.blocks.AlchemyJarBlock;
-import cassunshine.thework.recipes.TheWorkRecipes;
-import net.minecraft.nbt.NbtCompound;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.math.MathHelper;
 
 public class DeconstructNodeType extends AlchemyNodeType {
 

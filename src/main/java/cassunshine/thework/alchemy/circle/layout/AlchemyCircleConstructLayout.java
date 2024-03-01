@@ -1,13 +1,11 @@
 package cassunshine.thework.alchemy.circle.layout;
 
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
-import cassunshine.thework.alchemy.circle.layout.AlchemyCircleLayout;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
-import cassunshine.thework.network.TheWorkNetworking;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
-import cassunshine.thework.recipes.ConstructionRecipe;
-import cassunshine.thework.recipes.TheWorkRecipes;
+import cassunshine.thework.data.recipes.ConstructionRecipe;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
 import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.item.ItemStack;
 

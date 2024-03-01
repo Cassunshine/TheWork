@@ -4,6 +4,7 @@ import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPageRenderers;
 import cassunshine.thework.client.rendering.util.RenderingUtilities;
+import cassunshine.thework.client.utils.NotebookDataUtils;
 import cassunshine.thework.items.notebook.NotebookData;
 import cassunshine.thework.items.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.utils.TheWorkUtils;
@@ -123,6 +124,7 @@ public class AlchemistNotebookRenderer {
         if (drawPages && stack.hasNbt()) {
             data = RENDERER_DATA;
             data.readNbt(stack.getOrCreateNbt());
+            NotebookDataUtils.convertJournals(data);
         }
 
         renderBook(bookAngle, useNormal, drawPages, data);

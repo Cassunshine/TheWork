@@ -4,6 +4,7 @@ import cassunshine.thework.client.events.TheWorkClientNetworkEvents;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.TheWorkNetworking;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -19,6 +20,7 @@ public class TheWorkClientNetworking {
         TheWorkClientNetworkEvents.initialize();
 
         ClientPlayNetworking.registerGlobalReceiver(TheWorkNetworking.OPEN_ALCHEMIST_BOOK, TheWorkClientNetworking::onOpenBook);
+        ClientPlayNetworking.registerGlobalReceiver(TheWorkNetworking.SYNC_ALL_DATA, TheWorkClientNetworking::syncAllData);
     }
 
     private static void onOpenBook(MinecraftClient minecraftClient, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf packetByteBuf, PacketSender packetSender) {
@@ -41,5 +43,13 @@ public class TheWorkClientNetworking {
         buf.writeNbt(compound);
 
         ClientPlayNetworking.send(TheWorkNetworking.CLIENT_UPDATED_NOTEBOOK, buf);
+    }
+
+    private static void syncAllData(MinecraftClient client, ClientPlayNetworkHandler clientPlayNetworkHandler, PacketByteBuf buf, PacketSender packetSender) {
+        //Don't sync when using integrated server.
+        if (MinecraftClient.getInstance().isIntegratedServerRunning())
+            return;
+
+        TheWorkRecipes.readSync(buf);
     }
 }

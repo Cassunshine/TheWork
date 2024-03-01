@@ -9,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
@@ -43,27 +45,32 @@ public class AlchemistNotebookItem extends Item {
         if (!context.getPlayer().isSneaking())
             return ActionResult.PASS;
 
+        var world = context.getWorld();
         var data = getData();
         data.readNbt(context.getStack().getOrCreateNbt());
 
-        var targetBlock = context.getWorld().getBlockState(context.getBlockPos()).getBlock();
+        var targetBlock = world.getBlockState(context.getBlockPos()).getBlock();
         var item = targetBlock.asItem();
 
         var blockAdded = data.recipesSection.putItemIfNew(item);
         if (blockAdded != ActionResult.PASS) {
             context.getStack().setNbt(data.writeNbt(new NbtCompound()));
+            if (world.isClient)
+                world.playSound(context.getPlayer(), context.getPlayer().getBlockPos(), SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.NEUTRAL);
             return blockAdded;
         }
 
-        var groundItems = context.getWorld().getEntitiesByClass(ItemEntity.class, new Box(context.getBlockPos().add(context.getSide().getVector())), p -> true);
+        var groundItems = world.getEntitiesByClass(ItemEntity.class, new Box(context.getBlockPos().add(context.getSide().getVector())), p -> true);
         if (groundItems.isEmpty())
             return ActionResult.PASS;
 
-        var groundItem = groundItems.get(context.getWorld().random.nextInt(groundItems.size())).getStack().getItem();
+        var groundItem = groundItems.get(world.random.nextInt(groundItems.size())).getStack().getItem();
 
         var itemAdded = data.recipesSection.putItemIfNew(groundItem);
         if (itemAdded != ActionResult.PASS) {
             context.getStack().setNbt(data.writeNbt(new NbtCompound()));
+            if (world.isClient)
+                world.playSound(context.getPlayer(), context.getPlayer().getBlockPos(), SoundEvents.ITEM_BOOK_PAGE_TURN, SoundCategory.NEUTRAL);
             return itemAdded;
         }
 

@@ -226,6 +226,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public void activate() {
         isActive = true;
 
+        regenerateLayouts();
+
         for (AlchemyRing ring : rings)
             ring.activate();
 

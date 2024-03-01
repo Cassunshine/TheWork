@@ -1,0 +1,25 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "icon",
+          "contents": "thework:chalk",
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "Trusty chalk! I made this using some Calcite.\nI can use it to draw alchemical circles in the ground. Paired with the book, I can design nodes with specific numbers of sides, and specific runes.\n\nI don't really know what any of these nodes do yet, but I'll continue to write my notes here as I discover more things."
+        }
+      ]
+    }
+  ]
+}

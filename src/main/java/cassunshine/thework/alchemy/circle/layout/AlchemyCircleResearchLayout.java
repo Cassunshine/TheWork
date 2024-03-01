@@ -5,7 +5,7 @@ import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.elements.ElementPacket;
 import cassunshine.thework.alchemy.elements.Elements;
-import cassunshine.thework.recipes.TheWorkRecipes;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.util.math.Box;
 

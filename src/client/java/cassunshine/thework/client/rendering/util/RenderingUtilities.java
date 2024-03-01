@@ -4,9 +4,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -50,6 +48,11 @@ public class RenderingUtilities {
     public static void setupLightOverlay(int light, int overlay) {
         RenderingUtilities.light = light;
         RenderingUtilities.overlay = overlay;
+    }
+
+    public static void resetLightOverlay() {
+        RenderingUtilities.light = LightmapTextureManager.MAX_LIGHT_COORDINATE;
+        RenderingUtilities.overlay = OverlayTexture.DEFAULT_UV;
     }
 
     public static void setupColor(int red, int green, int blue, int alpha) {

@@ -1,5 +1,6 @@
 package cassunshine.thework.client.gui.ingame.notebook.pages;
 
+import cassunshine.thework.client.utils.ClientJournalPage;
 import cassunshine.thework.items.notebook.pages.NodePickPage;
 import cassunshine.thework.items.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.items.notebook.pages.RecipePage;
@@ -15,6 +16,7 @@ public class AlchemistNotebookPageRenderers {
 
         builder.put(NodePickPage.class, NodePageRenderer::new);
         builder.put(RecipePage.class, RecipePageRenderer::new);
+        builder.put(ClientJournalPage.class, ClientJournalPageRenderer::new);
 
 
         renderers = builder.build();

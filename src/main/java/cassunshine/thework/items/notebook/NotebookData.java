@@ -8,7 +8,6 @@ import cassunshine.thework.items.notebook.sections.StorySection;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Pair;
 
 public class NotebookData {
@@ -83,6 +82,10 @@ public class NotebookData {
     }
 
     public void onItemDiscovered(Item discovered) {
+        storySection.onItemDiscovered(discovered);
+    }
 
+    public void onRecipeObtained(Item recipeOutput) {
+        storySection.onRecipeObtained(recipeOutput);
     }
 }

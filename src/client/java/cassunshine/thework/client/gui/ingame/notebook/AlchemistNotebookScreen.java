@@ -5,6 +5,7 @@ import cassunshine.thework.client.gui.ingame.notebook.drawables.TextureDrawer;
 import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPageRenderer;
 import cassunshine.thework.client.gui.ingame.notebook.pages.AlchemistNotebookPageRenderers;
 import cassunshine.thework.client.networking.TheWorkClientNetworking;
+import cassunshine.thework.client.utils.NotebookDataUtils;
 import cassunshine.thework.items.notebook.NotebookData;
 import cassunshine.thework.items.notebook.pages.AlchemistNotebookPage;
 import cassunshine.thework.items.notebook.sections.AlchemistNotebookSection;
@@ -47,6 +48,8 @@ public class AlchemistNotebookScreen extends Screen {
         super(Text.translatable("ui.alchemist_notebook.title"));
 
         data.readNbt(stack.getOrCreateNbt());
+        NotebookDataUtils.convertJournals(data);
+
         data.currentSection = MathHelper.clamp(data.currentSection, 0, data.sections.size());
         currentSection = data.getCurrentSection();
 
@@ -55,7 +58,9 @@ public class AlchemistNotebookScreen extends Screen {
         this.stack = stack;
 
         for (AlchemistNotebookSection section : data.sections)
-            sectionWidgets.add(new SectionWidget(this, section, 8 * AlchemistNotebookPage.PAGE_SCALE, 10 * AlchemistNotebookPage.PAGE_SCALE));
+            if (!section.pages.isEmpty())
+                sectionWidgets.add(new SectionWidget(this, section, 8 * AlchemistNotebookPage.PAGE_SCALE, 10 * AlchemistNotebookPage.PAGE_SCALE));
+
 
         updatePages();
     }
@@ -133,6 +138,7 @@ public class AlchemistNotebookScreen extends Screen {
     public void init() {
         clearChildren();
         super.init();
+
 
         int centerX = MathHelper.floor(width / 2.0f);
         int centerY = MathHelper.floor(height / 2.0f);

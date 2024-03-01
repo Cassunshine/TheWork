@@ -2,8 +2,9 @@ package cassunshine.thework.items.notebook.pages;
 
 import cassunshine.thework.alchemy.elements.ElementPacket;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
-import cassunshine.thework.recipes.ConstructionRecipe;
-import cassunshine.thework.recipes.TheWorkRecipes;
+import cassunshine.thework.data.recipes.ConstructionRecipe;
+import cassunshine.thework.data.recipes.TheWorkRecipes;
+import cassunshine.thework.items.notebook.sections.recipe.RecipesSection;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
  */
 public class RecipePage extends AlchemistNotebookPage {
 
+    public final RecipesSection section;
+
     public final ConstructionRecipe recipe;
 
     public final ArrayList<RingGuess> circleGuess = new ArrayList<>();
@@ -34,11 +37,13 @@ public class RecipePage extends AlchemistNotebookPage {
     /**
      * Constructs the page using an item's ID and the NBT data (if any) for the guesses on this page.
      */
-    public RecipePage(Identifier itemID) {
+    public RecipePage(RecipesSection section, Identifier itemID) {
         super(itemID);
+        this.section = section;
         this.itemID = itemID;
+
         var item = Registries.ITEM.get(itemID);
-        recipe = TheWorkRecipes.getConstruction(item);
+        this.recipe = TheWorkRecipes.getConstruction(item);
 
         if (recipe == null)
             throw new RuntimeException("Unable to find recipe for item " + itemID.toString());
@@ -58,19 +63,27 @@ public class RecipePage extends AlchemistNotebookPage {
     }
 
     public void checkIfCorrect() {
+        checkIfCorrect(false);
+    }
+
+    public void checkIfCorrect(boolean alert) {
+        if (isCorrect)
+            return;
+
+        //TODO - replace with signature check
         for (int i = 0; i < recipe.inputRings.length; i++) {
             var ring = circleGuess.get(i);
             var ringRecipe = recipe.inputRings[i];
 
-            for (int j = 0; j < ringRecipe.length; j++) {
-                if (!ring.runeGuesses.get(j).equals(ringRecipe[j].element().id)) {
-                    isCorrect = false;
+            for (int j = 0; j < ringRecipe.length; j++)
+                if (!ring.runeGuesses.get(j).equals(ringRecipe[j].element().id))
                     return;
-                }
-            }
         }
 
+        //If everything was correct, then we're good to go.
         isCorrect = true;
+        if (alert)
+            section.onRecipeObtained(recipeOutputStack.getItem());
     }
 
     @Override
@@ -107,7 +120,6 @@ public class RecipePage extends AlchemistNotebookPage {
     }
 
     public void cheatRecipe() {
-
         for (int i = 0; i < recipe.inputRings.length; i++) {
             var truth = recipe.inputRings[i];
             var guess = circleGuess.get(i);

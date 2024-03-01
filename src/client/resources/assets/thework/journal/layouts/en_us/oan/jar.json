@@ -1,0 +1,19 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "text",
+          "x": 10,
+          "y": 10,
+          "width": -1,
+          "height": -1,
+          "contents": "The longer I have been working with this new science, the more I have grown frustrated with finding objects with the specific quantities of elements I need to create what I desire.\nI have been researching the idea of using thin glass sheets and a fired clay lid to create containers for elements."
+        }
+      ],
+      "discoveries": [
+        "thework:alchemy_jar"
+      ]
+    }
+  ]
+}
