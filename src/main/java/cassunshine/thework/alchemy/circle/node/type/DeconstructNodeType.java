@@ -1,9 +1,13 @@
 package cassunshine.thework.alchemy.circle.node.type;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.blocks.AlchemyJarBlock;
 import cassunshine.thework.data.recipes.TheWorkRecipes;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.registry.Registries;
+import net.minecraft.util.Identifier;
 
 public class DeconstructNodeType extends AlchemyNodeType {
 
@@ -60,6 +64,8 @@ public class DeconstructNodeType extends AlchemyNodeType {
             node.linkOutput.put(output.element(), output.amount());
             movedOutputs += output.amount();
         }
+
+        TheWorkNetworkEvents.sendBookLearnEvent(node.ring.circle.blockEntity.getPos(), node.ring.circle.blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "4_side_node")));
 
         //Set on cooldown.
         data.putInt("cooldown", Math.max(recipe.time(), (int) Math.floor(movedOutputs)));

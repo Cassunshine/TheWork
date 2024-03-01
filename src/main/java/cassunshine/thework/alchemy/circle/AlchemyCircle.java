@@ -1,5 +1,6 @@
 package cassunshine.thework.alchemy.circle;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.balance.BalanceUtils;
 import cassunshine.thework.alchemy.circle.events.circle.ActivateToggleEvent;
 import cassunshine.thework.alchemy.circle.events.circle.AddRingEvent;
@@ -17,11 +18,13 @@ import cassunshine.thework.entities.BackfireEntity;
 import cassunshine.thework.items.ChalkItem;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -133,6 +136,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
         if (newLink.sourceNode == newLink.destinationNode)
             return;
 
+        TheWorkNetworkEvents.sendBookLearnEvent(blockEntity.getPos(), blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "link")));
+
         for (int i = links.size() - 1; i >= 0; i--) {
             var link = links.get(i);
 
@@ -213,6 +218,9 @@ public class AlchemyCircle implements AlchemyCircleComponent {
                 blockEntity.getWorld().spawnEntity(entity);
             }
         }
+
+        if (!backfireInventory.empty() && circleChaos > 0.1f)
+            TheWorkNetworkEvents.sendBookLearnEvent(blockEntity.getPos(), blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "balance_1")));
 
         backfireInventory.clear();
     }

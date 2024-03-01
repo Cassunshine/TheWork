@@ -31,7 +31,7 @@ public class ItemDisplay implements Drawable {
         matrices.translate((float) (x), (float) (y), (float) (150));
 
         try {
-            matrices.multiplyPositionMatrix((new Matrix4f()).scaling(1.0F, -1.0F, 1.0F));
+            matrices.multiplyPositionMatrix((new Matrix4f()).scaling(1.0F, -1.0F, 0.001f));
             matrices.scale( 48 / (float) client.getWindow().getScaleFactor(), 48 / (float) client.getWindow().getScaleFactor(), 48 / (float) client.getWindow().getScaleFactor());
             boolean bl = !bakedModel.isSideLit();
             if (bl) {

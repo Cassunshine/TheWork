@@ -72,6 +72,11 @@ public class AlchemyJarBlock extends BlockWithEntity {
     }
 
     @Override
+    public Item asItem() {
+        return super.asItem();
+    }
+
+    @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
 

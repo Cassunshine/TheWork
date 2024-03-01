@@ -2,6 +2,7 @@ package cassunshine.thework.items.notebook.sections;
 
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.items.notebook.NotebookData;
+import cassunshine.thework.items.notebook.pages.journal.JournalPage;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -23,6 +24,15 @@ public class StorySection extends JournalSection {
 
     public StorySection(NotebookData data) {
         super(data, IDENTIFIER, new ItemStack(Items.WRITABLE_BOOK));
+    }
+
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+
+        if (!journalPages.isEmpty()) {
+            journalPages.add(0, new Identifier(TheWorkMod.ModID, "oan/intro"));
+        }
     }
 
     public void onItemDiscovered(Item discovered) {

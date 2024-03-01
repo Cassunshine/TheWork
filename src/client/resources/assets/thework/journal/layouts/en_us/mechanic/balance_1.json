@@ -1,0 +1,25 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "icon",
+          "contents": "minecraft:tnt",
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "As I've grown used to working with circles more, I've realized something.\nCircles appear to 'like' some configurations more than others. For example, when I put a group of nodes on one side of a circle, the circle backfires incredibly often.\nIt seems that circles like being 'balanced' such if a node exists on one side, another exists on the other side, as well."
+        }
+      ]
+    }
+  ]
+}

@@ -19,4 +19,13 @@ public class MechanicsSection extends JournalSection {
         defaultPages.add(nodePage);
         defaultPages.add(new JournalPage(new Identifier(TheWorkMod.ModID, "mechanic/chalk")));
     }
+
+    public boolean discoverMechanic(Identifier mechanicId) {
+        if (journalPages.contains(mechanicId)) {
+            return false;
+        }
+
+        journalPages.add(mechanicId);
+        return true;
+    }
 }

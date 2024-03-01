@@ -1,6 +1,6 @@
 package cassunshine.thework.client.networking;
 
-import cassunshine.thework.client.events.TheWorkClientNetworkEvents;
+import cassunshine.thework.client.networking.events.TheWorkClientNetworkEvents;
 import cassunshine.thework.client.gui.ingame.notebook.AlchemistNotebookScreen;
 import cassunshine.thework.items.TheWorkItems;
 import cassunshine.thework.network.TheWorkNetworking;

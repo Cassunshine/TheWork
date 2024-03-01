@@ -1,0 +1,27 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "node",
+          "contents": {
+            "sides": 4
+          },
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "The 4-sided node seems to be an incredibly simple, 'destructive' node. When an item is present on it while the circle is active, the node will deconstruct the item and place the elements it contains onto its ring."
+        }
+      ]
+    }
+  ]
+}

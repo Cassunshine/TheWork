@@ -1,0 +1,25 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "icon",
+          "contents": "minecraft:tnt",
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "When I was watching an alchemical reaction take place, it seems as though some element escaped the circle. When it did, the element manifested as a bolt of energy. At the bolt's point of impact, objects comprised of the same element appeared.\nIt appears as though the objects make up the exact amount of element that escaped, so nothing was lost."
+        }
+      ]
+    }
+  ]
+}

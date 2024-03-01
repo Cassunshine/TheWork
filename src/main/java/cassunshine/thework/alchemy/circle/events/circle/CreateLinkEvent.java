@@ -4,6 +4,8 @@ import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.path.AlchemyLink;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 

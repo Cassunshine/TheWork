@@ -2,6 +2,7 @@ package cassunshine.thework.assets;
 
 import cassunshine.thework.assets.elements.IconElement;
 import cassunshine.thework.assets.elements.JournalLayoutElement;
+import cassunshine.thework.assets.elements.NodeElement;
 import cassunshine.thework.assets.elements.TextElement;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +31,7 @@ public class JournalLayout {
 
         builder.put("icon", IconElement::fromJson);
         builder.put("text", TextElement::fromJson);
+        builder.put("node", NodeElement::fromJson);
 
         ELEMENT_FACTORIES = builder.build();
     }

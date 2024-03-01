@@ -1,0 +1,22 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "text",
+          "y": 0,
+          "xAlignment": "center",
+          "contents": "Links"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "It seems that if I more carefully interact with a node, and then again with another node on the same circle, a link will be made between the two. Elements will travel along that link towards the inner-most ring. Taking the same action will erase the link."
+        }
+      ]
+    }
+  ]
+}

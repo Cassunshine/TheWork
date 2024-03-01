@@ -1,6 +1,7 @@
 package cassunshine.thework.blocks;
 
 import cassunshine.thework.TheWorkMod;
+import cassunshine.thework.items.AlchemyJarItem;
 import cassunshine.thework.items.TheWorkItems;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.Block;
@@ -25,8 +26,8 @@ public class TheWorkBlocks {
         registerBlock(ALCHEMY_CIRCLE_BLOCK, "alchemy_circle");
         registerBlockWithItem(DISTILLERY_BLOCK, "distillery", ItemGroups.FUNCTIONAL);
 
-        registerBlockWithItem(ALCHEMY_JAR_BLOCK, "alchemy_jar", new FabricItemSettings().maxCount(1), ItemGroups.FUNCTIONAL);
-
+        registerBlock(ALCHEMY_JAR_BLOCK, "alchemy_jar");
+        TheWorkItems.registerItem(new AlchemyJarItem(), "alchemy_jar", ItemGroups.FUNCTIONAL);
     }
 
     private static void registerBlock(Block b, String name) {

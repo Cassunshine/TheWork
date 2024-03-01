@@ -78,7 +78,7 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
         {
             RenderingUtilities.pushMat();
             RenderingUtilities.setupColor(0xFF000000);
-            ;
+
             RenderingUtilities.translateMatrix(PAGE_WIDTH / 2.0f, 10, 0);
             RenderingUtilities.drawTextCentered(target.recipeOutputStack.getItem().getName(), false);
             RenderingUtilities.popMat();
@@ -90,7 +90,7 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
         {
             RenderingUtilities.pushMat();
             //if (RenderingUtilities.SPACE == RenderingUtilities.RenderingSpace.GUI)
-            RenderingUtilities.getMatStack().multiplyPositionMatrix(new Matrix4f().scale(1, -1, 1));
+            RenderingUtilities.getMatStack().multiplyPositionMatrix(new Matrix4f().scale(1, -1, 0.0001f));
             RenderingUtilities.scaleMatrix(16.0f, 16.0f, 16.0f);
             RenderingUtilities.translateMatrix(0, 0, 0.21f);
 

@@ -1,0 +1,27 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "node",
+          "contents": {
+            "sides": 3
+          },
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "It appears that the 3-sided node is a 'filter' of some sort. When used with an alternate path or output, the filter node will push all elements that pass over it to the alternate output, and leave everything else to continue on the ring."
+        }
+      ]
+    }
+  ]
+}

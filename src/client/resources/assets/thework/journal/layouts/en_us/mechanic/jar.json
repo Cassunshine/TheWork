@@ -1,0 +1,25 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "icon",
+          "contents": "thework:alchemy_jar",
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "Using the Old Alchemist's notes, I was able to create an Alchemic Jar. According to their research, it should be able to store elements, somehow. Maybe there's a node that can move elements to a secondary output?"
+        }
+      ]
+    }
+  ]
+}

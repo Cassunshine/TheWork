@@ -1,13 +1,16 @@
 package cassunshine.thework.alchemy.circle.layout;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
 import cassunshine.thework.data.recipes.ConstructionRecipe;
 import cassunshine.thework.data.recipes.TheWorkRecipes;
 import cassunshine.thework.utils.TheWorkUtils;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 
 public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
 
@@ -63,6 +66,7 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
         for (ItemStack output : recipe.outputs) {
             TheWorkUtils.dropItem(circle.blockEntity.getWorld(), output.copy(), centerPos.x, centerPos.y, centerPos.z);
             TheWorkNetworkEvents.sendEvent(pos, be.getWorld(), new WitnessRecipeEvent(pos, output.getItem()));
+            TheWorkNetworkEvents.sendBookLearnEvent(circle.blockEntity.getPos(), circle.blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "6_side_node")));
         }
     }
 }

@@ -1,9 +1,11 @@
 package cassunshine.thework.entities;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.backfire.BackfireEffects;
 import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -62,7 +64,7 @@ public class BackfireEntity extends Entity {
             TheWorkNetworkEvents.sendEvent(getBlockPos(), getWorld(), event);
         }
 
-        //cooldown = getWorld().random.nextBetween(1, 2);
+        TheWorkNetworkEvents.sendBookLearnEvent(getBlockPos(), getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "backfire")));
     }
 
     @Override

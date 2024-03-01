@@ -5,6 +5,8 @@ import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.blocks.AlchemyJarBlock;
 import cassunshine.thework.blocks.TheWorkBlocks;
 import cassunshine.thework.alchemy.elements.Elements;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.util.Identifier;
@@ -23,7 +25,7 @@ public class TransferNodeType extends AlchemyNodeType {
 
         //Transfer nodes with an element turn into a filter node for that element.
         if (node.rune.equals(SPLIT)) {
-            if(node.inventory.empty())
+            if (node.inventory.empty())
                 return;
 
             if (!node.typeData.contains("split_other", NbtElement.BYTE_TYPE))
@@ -38,7 +40,7 @@ public class TransferNodeType extends AlchemyNodeType {
 
             return;
         } else if (node.rune.equals(ROUND_ROBIN)) {
-            if(node.inventory.empty())
+            if (node.inventory.empty())
                 return;
 
             if (!node.typeData.contains("rr_index", NbtElement.INT_TYPE))
@@ -59,9 +61,9 @@ public class TransferNodeType extends AlchemyNodeType {
 
             node.typeData.putInt("rr_index", val);
             return;
-        } else if(element != Elements.NONE) {
+        } else if (element != Elements.NONE) {
             //Transfer into the jar first, if possible.
-             if (node.heldStack.getItem() instanceof BlockItem bi && bi.getBlock() == TheWorkBlocks.ALCHEMY_JAR_BLOCK) {
+            if (node.heldStack.getItem() instanceof BlockItem bi && bi.getBlock() == TheWorkBlocks.ALCHEMY_JAR_BLOCK) {
                 var inv = AlchemyJarBlock.getInventoryForStack(node.heldStack);
 
                 node.inventory.transfer(inv, Float.POSITIVE_INFINITY, e -> e == element);
@@ -72,6 +74,9 @@ public class TransferNodeType extends AlchemyNodeType {
             //Move everything else into the link output.
             super.activeTick(node);
         }
+
+        if (node.link != null || node.heldStack.isOf(TheWorkBlocks.ALCHEMY_JAR_BLOCK.asItem()))
+            TheWorkNetworkEvents.sendBookLearnEvent(node.ring.circle.blockEntity.getPos(), node.ring.circle.blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "3_side_node")));
 
         super.activeTick(node);
     }

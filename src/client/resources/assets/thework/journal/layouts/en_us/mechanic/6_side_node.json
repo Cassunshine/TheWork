@@ -1,0 +1,27 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "node",
+          "contents": {
+            "sides": 6
+          },
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "It seems to be a 'construction' node. Any element that doesn't match its rune pass through it. It stores matching elements. If multiple construction nodes are organized as part of an alchemical circle in the correct configuration, and supplied with enough element, they will create an item matching that specific configuration.\nIt also appears that the rotation of the configuration on each ring doesn't matter."
+        }
+      ]
+    }
+  ]
+}

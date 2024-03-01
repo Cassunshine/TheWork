@@ -1,12 +1,16 @@
 package cassunshine.thework.alchemy.circle.layout;
 
+import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.AlchemyNode;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
 import cassunshine.thework.alchemy.elements.ElementPacket;
 import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.data.recipes.TheWorkRecipes;
+import cassunshine.thework.network.events.TheWorkNetworkEvents;
+import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 
 import java.util.ArrayList;
@@ -42,6 +46,8 @@ public class AlchemyCircleResearchLayout extends AlchemyCircleLayout {
         //Remove 1 item from the stack.
         stack.decrement(1);
 
+        TheWorkNetworkEvents.sendBookLearnEvent(circle.blockEntity.getPos(), circle.blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "5_side_node")));
+
         ArrayList<ElementPacket> packets = new ArrayList<>();
         for (int i = 0; i < constructRecipe.inputRings.length; i++) {
             var ringRecipe = constructRecipe.inputRings[i];
@@ -66,6 +72,7 @@ public class AlchemyCircleResearchLayout extends AlchemyCircleLayout {
             //Anything left in the list, backfire it.
             for (ElementPacket packet : packets)
                 circle.addBackfire(packet.element(), packet.amount());
+
 
             //Clear the remaining packets now that we backfired them.
             packets.clear();

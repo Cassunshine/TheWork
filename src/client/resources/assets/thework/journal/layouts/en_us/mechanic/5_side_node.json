@@ -1,0 +1,50 @@
+{
+  "pages": [
+    {
+      "elements": [
+        {
+          "type": "node",
+          "contents": {
+            "sides": 5
+          },
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "The 5-sided node is rather complex. As the half-way point between the 4 and 6 sided node, it shares behaviour from both. When a circle containing a 5-side is activated, it will deconstruct a single object located at the direct center of the circle.\n(continued on next page)"
+        }
+      ]
+    },
+    {
+      "elements": [
+        {
+          "type": "node",
+          "contents": {
+            "sides": 5
+          },
+          "x": -6,
+          "y": 16,
+          "width": 12,
+          "height": 12,
+          "xAlignment": "center"
+        },
+        {
+          "type": "text",
+          "x": 10,
+          "y": 28,
+          "width": -1,
+          "height": -1,
+          "contents": "The elements generated from this deconstruction will be placed into any 5-sided nodes that fall in the same place that a construction node would need to be in to create something. I think I can use this to discover the configuration of items..."
+        }
+      ]
+    }
+  ]
+}
