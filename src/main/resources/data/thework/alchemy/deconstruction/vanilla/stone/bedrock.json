@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:bedrock",
+  "cooldown": 10,
+  "elements": {
+    "terra": 99999999
+  }
+}

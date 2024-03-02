@@ -1,0 +1,10 @@
+{
+  "item": "minecraft:netherite_scrap",
+  "cooldown": 10,
+  "elements": {
+    "ferrum": 4,
+    "cuprum": 4,
+    "ignis": 16,
+    "ghenium": 32
+  }
+}

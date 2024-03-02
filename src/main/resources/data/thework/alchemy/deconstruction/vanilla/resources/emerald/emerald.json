@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:emerald",
+  "cooldown": 10,
+  "elements": {
+    "terra": 32,
+    "mana": 4
+  }
+}

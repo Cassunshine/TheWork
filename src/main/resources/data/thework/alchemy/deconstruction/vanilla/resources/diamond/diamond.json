@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:diamond",
+  "cooldown": 10,
+  "elements": {
+    "terra": 64,
+    "aqua": 4,
+    "mana": 4
+  }
+}

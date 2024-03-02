@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:stick",
+  "cooldown": 2,
+  "elements": {
+    "terra": 1,
+    "aqua": 1
+  }
+}

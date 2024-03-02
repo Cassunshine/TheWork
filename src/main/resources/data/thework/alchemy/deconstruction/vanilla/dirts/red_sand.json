@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:red_sand",
+  "cooldown": 10,
+  "elements": {
+    "terra": 1
+  }
+}

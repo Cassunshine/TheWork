@@ -8,6 +8,7 @@ import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.utils.ShiftSorting;
 import cassunshine.thework.utils.TheWorkUtils;
+import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -18,6 +19,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
 import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
@@ -34,6 +36,10 @@ public class TheWorkRecipes {
 
     private static ArrayList<ReactionRecipe> REACTIONS = new ArrayList<>();
 
+
+    public static ImmutableCollection<DeconstructionRecipe> getAllDeconstruction() {
+        return DECONSTRUCTION_RECIPES.values();
+    }
 
     /**
      * Returns the recipe to deconstruct the given ID, or null if none exists.
@@ -77,13 +83,13 @@ public class TheWorkRecipes {
         }
     }
 
-    public static void loadRecipes(ResourceManager resourceManager) {
-        loadDeconstructionRecipes(resourceManager);
+    public static void loadRecipes(MinecraftServer server, ResourceManager resourceManager) {
+        loadDeconstructionRecipes(server, resourceManager);
         loadConstructionRecipes(resourceManager);
         loadReactionRecipes(resourceManager);
     }
 
-    private static void loadDeconstructionRecipes(ResourceManager resourceManager) {
+    private static void loadDeconstructionRecipes(MinecraftServer server, ResourceManager resourceManager) {
         Map<Identifier, Resource> recipes = resourceManager.findResources("alchemy/deconstruction", p -> p.getPath().endsWith(".json"));
         ImmutableMap.Builder<Identifier, DeconstructionRecipe> builder = ImmutableMap.builder();
 
@@ -93,8 +99,8 @@ public class TheWorkRecipes {
             try {
                 var json = gson.fromJson(value.getReader(), JsonObject.class);
 
-                var inputID = new Identifier(json.get("input").getAsString());
-                var outputJson = json.get("output").getAsJsonObject();
+                var inputID = new Identifier(json.get("item").getAsString());
+                var outputJson = json.get("elements").getAsJsonObject();
 
                 ElementPacket[] outputsList = new ElementPacket[outputJson.size()];
                 int index = 0;
@@ -108,7 +114,7 @@ public class TheWorkRecipes {
                     outputsList[index++] = (new ElementPacket(element, amount));
                 }
 
-                int time = json.has("time") ? json.get("time").getAsInt() : 10;
+                int time = json.has("cooldown") ? json.get("cooldown").getAsInt() : 10;
 
                 builder.put(inputID, new DeconstructionRecipe(inputID, time, outputsList));
             } catch (Exception e) {
@@ -116,6 +122,11 @@ public class TheWorkRecipes {
             }
         }
 
+        //Build recipes so that we can use already-loaded recipes.
+        DECONSTRUCTION_RECIPES = builder.build();
+
+        //Build any recipes we don't have manually defined automatically.
+        new DeconstructionRecipeBuilder().buildRecipes(server, builder::put);
         DECONSTRUCTION_RECIPES = builder.build();
     }
 

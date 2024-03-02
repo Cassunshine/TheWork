@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:raw_iron",
+  "cooldown": 10,
+  "elements": {
+    "ferrum": 9
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:blaze_rod",
+  "cooldown": 10,
+  "elements": {
+    "ignis": 32,
+    "gehnium": 4
+  }
+}

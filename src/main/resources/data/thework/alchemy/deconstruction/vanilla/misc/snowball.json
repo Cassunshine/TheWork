@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:snowball",
+  "cooldown": 10,
+  "elements": {
+    "aqua": 1
+  }
+}

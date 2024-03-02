@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:iron_ore",
+  "cooldown": 10,
+  "elements": {
+    "ferrum": 9,
+    "terra": 6
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:redstone_ore",
+  "cooldown": 10,
+  "elements": {
+    "terra": 6,
+    "ferrum": 8,
+    "cuprum": 8
+  }
+}

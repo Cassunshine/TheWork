@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:glowstone_dust",
+  "cooldown": 10,
+  "elements": {
+    "terra": 2,
+    "ignis": 4,
+    "gehnium": 4
+  }
+}

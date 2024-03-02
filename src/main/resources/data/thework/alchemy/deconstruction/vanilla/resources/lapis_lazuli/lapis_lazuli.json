@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:lapis_lazuli",
+  "cooldown": 10,
+  "elements": {
+    "terra": 16,
+    "mana": 16
+  }
+}

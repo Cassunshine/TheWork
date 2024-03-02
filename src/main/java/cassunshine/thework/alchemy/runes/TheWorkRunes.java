@@ -32,8 +32,8 @@ public class TheWorkRunes {
                 TERRA,
                 AQUA,
                 VENTUS,
-                FERRUM,
                 CUPRUM,
+                FERRUM,
                 AURUM,
                 GEHNIUM,
                 FINIUM,
@@ -41,6 +41,7 @@ public class TheWorkRunes {
                 SPLIT
         };
     }
+
 
     public static int getRuneCount() {
         return RUNES_BY_ID.length;

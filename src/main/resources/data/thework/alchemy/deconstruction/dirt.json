@@ -1,7 +1,0 @@
-{
-  "input" : "minecraft:dirt",
-  "time" : 5,
-  "output" : {
-    "terra" : 1
-  }
-}

@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:netherrack",
+  "cooldown": 10,
+  "elements": {
+    "terra": 4,
+    "gehnium": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:iron_nugget",
+  "cooldown": 10,
+  "elements": {
+    "ferrum": 1
+  }
+}

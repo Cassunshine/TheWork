@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:dark_oak_wood",
+  "cooldown": 20,
+  "elements": {
+    "terra": 8,
+    "aqua": 12
+  }
+}

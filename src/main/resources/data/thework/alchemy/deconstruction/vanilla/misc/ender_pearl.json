@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:ender_pearl",
+  "cooldown": 10,
+  "elements": {
+    "terra": 2,
+    "finium": 4
+  }
+}

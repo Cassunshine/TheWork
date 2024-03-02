@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:deepslate",
+  "cooldown": 10,
+  "elements": {
+    "terra": 12
+  }
+}

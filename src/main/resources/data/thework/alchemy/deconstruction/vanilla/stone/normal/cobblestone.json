@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:cobblestone",
+  "cooldown": 10,
+  "elements": {
+    "terra": 8
+  }
+}

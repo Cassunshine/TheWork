@@ -24,8 +24,8 @@ public class Elements {
     public static final Element VENTUS = register("ventus", ColorHelper.Argb.getArgb(255, 217, 252, 238));
 
 
-    public static final Element FERRUM = register("ferrum", ColorHelper.Argb.getArgb(255, 245, 255, 255));
     public static final Element CUPRUM = register("cuprum", ColorHelper.Argb.getArgb(255, 255, 172, 84));
+    public static final Element FERRUM = register("ferrum", ColorHelper.Argb.getArgb(255, 245, 255, 255));
     public static final Element AURUM = register("aurum", ColorHelper.Argb.getArgb(255, 255, 222, 74));
 
 

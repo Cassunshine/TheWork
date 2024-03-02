@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:quartz",
+  "cooldown": 10,
+  "elements": {
+    "terra": 4,
+    "ghenium": 4
+  }
+}

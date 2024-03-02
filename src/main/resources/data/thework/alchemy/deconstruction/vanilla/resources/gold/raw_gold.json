@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:raw_gold",
+  "cooldown": 10,
+  "elements": {
+    "aurum": 9
+  }
+}

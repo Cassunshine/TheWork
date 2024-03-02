@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:acacia_log",
+  "cooldown": 20,
+  "elements": {
+    "terra": 8,
+    "aqua": 12
+  }
+}

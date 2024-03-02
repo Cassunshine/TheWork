@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:soul_soil",
+  "cooldown": 10,
+  "elements": {
+    "terra": 6,
+    "ghenium": 1,
+    "mana": 1
+  }
+}

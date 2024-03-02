@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:gunpowder",
+  "cooldown": 10,
+  "elements": {
+    "terra": 3,
+    "ignis": 3
+  }
+}

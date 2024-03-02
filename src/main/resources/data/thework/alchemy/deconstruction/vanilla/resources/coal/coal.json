@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:coal",
+  "cooldown": 10,
+  "elements": {
+    "terra": 4,
+    "ignis": 4
+  }
+}

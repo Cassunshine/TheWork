@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:raw_copper",
+  "cooldown": 10,
+  "elements": {
+    "cuprum": 1
+  }
+}

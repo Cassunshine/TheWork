@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:ice",
+  "cooldown": 10,
+  "elements": {
+    "aqua": 16
+  }
+}

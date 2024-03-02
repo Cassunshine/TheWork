@@ -34,7 +34,6 @@ public class TheWorkMod implements ModInitializer {
 
     private static boolean needResync = false;
 
-
     @Override
     public void onInitialize() {
         Elements.initialize();
@@ -59,8 +58,9 @@ public class TheWorkMod implements ModInitializer {
 
             @Override
             public void reload(ResourceManager manager) {
-                TheWorkRecipes.loadRecipes(manager);
-
+                schedule((s) -> {
+                    TheWorkRecipes.loadRecipes(s, manager);
+                });
                 schedule(TheWorkNetworking::syncAllData);
             }
         });

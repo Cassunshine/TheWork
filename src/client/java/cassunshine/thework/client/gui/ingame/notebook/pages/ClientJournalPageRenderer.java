@@ -64,7 +64,6 @@ public class ClientJournalPageRenderer extends AlchemistNotebookPageRenderer<Cli
             RenderingUtilities.drawText(line, false);
             RenderingUtilities.translateMatrix(0, textRenderer.fontHeight, 0);
         }
-
     }
 
     private void renderIcon(IconElement element, int width, int height) {

@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:redstone",
+  "cooldown": 10,
+  "elements": {
+    "ferrum": 1,
+    "cuprum": 1
+  }
+}
