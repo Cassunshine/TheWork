@@ -1,0 +1,27 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ferrum",
+        "amount": 1
+      },
+      {
+        "element": "aurum",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "ferrum",
+        "amount": 1
+      },
+      {
+        "element": "aurum",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:redstone": 2
+  }
+}

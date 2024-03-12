@@ -76,7 +76,7 @@ public class AlchemistNotebookScreen extends Screen {
     }
 
     public void nextPage() {
-        var maxPage = MathHelper.ceil(currentSection.pages.size() / 2.0f);
+        var maxPage = MathHelper.floor((currentSection.pages.size()-1) / 2.0f) * 2;
         var newIndex = data.currentPage + 2;
 
         if (newIndex > maxPage)

@@ -2,7 +2,7 @@
   "item": "minecraft:iron_ore",
   "cooldown": 10,
   "elements": {
-    "ferrum": 9,
+    "ferrum": 36,
     "terra": 6
   }
 }

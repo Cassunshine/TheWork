@@ -1,0 +1,33 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:deepslate": 1
+  }
+}

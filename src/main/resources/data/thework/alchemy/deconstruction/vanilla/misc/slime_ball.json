@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:slime_ball",
+  "cooldown": 20,
+  "elements": {
+    "terra": 2,
+    "aqua": 8
+  }
+}

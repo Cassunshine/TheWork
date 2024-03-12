@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:gravel",
+  "cooldown": 20,
+  "elements": {
+    "terra": 6
+  }
+}

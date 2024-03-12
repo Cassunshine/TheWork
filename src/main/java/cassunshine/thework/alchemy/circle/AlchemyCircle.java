@@ -16,9 +16,11 @@ import cassunshine.thework.alchemy.elements.inventory.ElementInventory;
 import cassunshine.thework.blockentities.alchemycircle.AlchemyCircleBlockEntity;
 import cassunshine.thework.entities.BackfireEntity;
 import cassunshine.thework.items.ChalkItem;
+import cassunshine.thework.network.events.BlockEntityEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvent;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
+import cassunshine.thework.network.events.effects.SpawnBoltEvent;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -28,6 +30,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -68,6 +71,10 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public AlchemyCircle(AlchemyCircleBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+    }
+
+    public World getWorld() {
+        return blockEntity.getWorld();
     }
 
     public void regenerateLayouts() {
@@ -155,19 +162,30 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
 
     private void spawnActiveParticles() {
-        var random = blockEntity.getWorld().random;
-        if (random.nextInt() % 10 > 3)
-            return;
+        var random = getWorld().random;
+        if (random.nextInt(10) > 7) {
+            Vec3d basePosition = blockEntity.getPos().toCenterPos();
+            float randomRadius = MathHelper.sqrt(random.nextFloat()) * (blockEntity.circle.rings.get(blockEntity.circle.rings.size() - 1).radius);
+            float randomAngle = random.nextFloat() * MathHelper.TAU;
+            float tangent = randomAngle + MathHelper.HALF_PI;
 
-        Vec3d basePosition = blockEntity.getPos().toCenterPos();
-        float randomRadius = MathHelper.sqrt(random.nextFloat()) * (blockEntity.circle.rings.get(blockEntity.circle.rings.size() - 1).radius);
-        float randomAngle = random.nextFloat() * MathHelper.TAU;
+            basePosition = basePosition.add(MathHelper.sin(randomAngle) * randomRadius, -0.5f, MathHelper.cos(randomAngle) * randomRadius);
 
-        float tangent = randomAngle + MathHelper.HALF_PI;
+            blockEntity.getWorld().addParticle(ParticleTypes.ENCHANT, basePosition.x, basePosition.y + 3, basePosition.z, MathHelper.sin(tangent), -3, MathHelper.cos(tangent));
+        }
 
-        basePosition = basePosition.add(MathHelper.sin(randomAngle) * randomRadius, -0.5f, MathHelper.cos(randomAngle) * randomRadius);
+        if (random.nextInt(100) > 90 && !getWorld().isClient) {
+            Vec3d basePosition = blockEntity.getPos().toCenterPos();
+            float randomRadius = MathHelper.sqrt(random.nextFloat()) * (blockEntity.circle.rings.get(blockEntity.circle.rings.size() - 1).radius);
+            float randomAngle = random.nextFloat() * MathHelper.TAU;
 
-        blockEntity.getWorld().addParticle(ParticleTypes.ENCHANT, basePosition.x, basePosition.y + 3, basePosition.z, MathHelper.sin(tangent), -3, MathHelper.cos(tangent));
+            float randomLength = MathHelper.lerp(random.nextFloat(), 1, 5);
+
+            var startPos = basePosition.add(MathHelper.sin(randomAngle) * randomRadius, -0.5f, MathHelper.cos(randomAngle) * randomRadius);
+            var endPos = basePosition.add(MathHelper.sin(randomAngle) * (randomRadius + 3f), randomLength, MathHelper.cos(randomAngle) * (randomRadius + 3f));
+
+            TheWorkNetworkEvents.sendEvent(blockEntity.getPos(), getWorld(), new SpawnBoltEvent(startPos, endPos, Elements.MANA, 6));
+        }
     }
 
     public void updateLinkLengths() {
@@ -181,7 +199,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public void addBackfire(Element element, float amount) {
         //Ignore client-side, server will spawn backfire.
-        if (blockEntity.getWorld().isClient)
+        if (getWorld().isClient)
             return;
 
         backfireInventory.put(element, amount);
@@ -190,7 +208,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
     public void addBackfire(ElementInventory inventory) {
         //Ignore client-side, server will spawn backfire.
-        if (blockEntity.getWorld().isClient)
+        if (getWorld().isClient)
             return;
 
         inventory.transfer(backfireInventory, Float.POSITIVE_INFINITY);
@@ -199,6 +217,7 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public void dumpBackfireInventory() {
 
         var pos = blockEntity.getPos().toCenterPos();
+        var world = getWorld();
 
         //Spawn backfire entities
         for (int i = 0; i < Elements.getElementCount(); i++) {
@@ -208,19 +227,19 @@ public class AlchemyCircle implements AlchemyCircleComponent {
 
             if (amount > 0) {
 
-                var entity = new BackfireEntity(null, blockEntity.getWorld());
+                var entity = new BackfireEntity(null, world);
                 entity.setPos(pos.x, pos.y, pos.z);
                 entity.element = element;
                 entity.amount = amount;
                 entity.minRadius = rings.get(rings.size() - 1).radius;
                 entity.maxRadius = Math.max(entity.minRadius + 15, entity.minRadius * 1.5f); //idk if this will ever even happen but /shrug
 
-                blockEntity.getWorld().spawnEntity(entity);
+                world.spawnEntity(entity);
             }
         }
 
         if (!backfireInventory.empty() && circleChaos > 0.1f)
-            TheWorkNetworkEvents.sendBookLearnEvent(blockEntity.getPos(), blockEntity.getWorld(), new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "balance_1")));
+            TheWorkNetworkEvents.sendBookLearnEvent(blockEntity.getPos(), world, new DiscoverMechanicEvent(new Identifier(TheWorkMod.ModID, "balance_1")));
 
         backfireInventory.clear();
     }
@@ -280,6 +299,8 @@ public class AlchemyCircle implements AlchemyCircleComponent {
     public void onDestroy() {
         for (AlchemyRing ring : rings)
             ring.onDestroy();
+
+        deactivate();
     }
 
     @Override

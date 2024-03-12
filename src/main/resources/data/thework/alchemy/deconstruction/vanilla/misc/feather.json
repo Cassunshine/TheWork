@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:feather",
+  "cooldown": 20,
+  "elements": {
+    "terra": 1
+  }
+}

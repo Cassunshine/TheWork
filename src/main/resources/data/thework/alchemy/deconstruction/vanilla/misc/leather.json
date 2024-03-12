@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:leather",
+  "cooldown": 20,
+  "elements": {
+    "terra": 6
+  }
+}

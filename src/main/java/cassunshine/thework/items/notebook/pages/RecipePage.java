@@ -1,10 +1,13 @@
 package cassunshine.thework.items.notebook.pages;
 
+import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.ElementPacket;
+import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
 import cassunshine.thework.data.recipes.ConstructionRecipe;
 import cassunshine.thework.data.recipes.TheWorkRecipes;
 import cassunshine.thework.items.notebook.sections.recipe.RecipesSection;
+import cassunshine.thework.utils.ShiftSorting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -52,7 +55,8 @@ public class RecipePage extends AlchemistNotebookPage {
 
         //Fill out the ring guesses based on the recipe
         for (ElementPacket[] ring : recipe.inputRings) {
-            var ringGuess = new RingGuess(minRadius++);
+            var ringGuess = new RingGuess(minRadius);
+            minRadius += 1.1f;
             for (ElementPacket elementPacket : ring)
                 ringGuess.runeGuesses.add(TheWorkRunes.NULL);
 
@@ -70,13 +74,26 @@ public class RecipePage extends AlchemistNotebookPage {
         if (isCorrect)
             return;
 
+        var tmp = new Element[circleGuess.size()][];
+
+        for (int i = 0; i < tmp.length; i++) {
+            var ringGuess = circleGuess.get(i);
+            var ring = tmp[i] = new Element[ringGuess.runeGuesses.size()];
+
+            for (int j = 0; j < ring.length; j++)
+                ring[j] = Elements.getElement(ringGuess.runeGuesses.get(j));
+
+            var sortValue = ShiftSorting.findShiftValue(ring, e -> e.number);
+            ShiftSorting.rotateArray(ring, sortValue);
+        }
+
         //TODO - replace with signature check
         for (int i = 0; i < recipe.inputRings.length; i++) {
-            var ring = circleGuess.get(i);
+            var ring = tmp[i];
             var ringRecipe = recipe.inputRings[i];
 
             for (int j = 0; j < ringRecipe.length; j++)
-                if (!ring.runeGuesses.get(j).equals(ringRecipe[j].element().id))
+                if (!ring[j].equals(ringRecipe[j].element()))
                     return;
         }
 
@@ -147,8 +164,6 @@ public class RecipePage extends AlchemistNotebookPage {
                 return;
 
             runeGuesses.set(index, elementID);
-
-            checkIfCorrect();
         }
     }
 }

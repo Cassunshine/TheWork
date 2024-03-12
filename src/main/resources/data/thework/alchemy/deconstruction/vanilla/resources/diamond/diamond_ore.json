@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:diamond_ore",
+  "cooldown": 10,
+  "elements": {
+    "terra": 262,
+    "aqua": 16,
+    "mana": 16
+  }
+}

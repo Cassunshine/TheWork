@@ -1,0 +1,47 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:iron_ingot": 2
+  }
+}

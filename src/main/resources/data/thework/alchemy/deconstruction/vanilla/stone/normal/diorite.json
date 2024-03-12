@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:diorite",
+  "cooldown": 10,
+  "elements": {
+    "terra": 8
+  }
+}

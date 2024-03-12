@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 3
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 3
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "ventus",
+        "amount": 3
+      },
+      {
+        "element": "ventus",
+        "amount": 2
+      },
+      {
+        "element": "ventus",
+        "amount": 3
+      },
+      {
+        "element": "ventus",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:birch_log": 1
+  }
+}

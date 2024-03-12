@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ignis",
+        "amount": 8
+      },
+      {
+        "element": "ignis",
+        "amount": 8
+      },
+      {
+        "element": "ignis",
+        "amount": 8
+      },
+      {
+        "element": "ignis",
+        "amount": 8
+      }
+    ],
+    [
+      {
+        "element": "gehnium",
+        "amount": 2
+      },
+      {
+        "element": "gehnium",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:blaze_rod": 1
+  }
+}

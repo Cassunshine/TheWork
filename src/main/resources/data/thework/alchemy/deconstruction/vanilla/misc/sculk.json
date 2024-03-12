@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:sculk",
+  "cooldown": 1,
+  "elements": {
+    "mana": 1
+  }
+}

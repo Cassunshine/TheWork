@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:egg",
+  "cooldown": 20,
+  "elements": {
+    "terra": 1,
+    "aqua": 4
+  }
+}

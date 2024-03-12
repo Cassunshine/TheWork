@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "mana",
+        "amount": 4
+      },
+      {
+        "element": "mana",
+        "amount": 4
+      },
+      {
+        "element": "mana",
+        "amount": 4
+      },
+      {
+        "element": "mana",
+        "amount": 4
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 4
+      },
+      {
+        "element": "terra",
+        "amount": 4
+      },
+      {
+        "element": "terra",
+        "amount": 4
+      },
+      {
+        "element": "terra",
+        "amount": 4
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:lapis_lazuli": 1
+  }
+}

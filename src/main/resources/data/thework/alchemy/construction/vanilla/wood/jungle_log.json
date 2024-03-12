@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:jungle_log": 1
+  }
+}

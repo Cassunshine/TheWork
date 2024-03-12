@@ -21,7 +21,7 @@ public class BalanceUtils {
             AlchemyRing ring = rings.get(i);
 
             //Rings REALLY like to be alternating clockwise and counterclockwise.
-            if (i != 0 && ring.isClockwise != lastRingDirection)
+            if (i != 0 && ring.isClockwise == lastRingDirection)
                 ringTotalChaos += 0.2f;
 
             lastRingDirection = ring.isClockwise;

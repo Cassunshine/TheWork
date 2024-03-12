@@ -3,6 +3,7 @@ package cassunshine.thework.alchemy.circle.layout;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.circle.AlchemyCircle;
 import cassunshine.thework.alchemy.circle.node.type.AlchemyNodeTypes;
+import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.network.events.TheWorkNetworkEvents;
 import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
@@ -37,6 +38,10 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
                 var alchemyNode = alchemyRing.nodes.get(n);
                 var recipeNode = recipeRing[n];
 
+                //Air is never needed, it's omni-present.
+                if (recipeNode.element() == Elements.VENTUS)
+                    continue;
+
                 hasAll = alchemyNode.inventory.has(recipeNode.element(), recipeNode.amount());
             }
         }
@@ -53,6 +58,9 @@ public class AlchemyCircleConstructLayout extends AlchemyCircleLayout {
             for (int n = 0; n < alchemyRing.nodes.size(); n++) {
                 var alchemyNode = alchemyRing.nodes.get(n);
                 var recipeNode = recipeRing[n];
+
+                if (recipeNode.element() == Elements.VENTUS)
+                    continue;
 
                 alchemyNode.inventory.give(recipeNode.element(), recipeNode.amount());
             }

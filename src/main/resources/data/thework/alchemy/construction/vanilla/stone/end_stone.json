@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "finium",
+        "amount": 1
+      },
+      {
+        "element": "finium",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:end_stone": 1
+  }
+}

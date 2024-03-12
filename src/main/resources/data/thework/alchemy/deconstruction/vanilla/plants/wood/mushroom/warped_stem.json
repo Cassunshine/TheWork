@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:warped_stem",
+  "cooldown": 20,
+  "elements": {
+    "terra": 8,
+    "ignis": 12,
+    "gehnium": 4
+  }
+}

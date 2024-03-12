@@ -35,8 +35,11 @@ public class BoltParticle extends SpriteBillboardParticle {
 
     private int previousAge = 0;
 
-
     public BoltParticle(ClientWorld world, double x, double y, double z, double targetX, double targetY, double targetZ, Element element) {
+        this(world, x, y, z, targetX, targetY, targetZ, element, MathHelper.ceil(new Vec3d(x, y, z).distanceTo(new Vec3d(targetX, targetY, targetZ)) / 2.0f));
+    }
+
+    public BoltParticle(ClientWorld world, double x, double y, double z, double targetX, double targetY, double targetZ, Element element, int quality) {
         super(world, x, y, z, 0, 0, 0);
 
         this.originPoint = new Vec3d(x, y, z);
@@ -48,7 +51,7 @@ public class BoltParticle extends SpriteBillboardParticle {
         setMaxAge(3);
 
 
-        int numPoints = MathHelper.ceil(originPoint.distanceTo(endPoint) / 2.0f);
+        int numPoints = quality;
 
         Vec3d[] midPoints = new Vec3d[numPoints];
         Quaternionf[] rotations = new Quaternionf[numPoints];
@@ -59,7 +62,7 @@ public class BoltParticle extends SpriteBillboardParticle {
             float progressFrac = (i / (float) numPoints);
             var point = originPoint.lerp(endPoint, progressFrac);
 
-            if(i != 0 && i != numPoints - 1)
+            if (i != 0 && i != numPoints - 1)
                 point = point.add((world.random.nextFloat() - 0.5f) * 1.3f, (world.random.nextFloat() - 0.5f) * 1.3f, (world.random.nextFloat() - 0.5f) * 1.3f);
 
             midPoints[i] = point;

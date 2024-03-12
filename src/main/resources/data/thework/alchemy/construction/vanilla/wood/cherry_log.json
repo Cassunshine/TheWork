@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:cherry_log": 1
+  }
+}

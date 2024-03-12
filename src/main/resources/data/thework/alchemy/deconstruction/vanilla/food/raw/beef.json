@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:beef",
+  "cooldown": 20,
+  "elements": {
+    "terra": 4,
+    "aqua": 4
+  }
+}

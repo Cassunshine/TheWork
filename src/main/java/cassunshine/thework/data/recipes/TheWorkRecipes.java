@@ -22,9 +22,7 @@ import net.minecraft.resource.ResourceManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class TheWorkRecipes {
 
@@ -102,6 +100,7 @@ public class TheWorkRecipes {
                 var inputID = new Identifier(json.get("item").getAsString());
                 var outputJson = json.get("elements").getAsJsonObject();
 
+                int totalElement = 0;
                 ElementPacket[] outputsList = new ElementPacket[outputJson.size()];
                 int index = 0;
 
@@ -112,11 +111,10 @@ public class TheWorkRecipes {
                     int amount = jsonEntry.getValue().getAsInt();
 
                     outputsList[index++] = (new ElementPacket(element, amount));
+                    totalElement += amount;
                 }
 
-                int time = json.has("cooldown") ? json.get("cooldown").getAsInt() : 10;
-
-                builder.put(inputID, new DeconstructionRecipe(inputID, time, outputsList));
+                builder.put(inputID, new DeconstructionRecipe(inputID, totalElement + 1, outputsList));
             } catch (Exception e) {
                 TheWorkMod.LOGGER.error(e.toString());
             }
@@ -126,14 +124,21 @@ public class TheWorkRecipes {
         DECONSTRUCTION_RECIPES = builder.build();
 
         //Build any recipes we don't have manually defined automatically.
-        new DeconstructionRecipeBuilder().buildRecipes(server, builder::put);
+        new DeconstructionRecipeBuilder().buildRecipes(server, (i, r) -> {
+            if (!DECONSTRUCTION_RECIPES.containsKey(i))
+                builder.put(i, r);
+        });
         DECONSTRUCTION_RECIPES = builder.build();
+
+        TheWorkMod.LOGGER.info("Total deconstruction recipe count: {}", DECONSTRUCTION_RECIPES.size());
     }
 
     private static void loadConstructionRecipes(ResourceManager resourceManager) {
         Map<Identifier, Resource> recipes = resourceManager.findResources("alchemy/construction", p -> p.getPath().endsWith(".json"));
         ImmutableMap.Builder<String, ConstructionRecipe> constructRecipes = ImmutableMap.builder();
         ImmutableMap.Builder<Item, ConstructionRecipe> constructRecipesByItem = ImmutableMap.builder();
+
+        HashSet<String> _usedSignatures = new HashSet<>();
 
         for (var entry : recipes.entrySet()) {
             var value = entry.getValue();
@@ -157,7 +162,8 @@ public class TheWorkRecipes {
                             var jsonRingEntry = jsonInputRing.get(j).getAsJsonObject();
                             var element = Elements.getElement(new Identifier(TheWorkMod.ModID, jsonRingEntry.get("element").getAsString()));
 
-                            if (element == Elements.NONE) throw new Exception("Element not found!!");
+                            if (element == Elements.NONE)
+                                throw new Exception("Element not found!!");
 
                             ring[j] = new ElementPacket(element, jsonRingEntry.get("amount").getAsInt());
                         }
@@ -183,7 +189,15 @@ public class TheWorkRecipes {
                 }
 
                 var recipe = new ConstructionRecipe(rings, outputs, TheWorkUtils.generateSignature(rings, r -> TheWorkUtils.generateSignature(r, e -> e.element().id.toString())));
+                if (_usedSignatures.contains(recipe.signature)) {
+                    var f = constructRecipes.build();
+
+                    TheWorkMod.LOGGER.error("Signature for recipe " + recipe.signature + " already exists, and is taken by item " + f.get(recipe.signature).outputs[0].getItem());
+                    continue;
+                }
+
                 constructRecipes.put(recipe.signature, recipe);
+                _usedSignatures.add(recipe.signature);
 
                 if (recipe.outputs.length == 1)
                     constructRecipesByItem.put(recipe.outputs[0].getItem(), recipe);

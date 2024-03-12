@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:gold_ore",
+  "cooldown": 10,
+  "elements": {
+    "aurum": 36,
+    "terra": 6
+  }
+}

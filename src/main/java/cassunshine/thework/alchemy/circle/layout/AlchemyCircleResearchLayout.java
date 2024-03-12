@@ -73,7 +73,6 @@ public class AlchemyCircleResearchLayout extends AlchemyCircleLayout {
             for (ElementPacket packet : packets)
                 circle.addBackfire(packet.element(), packet.amount());
 
-
             //Clear the remaining packets now that we backfired them.
             packets.clear();
         }

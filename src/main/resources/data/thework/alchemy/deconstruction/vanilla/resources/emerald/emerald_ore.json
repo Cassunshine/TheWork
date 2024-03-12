@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:emerald_ore",
+  "cooldown": 10,
+  "elements": {
+    "terra": 132,
+    "mana" : 16
+  }
+}

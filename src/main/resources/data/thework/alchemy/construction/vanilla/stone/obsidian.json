@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 6
+      },
+      {
+        "element": "aqua",
+        "amount": 6
+      },
+      {
+        "element": "ignis",
+        "amount": 6
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 6
+      },
+      {
+        "element": "aqua",
+        "amount": 6
+      },
+      {
+        "element": "ignis",
+        "amount": 6
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:obsidian": 1
+  }
+}

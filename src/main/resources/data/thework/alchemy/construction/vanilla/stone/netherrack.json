@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "gehnium",
+        "amount": 1
+      },
+      {
+        "element": "gehnium",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:netherrack": 2
+  }
+}

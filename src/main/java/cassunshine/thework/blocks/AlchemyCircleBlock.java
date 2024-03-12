@@ -118,7 +118,6 @@ public class AlchemyCircleBlock extends BlockWithEntity {
         if (maybeBE.isPresent())
             maybeBE.get().circle.onDestroy();
 
-
         return super.onBreak(world, pos, state, player);
     }
 

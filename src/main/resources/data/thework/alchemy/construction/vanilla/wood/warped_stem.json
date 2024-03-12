@@ -1,0 +1,35 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 4
+      },
+      {
+        "element": "gehnium",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 4
+      },
+      {
+        "element": "gehnium",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "ignis",
+        "amount": 6
+      },
+      {
+        "element": "ignis",
+        "amount": 6
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:warped_stem": 1
+  }
+}

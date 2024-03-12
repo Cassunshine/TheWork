@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "cuprum",
+        "amount": 1
+      },
+      {
+        "element": "cuprum",
+        "amount": 1
+      },
+      {
+        "element": "cuprum",
+        "amount": 1
+      },
+      {
+        "element": "cuprum",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:copper_ingot": 1
+  }
+}

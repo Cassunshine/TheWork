@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ventus",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "ventus",
+        "amount": 1
+      },
+      {
+        "element": "ventus",
+        "amount": 1
+      },
+      {
+        "element": "ventus",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:diorite": 1
+  }
+}

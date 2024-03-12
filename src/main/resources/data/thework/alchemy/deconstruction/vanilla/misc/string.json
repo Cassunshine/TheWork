@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:string",
+  "cooldown": 20,
+  "elements": {
+    "terra": 2
+  }
+}

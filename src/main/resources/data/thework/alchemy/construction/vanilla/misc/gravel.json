@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 3
+      },
+      {
+        "element": "ventus",
+        "amount": 0
+      },
+      {
+        "element": "terra",
+        "amount": 3
+      },
+      {
+        "element": "ventus",
+        "amount": 0
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:gravel": 1
+  }
+}

@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 public class StorySection extends JournalSection {
 
     public static final Identifier IDENTIFIER = new Identifier(TheWorkMod.ModID, "story");
+    public static final Identifier INTRO_IDENTIFIER = new Identifier(TheWorkMod.ModID, "oan/intro");
 
     public static final ArrayList<Pair<Identifier, Predicate<NotebookData>>> autoDiscoveryList = new ArrayList<>();
 
@@ -30,8 +31,8 @@ public class StorySection extends JournalSection {
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
 
-        if (!journalPages.isEmpty()) {
-            journalPages.add(0, new Identifier(TheWorkMod.ModID, "oan/intro"));
+        if (!journalPages.isEmpty() && !journalPages.contains(INTRO_IDENTIFIER)) {
+            journalPages.add(0, INTRO_IDENTIFIER);
         }
     }
 

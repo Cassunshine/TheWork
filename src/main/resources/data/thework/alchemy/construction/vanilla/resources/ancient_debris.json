@@ -1,0 +1,61 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "cuprum",
+        "amount": 2
+      },
+      {
+        "element": "ferrum",
+        "amount": 2
+      },
+      {
+        "element": "cuprum",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "ignis",
+        "amount": 4
+      },
+      {
+        "element": "ignis",
+        "amount": 4
+      },
+      {
+        "element": "ignis",
+        "amount": 4
+      },
+      {
+        "element": "ignis",
+        "amount": 4
+      }
+    ],
+    [
+      {
+        "element": "gehnium",
+        "amount": 32
+      },
+      {
+        "element": "gehnium",
+        "amount": 32
+      },
+      {
+        "element": "gehnium",
+        "amount": 32
+      },
+      {
+        "element": "gehnium",
+        "amount": 32
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:ancient_debris": 1
+  }
+}

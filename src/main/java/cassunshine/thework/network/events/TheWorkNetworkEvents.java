@@ -14,6 +14,7 @@ import cassunshine.thework.alchemy.circle.events.ring.AlchemyRingSetColorEvent;
 import cassunshine.thework.network.events.bookevents.BookLearnEvent;
 import cassunshine.thework.network.events.bookevents.DiscoverMechanicEvent;
 import cassunshine.thework.network.events.bookevents.WitnessRecipeEvent;
+import cassunshine.thework.network.events.effects.SpawnBoltEvent;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -56,6 +57,8 @@ public class TheWorkNetworkEvents {
 
         register(DiscoverMechanicEvent.IDENTIFIER, DiscoverMechanicEvent::new);
         register(WitnessRecipeEvent.IDENTIFIER, WitnessRecipeEvent::new);
+
+        register(SpawnBoltEvent.IDENTIFIER, SpawnBoltEvent::new);
     }
 
 

@@ -1,0 +1,7 @@
+{
+  "item": "minecraft:flint",
+  "cooldown": 20,
+  "elements": {
+    "terra": 2
+  }
+}

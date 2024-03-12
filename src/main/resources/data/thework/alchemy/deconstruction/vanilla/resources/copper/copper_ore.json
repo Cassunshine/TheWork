@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:copper_ore",
+  "cooldown": 10,
+  "elements": {
+    "cuprum": 20,
+    "terra": 6
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "ignis",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 1
+      },
+      {
+        "element": "ignis",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:gunpowder": 2
+  }
+}

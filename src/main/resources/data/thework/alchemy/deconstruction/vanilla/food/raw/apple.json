@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:apple",
+  "cooldown": 20,
+  "elements": {
+    "terra": 2,
+    "aqua": 6
+  }
+}

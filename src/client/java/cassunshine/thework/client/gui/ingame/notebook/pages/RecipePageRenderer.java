@@ -1,5 +1,6 @@
 package cassunshine.thework.client.gui.ingame.notebook.pages;
 
+import cassunshine.thework.TheWorkClient;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.elements.Elements;
 import cassunshine.thework.alchemy.runes.TheWorkRunes;
@@ -42,7 +43,7 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
             var runes = ringGuess.runeGuesses;
 
             for (int i = 0; i < runes.size(); i++) {
-                float angle = ((float) i / runes.size()) * MathHelper.TAU;
+                float angle = -((float) i / runes.size()) * MathHelper.TAU;
 
                 var centerPos = new Vec3d(baseX + (MathHelper.sin(MathHelper.TAU - angle) * ringGuess.radius) * 16, baseY + (-MathHelper.cos(MathHelper.TAU - angle) * ringGuess.radius) * 16, 0);
 
@@ -69,6 +70,7 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
 
     @Override
     public void render() {
+
         var target = getTarget();
         RenderingUtilities.setupNormal(0, 0, 0);
 
@@ -102,6 +104,10 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
         RenderingUtilities.scaleMatrix(16.0f, -16.0f, 16.0f);
         RenderingUtilities.rotateMatrix(MathHelper.HALF_PI, 0, 0);
 
+        float globalAngle = (float) TheWorkClient.getTime() / 10.0f;
+        if (!target.isCorrect)
+            globalAngle = 0;
+
         for (RecipePage.RingGuess ringGuess : target.circleGuess) {
             var runes = ringGuess.runeGuesses;
             float circumference = ringGuess.radius * MathHelper.TAU;
@@ -111,22 +117,23 @@ public class RecipePageRenderer extends AlchemistNotebookPageRenderer<RecipePage
 
             for (int i = 0; i < runes.size(); i++) {
                 var element = Elements.getElement(runes.get(i));
-                float angle = ((float) i / runes.size()) * MathHelper.TAU;
-                float angleNext = ((float) (i + 1) / runes.size()) * MathHelper.TAU;
+                float angle = (((float) i / runes.size()) * MathHelper.TAU) + globalAngle;
+                float angleNext = (((float) (i + 1) / runes.size()) * MathHelper.TAU) + globalAngle;
 
                 RenderingUtilities.setupColor(0xFFFFFFFF);
 
                 RenderingUtilities.setupRenderLayer(RenderLayer.getEntityCutoutNoCull(new Identifier(TheWorkMod.ModID, "textures/other/alchemy_circle.png")));
-                AlchemyCircleRenderer.drawCircleSegment(ringGuess.radius, angle + widthNode, angleNext - widthNode, unitsPerSegment);
+                AlchemyCircleRenderer.drawCircleSegment(ringGuess.radius, -(angle + widthNode + MathHelper.PI), -(angleNext - widthNode + MathHelper.PI), unitsPerSegment);
 
                 RenderingUtilities.pushMat();
-                RenderingUtilities.rotateMatrix(0, angle, 0);
+                RenderingUtilities.rotateMatrix(0, -angle, 0);
                 RenderingUtilities.translateMatrix(0, 0, -ringGuess.radius);
+                RenderingUtilities.rotateMatrix(0, angle, 0);
 
                 if (element != null)
                     RenderingUtilities.setupColor(element.color);
 
-                AlchemyCircleRenderer.drawSidedCircleAndRune(0.5f, 6, element == Elements.NONE ? TheWorkRunes.NULL : element.id, -angle);
+                AlchemyCircleRenderer.drawSidedCircleAndRune(0.5f, 6, element == Elements.NONE ? TheWorkRunes.NULL : element.id, 0);
 
                 RenderingUtilities.popMat();
             }

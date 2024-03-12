@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ghenium",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ghenium",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ghenium",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "ghenium",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:quartz": 1
+  }
+}

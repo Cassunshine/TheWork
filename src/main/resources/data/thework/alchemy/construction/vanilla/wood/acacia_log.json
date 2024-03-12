@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 1
+      },
+      {
+        "element": "ventus",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 2
+      },
+      {
+        "element": "ventus",
+        "amount": 1
+      },
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:acacia_log": 1
+  }
+}

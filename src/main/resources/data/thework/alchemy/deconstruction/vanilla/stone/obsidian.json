@@ -1,0 +1,9 @@
+{
+  "item": "minecraft:obsidian",
+  "cooldown": 10,
+  "elements": {
+    "terra": 12,
+    "aqua": 12,
+    "ignis": 12
+  }
+}

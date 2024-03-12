@@ -3,6 +3,7 @@ package cassunshine.thework.data.recipes;
 import cassunshine.thework.TheWorkMod;
 import cassunshine.thework.alchemy.elements.Element;
 import cassunshine.thework.alchemy.elements.ElementPacket;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
@@ -15,10 +16,7 @@ import net.minecraft.util.math.MathHelper;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -56,24 +54,48 @@ public class DeconstructionRecipeBuilder {
         importExisting();
         tryBuild(server);
 
+        int added = 0;
+
+        for (EvaluatedItem value : evaluatedItems.values()) {
+            if (value == NULL)
+                continue;
+
+            var item = value.item;
+            var id = Registries.ITEM.getId(item);
+
+            var elements = new ElementPacket[value.result.size()];
+            int index = 0;
+            for (var entry : value.result.entrySet())
+                elements[index++] = new ElementPacket(entry.getKey(), entry.getValue());
+
+            recipeConsumer.accept(id, new DeconstructionRecipe(id, value.totalElement, elements));
+            added++;
+        }
+
+        TheWorkMod.LOGGER.info("Added {} deconstruction recipes", added);
+
         allItems = null;
 
         try {
-            var writer = new BufferedWriter(new FileWriter("root_items.json"));
 
-            for (Item item : rootItems) {
-                writer.write(Registries.ITEM.getId(item) + "\n");
+            //Write out root items and items with no valid recipe to a list, but only in dev environments
+            if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
+                var writer = new BufferedWriter(new FileWriter("root_items.json"));
+
+                for (Item item : rootItems) {
+                    writer.write(Registries.ITEM.getId(item) + "\n");
+                }
+
+                writer.close();
+
+                writer = new BufferedWriter(new FileWriter("null_items.json"));
+
+                for (Item item : nullItems) {
+                    writer.write(Registries.ITEM.getId(item) + "\n");
+                }
+
+                writer.close();
             }
-
-            writer.close();
-
-            writer = new BufferedWriter(new FileWriter("null_items.json"));
-
-            for (Item item : nullItems) {
-                writer.write(Registries.ITEM.getId(item) + "\n");
-            }
-
-            writer.close();
         } catch (Exception e) {
             //Ignore
             TheWorkMod.LOGGER.error(e.toString());
@@ -167,8 +189,9 @@ public class DeconstructionRecipeBuilder {
 
         var difference = end - start;
 
-        TheWorkMod.LOGGER.info("Generated recipes in {}ms", (difference / 1_000_000));
+        TheWorkMod.LOGGER.info("Generated deconstruction recipes in {}ms", (difference / 1_000_000));
     }
+
 
     private <T extends Recipe<C>, C extends Inventory> void collectRecipes(RecipeType<T> type, Function<T, GenericRecipe> recipeSupplier) {
         var allRecipes = server.getRecipeManager().listAllOfType(type);

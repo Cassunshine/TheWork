@@ -1,0 +1,8 @@
+{
+  "item": "minecraft:coal_ore",
+  "cooldown": 10,
+  "elements": {
+    "ignis": 16,
+    "terra": 22
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aurum",
+        "amount": 1
+      },
+      {
+        "element": "aurum",
+        "amount": 1
+      },
+      {
+        "element": "aurum",
+        "amount": 1
+      },
+      {
+        "element": "aurum",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:gold_nugget": 1
+  }
+}

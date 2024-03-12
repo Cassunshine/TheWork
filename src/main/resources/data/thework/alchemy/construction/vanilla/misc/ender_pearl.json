@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "finium",
+        "amount": 2
+      },
+      {
+        "element": "terra",
+        "amount": 1
+      },
+      {
+        "element": "finium",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:ender_pearl": 1
+  }
+}

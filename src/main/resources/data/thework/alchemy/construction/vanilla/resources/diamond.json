@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "mana",
+        "amount": 2
+      },
+      {
+        "element": "aqua",
+        "amount": 2
+      },
+      {
+        "element": "mana",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 16
+      },
+      {
+        "element": "terra",
+        "amount": 16
+      },
+      {
+        "element": "terra",
+        "amount": 16
+      },
+      {
+        "element": "terra",
+        "amount": 16
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:diamond": 1
+  }
+}

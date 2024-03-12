@@ -1,0 +1,43 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "terra",
+        "amount": 8
+      },
+      {
+        "element": "mana",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 8
+      },
+      {
+        "element": "mana",
+        "amount": 1
+      }
+    ],
+    [
+      {
+        "element": "terra",
+        "amount": 8
+      },
+      {
+        "element": "mana",
+        "amount": 1
+      },
+      {
+        "element": "terra",
+        "amount": 8
+      },
+      {
+        "element": "mana",
+        "amount": 1
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:emerald": 1
+  }
+}

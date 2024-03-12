@@ -1,0 +1,47 @@
+{
+  "inputs": [
+    [
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      }
+    ],
+    [
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      },
+      {
+        "element": "aurum",
+        "amount": 2
+      }
+    ]
+  ],
+  "outputs": {
+    "minecraft:gold_ingot": 2
+  }
+}

@@ -18,15 +18,15 @@ public class AlchemyNodeTypes {
 
     static {
         NODE_TYPES = new AlchemyNodeType[]{
-                NONE,       //0
-                NONE,       //1
-                NONE,       //2
-                TRANSFER,   //3
-                DECONSTRUCT,       //4
-                RESEARCH,       //5
-                CONSTRUCT,       //6
-                NONE,       //7
-                NONE,       //8
+                NONE,               //0
+                NONE,               //1
+                NONE,               //2
+                TRANSFER,           //3
+                DECONSTRUCT,        //4
+                RESEARCH,           //5
+                CONSTRUCT,          //6
+                NONE,               //7
+                NONE,               //8
         };
     }
 
